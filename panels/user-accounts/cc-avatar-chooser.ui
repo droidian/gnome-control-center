@@ -4,6 +4,11 @@
   <template class="CcAvatarChooser" parent="GtkPopover">
     <property name="visible">False</property>
     <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">1</property>
+        <property name="hscrollbar-policy">never</property>
+        <property name="min-content-height">380</property>
+    <child>
       <object class="GtkBox">
         <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
         <property name="spacing">10</property>
@@ -11,7 +16,7 @@
           <object class="GtkFlowBox" id="user_flowbox">
             <property name="selection-mode">none</property>
             <property name="homogeneous">True</property>
-            <property name="max-children-per-line">5</property>
+            <property name="max-children-per-line">3</property>
             <property name="column-spacing">10</property>
           </object>
         </child>
@@ -19,7 +24,7 @@
           <object class="GtkFlowBox" id="flowbox">
             <property name="selection-mode">none</property>
             <property name="homogeneous">True</property>
-            <property name="max-children-per-line">5</property>
+            <property name="max-children-per-line">3</property>
             <property name="column-spacing">10</property>
           </object>
         </child>
@@ -35,6 +40,8 @@
             </child>
           </object>
         </child>
+      </object>
+    </child>
       </object>
     </child>
   </template>
