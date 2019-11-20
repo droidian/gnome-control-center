@@ -9,12 +9,12 @@
         <child>
           <object class="GtkGrid">
             <property name="visible">True</property>
-            <property name="row_spacing">30</property>
-            <property name="column_spacing">30</property>
+            <property name="row_spacing">12</property>
+            <property name="column_spacing">12</property>
             <property name="margin-top">30</property>
-            <property name="margin-bottom">30</property>
-            <property name="margin-start">30</property>
-            <property name="margin-end">30</property>
+            <property name="margin-bottom">9</property>
+            <property name="margin-start">9</property>
+            <property name="margin-end">9</property>
             <child>
               <object class="CcSpeakerTestButton" id="front_left_speaker_button">
                 <property name="visible">True</property>
