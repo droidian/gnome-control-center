@@ -1321,7 +1321,7 @@ setup_power_profiles (CcPowerPanel *self)
       self->power_profiles_row[profile] = row;
       gtk_widget_show (GTK_WIDGET (row));
       gtk_list_box_append (self->power_profile_listbox, GTK_WIDGET (row));
-      gtk_size_group_add_widget (self->row_sizegroup, GTK_WIDGET (row));
+      /* gtk_size_group_add_widget (self->row_sizegroup, GTK_WIDGET (row)); */
 
       /* Connect radio button to group */
       button = cc_power_profile_row_get_radio_button (row);
