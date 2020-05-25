@@ -1,0 +1,22 @@
+From: Mohammed Sadiq <sadiq@sadiqpk.org>
+Date: Tue, 15 Sep 2020 16:38:47 +0530
+Subject: [PATCH 3/7] display: Request a smaller size for arrangment widget
+
+So that it fits smaller screens well
+---
+ panels/display/cc-display-panel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/panels/display/cc-display-panel.c b/panels/display/cc-display-panel.c
+index 5220804..245a3fa 100644
+--- a/panels/display/cc-display-panel.c
++++ b/panels/display/cc-display-panel.c
+@@ -1184,7 +1184,7 @@ cc_display_panel_init (CcDisplayPanel *self)
+   self->arrangement = cc_display_arrangement_new (NULL);
+ 
+   gtk_widget_show (GTK_WIDGET (self->arrangement));
+-  gtk_widget_set_size_request (GTK_WIDGET (self->arrangement), 400, 175);
++  gtk_widget_set_size_request (GTK_WIDGET (self->arrangement), 320, 175);
+   gtk_container_add (GTK_CONTAINER (self->arrangement_bin), GTK_WIDGET (self->arrangement));
+ 
+   g_signal_connect_object (self->arrangement, "updated",
