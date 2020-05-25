@@ -9,6 +9,14 @@
     </columns>
     <data>
       <row>
+        <col id="0" translatable="yes" context="automatic_suspend" comments="Translators: Option for &quot;Delay&quot; in &quot;Automatic suspend&quot; dialog.">5 minutes</col>
+        <col id="1">300</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes" context="automatic_suspend" comments="Translators: Option for &quot;Delay&quot; in &quot;Automatic suspend&quot; dialog.">10 minutes</col>
+        <col id="1">600</col>
+      </row>
+      <row>
         <col id="0" translatable="yes" context="automatic_suspend" comments="Translators: Option for &quot;Delay&quot; in &quot;Automatic suspend&quot; dialog.">15 minutes</col>
         <col id="1">900</col>
       </row>
