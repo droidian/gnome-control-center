@@ -1,0 +1,30 @@
+From: Mohammed Sadiq <sadiq@sadiqpk.org>
+Date: Thu, 19 Nov 2020 07:45:10 +0530
+Subject: [PATCH 07/10] user-panel: Hide automatic login switch
+
+Fixes #102
+---
+ panels/user-accounts/cc-user-panel.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/panels/user-accounts/cc-user-panel.c b/panels/user-accounts/cc-user-panel.c
+index aa273fc..6c9d38c 100644
+--- a/panels/user-accounts/cc-user-panel.c
++++ b/panels/user-accounts/cc-user-panel.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "config.h"
++#include "pureos.h"
+ 
+ #include "cc-user-panel.h"
+ 
+@@ -921,7 +922,7 @@ show_user (ActUser *user, CcUserPanel *self)
+ 
+         /* Autologin: show when local account */
+         show = act_user_is_local_account (user);
+-        gtk_widget_set_visible (GTK_WIDGET (self->autologin_row), show);
++        gtk_widget_set_visible (GTK_WIDGET (self->autologin_row), FALSE);
+ 
+ #ifdef HAVE_MALCONTENT
+         /* Parental Controls: Unavailable if user is admin */
