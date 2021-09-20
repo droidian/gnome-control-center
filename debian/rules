@@ -10,6 +10,13 @@ else
 MALCONTENT := -Dmalcontent=false
 endif
 
+# Cheese is currently unused on the L5 and slows down startup
+ifneq (,$(filter $(DEB_HOST_ARCH), arm64))
+CHEESE:= -Dcheese=false
+else
+CHEESE:= -Dcheese=true
+endif
+
 %:
 	dh $@
 
@@ -17,4 +24,5 @@ override_dh_auto_configure:
 	dh_auto_configure -- \
 		-Dprivileged_group=sudo \
 		-Ddocumentation=true \
+		$(CHEESE) \
 		$(MALCONTENT)
