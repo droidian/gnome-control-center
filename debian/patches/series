@@ -31,3 +31,7 @@ mobian/fix-region-panel-width.patch
 mobian/common-Wrap-all-subtitles.patch
 mobian/fix-keyboard-panel-width.patch
 mobian/fix-region-login-width.patch
+
+# Backport upstream fixes to display panel
+backport/shell-Mirror-the-main-leaflet-s-folded-property.patch
+backport/display-Use-ComboBox-when-folded.patch
