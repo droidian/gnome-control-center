@@ -45,3 +45,7 @@ mobian/0003-usage-ellipsize-labels-to-fit-small-screens.patch
 mobian/0004-power-add-more-suspend-timing-options.patch
 mobian/0005-applications-ellipsize-title-label-to-always-fit-sma.patch
 mobian/fix-40-wifi-panel.patch
+mobian/fix-region-panel-width.patch
+mobian/common-Wrap-all-subtitles.patch
+mobian/fix-keyboard-panel-width.patch
+mobian/fix-region-login-width.patch
