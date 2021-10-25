@@ -1,0 +1,37 @@
+From: Debian GNOME Maintainers
+ <pkg-gnome-maintainers@lists.alioth.debian.org>
+Date: Tue, 29 Mar 2022 13:01:08 +0200
+Subject: fix-40-wifi-panel
+
+===================================================================
+---
+ panels/network/cc-wifi-connection-row.ui | 2 +-
+ panels/network/cc-wifi-panel.ui          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/panels/network/cc-wifi-connection-row.ui b/panels/network/cc-wifi-connection-row.ui
+index e294484..caef5ac 100644
+--- a/panels/network/cc-wifi-connection-row.ui
++++ b/panels/network/cc-wifi-connection-row.ui
+@@ -65,7 +65,7 @@
+             <property name="visible">True</property>
+             <property name="can_focus">False</property>
+             <property name="margin_end">6</property>
+-            <property name="label" translatable="yes">Connected</property>
++            <property name="label" translatable="no">✓</property>
+             <style>
+               <class name="dim-label"/>
+             </style>
+diff --git a/panels/network/cc-wifi-panel.ui b/panels/network/cc-wifi-panel.ui
+index 01a8ab5..b951792 100644
+--- a/panels/network/cc-wifi-panel.ui
++++ b/panels/network/cc-wifi-panel.ui
+@@ -44,7 +44,7 @@
+                         <property name="show-switch">True</property>
+                         <property name="bold">True</property>
+                         <property name="title" translatable="yes">Airplane Mode</property>
+-                        <property name="subtitle" translatable="yes">Disables Wi-Fi, Bluetooth and mobile broadband</property>
++                        <property name="subtitle" translatable="yes">Disables all radio</property>
+                         <signal name="notify::active" handler="rfkill_switch_notify_activate_cb" object="CcWifiPanel" swapped="no" />
+                       </object>
+                     </child>
