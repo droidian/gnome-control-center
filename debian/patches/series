@@ -6,3 +6,6 @@ debian/Revert-adding-Remote-Login.patch
 
 # Purism's patches
 purism/Add-patches-to-check-if-phone.patch
+
+# Mobian patches
+mobian/0004-power-add-more-suspend-timing-options.patch
