@@ -11,3 +11,7 @@ purism/0006-sound-fix-test-dialog-on-small-screen.patch
 purism/Add-patches-to-check-if-phone.patch
 purism/network-connection-editor-Allow-dialog-to-resize.patch
 purism/0002-UserAccount-fix-window-resizing-issue.patch
+
+# Mobian patches
+mobian/0004-power-add-more-suspend-timing-options.patch
+mobian/resize-connection-editor.patch
