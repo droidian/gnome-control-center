@@ -8,3 +8,7 @@ purism/0001-avatar-chooser-Adapt-to-work-on-librem5.patch
 purism/0005-power-show-brightness-slider-in-a-separate-row.patch
 purism/Add-patches-to-check-if-phone.patch
 purism/network-connection-editor-Allow-dialog-to-resize.patch
+
+# Mobian patches
+mobian/0004-power-add-more-suspend-timing-options.patch
+mobian/resize-connection-editor.patch
