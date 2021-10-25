@@ -20,3 +20,10 @@ purism/Add-patches-to-check-if-phone.patch
 purism/display-Let-button-box-have-vertical-orientation-on-.patch
 purism/Add-form-factors-to-desktop-and-appdata-files.patch
 purism/wifi-Wrap-Hotspot-info-label.patch
+
+# Mobian patches
+mobian/0002-search-ellipsize-button-label-to-fit-small-screens.patch
+mobian/0003-usage-ellipsize-labels-to-fit-small-screens.patch
+mobian/0004-power-add-more-suspend-timing-options.patch
+mobian/0005-applications-ellipsize-title-label-to-always-fit-sma.patch
+mobian/fix-40-wifi-panel.patch
