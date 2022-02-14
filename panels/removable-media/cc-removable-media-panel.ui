@@ -188,12 +188,23 @@
               </object>
             </child>
             <child>
-              <object class="GtkCheckButton" id="autorun_never_checkbutton">
-                <property name="valign">end</property>
-                <property name="vexpand">False</property>
-                <property name="use_underline">True</property>
-                <property name="label" translatable="yes">_Never prompt or start programs on media insertion</property>
-              </object>
+	      <object class="GtkBox">
+		<property name="orientation">horizontal</property>
+		<child>
+		  <object class="GtkCheckButton" id="autorun_never_checkbutton">
+                    <property name="valign">end</property>
+                    <property name="vexpand">False</property>
+		  </object>
+		</child>
+		<!-- Workaround for https://gitlab.gnome.org/GNOME/gtk/-/issues/4698 -->
+		<child>
+		  <object class="GtkLabel">
+		    <property name="use_underline">True</property>
+                    <property name="label" translatable="yes">_Never prompt or start programs on media insertion</property>
+		    <property name="wrap">True</property>
+		  </object>
+		</child>
+	      </object>
             </child>
           </object>
         </child>
