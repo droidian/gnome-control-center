@@ -4,34 +4,21 @@ debian/info-overview-Use-the-Vendor-logo-prominently.patch
 debian/Ignore-result-of-test-network-panel.patch
 
 # Purism's patches
-purism/0001-Add-helper-for-new-connection-editor.patch
-purism/0001-Add-new-connection-editor.patch
-purism/0002-wifi-Use-new-connection-editor.patch
-purism/0020-user-panel-Hide-automatic-login-switch.patch
-purism/0002-UserAccount-fix-window-resizing-issue.patch
 purism/0001-avatar-chooser-Adapt-to-work-on-librem5.patch
 purism/0002-datetime-Fix-timezone-selection-map.patch
 purism/0003-display-Request-a-smaller-size-for-arrangment-widget.patch
-purism/0004-online-accounts-Make-edit-account-dialog-resizable.patch
 purism/0005-power-show-brightness-slider-in-a-separate-row.patch
 purism/0006-sound-fix-test-dialog-on-small-screen.patch
-purism/0007-UserAccount-Allow-stack-to-have-different-size.patch
 purism/Add-patches-to-check-if-phone.patch
-purism/display-Let-button-box-have-vertical-orientation-on-.patch
-purism/Add-form-factors-to-desktop-and-appdata-files.patch
-purism/wifi-Wrap-Hotspot-info-label.patch
+purism/network-connection-editor-Allow-dialog-to-resize.patch
+purism/0002-UserAccount-fix-window-resizing-issue.patch
 
 # Mobian patches
-mobian/0002-search-ellipsize-button-label-to-fit-small-screens.patch
-mobian/0003-usage-ellipsize-labels-to-fit-small-screens.patch
 mobian/0004-power-add-more-suspend-timing-options.patch
-mobian/0005-applications-ellipsize-title-label-to-always-fit-sma.patch
-mobian/fix-40-wifi-panel.patch
-mobian/fix-region-panel-width.patch
-mobian/common-Wrap-all-subtitles.patch
-mobian/fix-keyboard-panel-width.patch
-mobian/fix-region-login-width.patch
+mobian/resize-connection-editor.patch
 
-# Backport upstream fixes to display panel
-backport/shell-Mirror-the-main-leaflet-s-folded-property.patch
-backport/display-Use-ComboBox-when-folded.patch
+# Patches from upstream MRs
+upstream/0001-common-Wrap-CcPermissionInfobar-labels-to-fit-in-nar.patch
+upstream/0001-display-Wrap-Night-Light-GtkInfoBar-label-to-fit-in-.patch
+upstream/0001-printers-Wrap-job-dialog-GtkInfoBar-label-to-fit-in-.patch
+upstream/0001-removable-media-Wrap-GtkCheckButton-label-to-fit-nar.patch

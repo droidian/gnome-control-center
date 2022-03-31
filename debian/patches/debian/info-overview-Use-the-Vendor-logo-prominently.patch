@@ -16,11 +16,11 @@ Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/base-files/+bug/1931582
  panels/info-overview/cc-info-overview-panel.c | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/panels/info-overview/cc-info-overview-panel.c b/panels/info-overview/cc-info-overview-panel.c
-index b348c0f..2d43b7a 100644
---- a/panels/info-overview/cc-info-overview-panel.c
-+++ b/panels/info-overview/cc-info-overview-panel.c
-@@ -948,6 +948,7 @@ use_dark_theme (CcInfoOverviewPanel *panel)
+Index: gnome-control-center/panels/info-overview/cc-info-overview-panel.c
+===================================================================
+--- gnome-control-center.orig/panels/info-overview/cc-info-overview-panel.c	2022-03-31 05:05:48.379000000 +0000
++++ gnome-control-center/panels/info-overview/cc-info-overview-panel.c	2022-03-31 05:05:48.376000000 +0000
+@@ -948,6 +948,7 @@
  static void
  setup_os_logo (CcInfoOverviewPanel *panel)
  {
@@ -28,7 +28,7 @@ index b348c0f..2d43b7a 100644
    GtkIconTheme *icon_theme;
    g_autofree char *logo_name = g_get_os_info ("LOGO");
    g_autoptr(GtkIconPaintable) icon_paintable = NULL;
-@@ -975,6 +976,10 @@ setup_os_logo (CcInfoOverviewPanel *panel)
+@@ -975,6 +976,10 @@
                                                     gtk_widget_get_direction (GTK_WIDGET (panel)),
                                                     0);
    gtk_picture_set_paintable (panel->os_logo, GDK_PAINTABLE (icon_paintable));
