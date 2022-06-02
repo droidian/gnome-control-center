@@ -3,19 +3,11 @@ debian/Debian-s-adduser-doesn-t-allow-uppercase-letters-by-defau.patch
 debian/Ignore-result-of-test-network-panel.patch
 
 # Purism's patches
-purism/0001-Add-helper-for-new-connection-editor.patch
-purism/0001-Add-new-connection-editor.patch
-purism/0002-wifi-Use-new-connection-editor.patch
-purism/0020-user-panel-Hide-automatic-login-switch.patch
-purism/0002-UserAccount-fix-window-resizing-issue.patch
 purism/0001-avatar-chooser-Adapt-to-work-on-librem5.patch
 purism/0002-datetime-Fix-timezone-selection-map.patch
 purism/0003-display-Request-a-smaller-size-for-arrangment-widget.patch
-purism/0004-online-accounts-Make-edit-account-dialog-resizable.patch
 purism/0005-power-show-brightness-slider-in-a-separate-row.patch
 purism/0006-sound-fix-test-dialog-on-small-screen.patch
-purism/0007-UserAccount-Allow-stack-to-have-different-size.patch
 purism/Add-patches-to-check-if-phone.patch
-purism/display-Let-button-box-have-vertical-orientation-on-.patch
-purism/Add-form-factors-to-desktop-and-appdata-files.patch
-purism/wifi-Wrap-Hotspot-info-label.patch
+purism/network-connection-editor-Allow-dialog-to-resize.patch
+purism/0002-UserAccount-fix-window-resizing-issue.patch

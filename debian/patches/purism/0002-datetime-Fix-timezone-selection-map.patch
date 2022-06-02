@@ -4,23 +4,23 @@ Subject: [PATCH 2/7] datetime: Fix timezone selection map
 
 So as to fit on small screen
 ---
- panels/datetime/cc-datetime-panel.ui | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ panels/datetime/cc-datetime-panel.ui | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/panels/datetime/cc-datetime-panel.ui b/panels/datetime/cc-datetime-panel.ui
-index bfe5b23..836f79d 100644
+index 364666b..2114f65 100644
 --- a/panels/datetime/cc-datetime-panel.ui
 +++ b/panels/datetime/cc-datetime-panel.ui
-@@ -284,7 +284,7 @@
+@@ -111,7 +111,7 @@
+   </object>
    <object class="GtkDialog" id="timezone_dialog">
-     <property name="can_focus">False</property>
      <property name="title" translatable="yes">Time Zone</property>
 -    <property name="resizable">False</property>
-+    <property name="resizable">1</property>
-     <property name="type_hint">dialog</property>
++    <property name="resizable">True</property>
+     <property name="modal">True</property>
      <property name="use_header_bar">1</property>
-     <signal name="delete-event" handler="gtk_widget_hide_on_delete"/>
-@@ -300,7 +300,7 @@
+     <property name="hide-on-close">True</property>
+@@ -123,7 +123,7 @@
                  <property name="halign">center</property>
                  <property name="margin_start">5</property>
                  <property name="margin_end">5</property>
@@ -29,21 +29,3 @@ index bfe5b23..836f79d 100644
                  <property name="primary_icon_name">edit-find-symbolic</property>
                  <property name="primary_icon_activatable">False</property>
                  <property name="primary_icon_sensitive">False</property>
-@@ -315,14 +315,15 @@
-         <property name="orientation">vertical</property>
-         <property name="spacing">2</property>
-         <child>
--          <object class="GtkFrame" id="aspectmap">
-+          <object class="GtkScrolledWindow" id="aspectmap">
-             <property name="visible">True</property>
-             <property name="can_focus">False</property>
-             <property name="margin_start">5</property>
-             <property name="margin_end">5</property>
-             <property name="margin_top">5</property>
-             <property name="margin_bottom">5</property>
--            <property name="label_xalign">0</property>
-+            <property name="vscrollbar-policy">never</property>
-+            <property name="overlay-scrolling">0</property>
-             <child>
-               <placeholder/>
-             </child>
