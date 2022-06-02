@@ -69,7 +69,7 @@ finish_setup (CEPage8021xSecurity *self, gpointer unused, GError *error, gpointe
 	if (error)
 		return;
 
-	self->group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
+	self->group = gtk_size_group_new (GTK_SIZE_GROUP_VERTICAL);
 
 	self->security = ws_wpa_eap_new (self->connection);
 	if (!self->security) {

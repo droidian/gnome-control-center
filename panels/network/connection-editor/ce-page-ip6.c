@@ -196,7 +196,7 @@ add_address_row (CEPageIP6   *self,
         row = gtk_list_box_row_new ();
         gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), FALSE);
 
-        row_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+        row_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
         gtk_widget_add_css_class (row_box, "linked");
 
         widget = GTK_WIDGET (ce_ip_address_entry_new (AF_INET6));
@@ -330,7 +330,7 @@ add_route_row (CEPageIP6   *self,
         row = gtk_list_box_row_new ();
         gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), FALSE);
 
-        row_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+        row_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
         gtk_widget_add_css_class (row_box, "linked");
 
         widget = GTK_WIDGET (ce_ip_address_entry_new (AF_INET6));

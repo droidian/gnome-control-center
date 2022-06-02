@@ -2,12 +2,12 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <template class="CEPageDetails" parent="GtkGrid">
-    <property name="margin_start">24</property>
-    <property name="margin_end">24</property>
+    <property name="margin_start">12</property>
+    <property name="margin_end">12</property>
     <property name="margin_top">24</property>
     <property name="margin_bottom">24</property>
     <property name="row_spacing">12</property>
-    <property name="column_spacing">12</property>
+    <property name="column_spacing">2</property>
     <child>
       <object class="GtkLabel" id="strength_heading_label">
         <property name="xalign">1</property>
@@ -412,6 +412,7 @@
               <object class="GtkLabel">
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">_Metered connection: has data limits or can incur charges</property>
+                <property name="wrap">True</property>
                 <property name="hexpand">True</property>
                 <property name="use_underline">True</property>
                 <property name="mnemonic_widget">restrict_data_check</property>
@@ -422,7 +423,7 @@
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">Software updates and other large downloads will not be started automatically.</property>
                 <property name="wrap">True</property>
-                <property name="max_width_chars">60</property>
+                <property name="max_width_chars">30</property>
                 <style>
                   <class name="dim-label" />
                 </style>

@@ -238,7 +238,7 @@ finish_setup (CEPageSecurity *self)
         sw = nm_connection_get_setting_wireless (self->connection);
         g_assert (sw);
 
-        self->group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
+        self->group = gtk_size_group_new (GTK_SIZE_GROUP_VERTICAL);
 
         dev_caps =   NM_WIFI_DEVICE_CAP_CIPHER_WEP40
                    | NM_WIFI_DEVICE_CAP_CIPHER_WEP104
