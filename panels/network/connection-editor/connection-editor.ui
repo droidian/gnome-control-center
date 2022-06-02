@@ -2,7 +2,7 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <template class="NetConnectionEditor" parent="GtkDialog">
-    <property name="resizable">False</property>
+    <property name="resizable">true</property>
     <property name="modal">True</property>
     <property name="default_width">500</property>
     <property name="default_height">600</property>
