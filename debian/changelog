@@ -13,6 +13,13 @@ gnome-control-center (1:43~beta-1) experimental; urgency=medium
   * debian/control.in: Bump minimum libadwaita to 1.2~alpha
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 19 Aug 2022 13:33:46 -0400
+  * d/patches: import adaptive UI patches from Purism
+  * d/patches: rebase Purism patches for v42
+  * d/patches: add Mobian patches
+  * d/patches: backport upstream fixes for adaptive UI
+  * d/gbp.conf: update for Mobian
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Mon, 18 Jul 2022 12:28:57 +0200
 
 gnome-control-center (1:42.3-2) unstable; urgency=medium
 
