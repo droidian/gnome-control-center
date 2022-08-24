@@ -13,10 +13,10 @@ split the label into its own object.
  panels/removable-media/cc-removable-media-panel.ui | 23 ++++++++++++++++------
  1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/panels/removable-media/cc-removable-media-panel.ui b/panels/removable-media/cc-removable-media-panel.ui
-index 899956e..1bb5efd 100644
---- a/panels/removable-media/cc-removable-media-panel.ui
-+++ b/panels/removable-media/cc-removable-media-panel.ui
+Index: gnome-control-center/panels/removable-media/cc-removable-media-panel.ui
+===================================================================
+--- gnome-control-center.orig/panels/removable-media/cc-removable-media-panel.ui	2022-08-24 01:49:35.330000000 +0000
++++ gnome-control-center/panels/removable-media/cc-removable-media-panel.ui	2022-08-24 01:49:35.328000000 +0000
 @@ -188,12 +188,23 @@
                </object>
              </child>

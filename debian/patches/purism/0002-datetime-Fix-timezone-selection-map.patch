@@ -7,10 +7,10 @@ So as to fit on small screen
  panels/datetime/cc-datetime-panel.ui | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/panels/datetime/cc-datetime-panel.ui b/panels/datetime/cc-datetime-panel.ui
-index 364666b..2114f65 100644
---- a/panels/datetime/cc-datetime-panel.ui
-+++ b/panels/datetime/cc-datetime-panel.ui
+Index: gnome-control-center/panels/datetime/cc-datetime-panel.ui
+===================================================================
+--- gnome-control-center.orig/panels/datetime/cc-datetime-panel.ui	2022-08-24 01:49:35.147000000 +0000
++++ gnome-control-center/panels/datetime/cc-datetime-panel.ui	2022-08-24 01:49:35.144000000 +0000
 @@ -111,7 +111,7 @@
    </object>
    <object class="GtkDialog" id="timezone_dialog">

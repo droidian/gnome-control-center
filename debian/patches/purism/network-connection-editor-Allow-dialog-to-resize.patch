@@ -8,10 +8,10 @@ Subject: network-connection-editor-Allow-dialog-to-resize
  panels/network/connection-editor/connection-editor.ui | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/panels/network/connection-editor/connection-editor.ui b/panels/network/connection-editor/connection-editor.ui
-index 7456b74..455a504 100644
---- a/panels/network/connection-editor/connection-editor.ui
-+++ b/panels/network/connection-editor/connection-editor.ui
+Index: gnome-control-center/panels/network/connection-editor/connection-editor.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/connection-editor.ui	2022-08-24 01:49:35.242000000 +0000
++++ gnome-control-center/panels/network/connection-editor/connection-editor.ui	2022-08-24 01:49:46.000000000 +0000
 @@ -2,7 +2,7 @@
  <interface>
    <!-- interface-requires gtk+ 3.0 -->
@@ -20,4 +20,4 @@ index 7456b74..455a504 100644
 +    <property name="resizable">true</property>
      <property name="modal">True</property>
      <property name="default_width">500</property>
-     <property name="default_height">300</property>
+     <property name="default_height">600</property>

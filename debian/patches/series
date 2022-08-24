@@ -17,7 +17,4 @@ mobian/0004-power-add-more-suspend-timing-options.patch
 mobian/resize-connection-editor.patch
 
 # Patches from upstream MRs
-backport/0001-common-Wrap-CcPermissionInfobar-labels-to-fit-in-nar.patch
-backport/0001-display-Wrap-Night-Light-GtkInfoBar-label-to-fit-in-.patch
-backport/0001-printers-Wrap-job-dialog-GtkInfoBar-label-to-fit-in-.patch
 backport/0001-removable-media-Wrap-GtkCheckButton-label-to-fit-nar.patch

@@ -14,11 +14,11 @@ Forwarded: not-needed, Debian-specific workaround
  tests/network/test-network-panel.py | 3 ++-
  2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/network/meson.build b/tests/network/meson.build
-index 34f7c74..203af9d 100644
---- a/tests/network/meson.build
-+++ b/tests/network/meson.build
-@@ -29,6 +29,7 @@ test(
+Index: gnome-control-center/tests/network/meson.build
+===================================================================
+--- gnome-control-center.orig/tests/network/meson.build	2022-08-24 01:49:35.110000000 +0000
++++ gnome-control-center/tests/network/meson.build	2022-08-24 01:49:35.106000000 +0000
+@@ -29,6 +29,7 @@
    'test-network-panel',
    find_program('test-network-panel.py'),
        env : envs,
@@ -26,11 +26,11 @@ index 34f7c74..203af9d 100644
    timeout : 60
  )
  
-diff --git a/tests/network/test-network-panel.py b/tests/network/test-network-panel.py
-index 1098bab..dac0894 100644
---- a/tests/network/test-network-panel.py
-+++ b/tests/network/test-network-panel.py
-@@ -41,4 +41,5 @@ class PanelTestCase(X11SessionTestCase, GTest):
+Index: gnome-control-center/tests/network/test-network-panel.py
+===================================================================
+--- gnome-control-center.orig/tests/network/test-network-panel.py	2022-08-24 01:49:35.110000000 +0000
++++ gnome-control-center/tests/network/test-network-panel.py	2022-08-24 01:49:35.107000000 +0000
+@@ -41,4 +41,5 @@
  
  if __name__ == '__main__':
      # avoid writing to stderr

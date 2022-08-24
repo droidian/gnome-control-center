@@ -20,10 +20,10 @@ Subject: resize-connection-editor
  panels/network/connection-editor/wifi-page.ui      |  6 +--
  13 files changed, 88 insertions(+), 88 deletions(-)
 
-diff --git a/panels/network/connection-editor/8021x-security-page.ui b/panels/network/connection-editor/8021x-security-page.ui
-index 5be96b3..f21bf5c 100644
---- a/panels/network/connection-editor/8021x-security-page.ui
-+++ b/panels/network/connection-editor/8021x-security-page.ui
+Index: gnome-control-center/panels/network/connection-editor/8021x-security-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/8021x-security-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/8021x-security-page.ui	2022-08-24 01:49:35.297000000 +0000
 @@ -2,14 +2,14 @@
  <interface>
    <!-- interface-requires gtk+ 3.0 -->
@@ -42,11 +42,11 @@ index 5be96b3..f21bf5c 100644
      <child>
        <object class="GtkLabel" id="security_label">
          <property name="xalign">1</property>
-diff --git a/panels/network/connection-editor/ce-page-8021x-security.c b/panels/network/connection-editor/ce-page-8021x-security.c
-index 90732fa..0eca58f 100644
---- a/panels/network/connection-editor/ce-page-8021x-security.c
-+++ b/panels/network/connection-editor/ce-page-8021x-security.c
-@@ -69,7 +69,7 @@ finish_setup (CEPage8021xSecurity *self, gpointer unused, GError *error, gpointe
+Index: gnome-control-center/panels/network/connection-editor/ce-page-8021x-security.c
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ce-page-8021x-security.c	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ce-page-8021x-security.c	2022-08-24 01:49:35.298000000 +0000
+@@ -69,7 +69,7 @@
  	if (error)
  		return;
  
@@ -55,11 +55,11 @@ index 90732fa..0eca58f 100644
  
  	self->security = ws_wpa_eap_new (self->connection);
  	if (!self->security) {
-diff --git a/panels/network/connection-editor/ce-page-ip4.c b/panels/network/connection-editor/ce-page-ip4.c
-index 36e5869..128d64b 100644
---- a/panels/network/connection-editor/ce-page-ip4.c
-+++ b/panels/network/connection-editor/ce-page-ip4.c
-@@ -208,7 +208,7 @@ add_address_row (CEPageIP4   *self,
+Index: gnome-control-center/panels/network/connection-editor/ce-page-ip4.c
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ce-page-ip4.c	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ce-page-ip4.c	2022-08-24 01:49:35.298000000 +0000
+@@ -215,7 +215,7 @@
          row = gtk_list_box_row_new ();
          gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), FALSE);
  
@@ -68,7 +68,7 @@ index 36e5869..128d64b 100644
          gtk_widget_add_css_class (row_box, "linked");
  
          widget = GTK_WIDGET (ce_ip_address_entry_new (AF_INET));
-@@ -341,7 +341,7 @@ add_route_row (CEPageIP4   *self,
+@@ -357,7 +357,7 @@
          row = gtk_list_box_row_new ();
          gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), FALSE);
  
@@ -77,11 +77,11 @@ index 36e5869..128d64b 100644
          gtk_widget_add_css_class (row_box, "linked");
  
          widget = GTK_WIDGET (ce_ip_address_entry_new (AF_INET));
-diff --git a/panels/network/connection-editor/ce-page-ip6.c b/panels/network/connection-editor/ce-page-ip6.c
-index d75eef3..c3401ad 100644
---- a/panels/network/connection-editor/ce-page-ip6.c
-+++ b/panels/network/connection-editor/ce-page-ip6.c
-@@ -189,7 +189,7 @@ add_address_row (CEPageIP6   *self,
+Index: gnome-control-center/panels/network/connection-editor/ce-page-ip6.c
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ce-page-ip6.c	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ce-page-ip6.c	2022-08-24 01:49:35.298000000 +0000
+@@ -196,7 +196,7 @@
          row = gtk_list_box_row_new ();
          gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), FALSE);
  
@@ -90,7 +90,7 @@ index d75eef3..c3401ad 100644
          gtk_widget_add_css_class (row_box, "linked");
  
          widget = GTK_WIDGET (ce_ip_address_entry_new (AF_INET6));
-@@ -314,7 +314,7 @@ add_route_row (CEPageIP6   *self,
+@@ -330,7 +330,7 @@
          row = gtk_list_box_row_new ();
          gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), FALSE);
  
@@ -99,11 +99,11 @@ index d75eef3..c3401ad 100644
          gtk_widget_add_css_class (row_box, "linked");
  
          widget = GTK_WIDGET (ce_ip_address_entry_new (AF_INET6));
-diff --git a/panels/network/connection-editor/ce-page-security.c b/panels/network/connection-editor/ce-page-security.c
-index c7cd7d9..db0dd4e 100644
---- a/panels/network/connection-editor/ce-page-security.c
-+++ b/panels/network/connection-editor/ce-page-security.c
-@@ -238,7 +238,7 @@ finish_setup (CEPageSecurity *self)
+Index: gnome-control-center/panels/network/connection-editor/ce-page-security.c
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ce-page-security.c	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ce-page-security.c	2022-08-24 01:49:35.299000000 +0000
+@@ -238,7 +238,7 @@
          sw = nm_connection_get_setting_wireless (self->connection);
          g_assert (sw);
  
@@ -112,17 +112,17 @@ index c7cd7d9..db0dd4e 100644
  
          dev_caps =   NM_WIFI_DEVICE_CAP_CIPHER_WEP40
                     | NM_WIFI_DEVICE_CAP_CIPHER_WEP104
-diff --git a/panels/network/connection-editor/connection-editor.ui b/panels/network/connection-editor/connection-editor.ui
-index 455a504..af4c0a2 100644
---- a/panels/network/connection-editor/connection-editor.ui
-+++ b/panels/network/connection-editor/connection-editor.ui
+Index: gnome-control-center/panels/network/connection-editor/connection-editor.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/connection-editor.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/connection-editor.ui	2022-08-24 01:49:35.299000000 +0000
 @@ -4,7 +4,7 @@
    <template class="NetConnectionEditor" parent="GtkDialog">
      <property name="resizable">true</property>
      <property name="modal">True</property>
 -    <property name="default_width">500</property>
 +    <property name="default_width">320</property>
-     <property name="default_height">300</property>
+     <property name="default_height">600</property>
      <!-- This doesn't seem to work for a template, so it is also hardcoded. -->
      <property name="use_header_bar">1</property>
 @@ -55,7 +55,7 @@
@@ -134,10 +134,10 @@ index 455a504..af4c0a2 100644
                          <property name="valign">start</property>
                        </object>
                      </child>
-diff --git a/panels/network/connection-editor/details-page.ui b/panels/network/connection-editor/details-page.ui
-index b976a3a..ef989a2 100644
---- a/panels/network/connection-editor/details-page.ui
-+++ b/panels/network/connection-editor/details-page.ui
+Index: gnome-control-center/panels/network/connection-editor/details-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/details-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/details-page.ui	2022-08-24 01:49:35.299000000 +0000
 @@ -2,12 +2,12 @@
  <interface>
    <!-- interface-requires gtk+ 3.0 -->
@@ -161,8 +161,8 @@ index b976a3a..ef989a2 100644
 +                <property name="wrap">True</property>
                  <property name="hexpand">True</property>
                  <property name="use_underline">True</property>
-               </object>
-@@ -421,7 +422,7 @@
+                 <property name="mnemonic_widget">restrict_data_check</property>
+@@ -422,7 +423,7 @@
                  <property name="xalign">0</property>
                  <property name="label" translatable="yes">Software updates and other large downloads will not be started automatically.</property>
                  <property name="wrap">True</property>
@@ -171,10 +171,10 @@ index b976a3a..ef989a2 100644
                  <style>
                    <class name="dim-label" />
                  </style>
-diff --git a/panels/network/connection-editor/ethernet-page.ui b/panels/network/connection-editor/ethernet-page.ui
-index ad4f2cb..44b5fb0 100644
---- a/panels/network/connection-editor/ethernet-page.ui
-+++ b/panels/network/connection-editor/ethernet-page.ui
+Index: gnome-control-center/panels/network/connection-editor/ethernet-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ethernet-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ethernet-page.ui	2022-08-24 01:49:35.299000000 +0000
 @@ -7,17 +7,16 @@
      <property name="page_increment">10</property>
    </object>
@@ -280,10 +280,10 @@ index ad4f2cb..44b5fb0 100644
          </layout>
        </object>
      </child>
-diff --git a/panels/network/connection-editor/ip4-page.ui b/panels/network/connection-editor/ip4-page.ui
-index ce7934d..9da4778 100644
---- a/panels/network/connection-editor/ip4-page.ui
-+++ b/panels/network/connection-editor/ip4-page.ui
+Index: gnome-control-center/panels/network/connection-editor/ip4-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ip4-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ip4-page.ui	2022-08-24 01:49:35.299000000 +0000
 @@ -9,13 +9,13 @@
            <object class="GtkViewport">
              <child>
@@ -376,9 +376,9 @@ index ce7934d..9da4778 100644
 -                            <property name="orientation">horizontal</property>
 +                            <property name="orientation">vertical</property>
                              <child>
-                               <object class="GtkLabel">
+                               <object class="GtkLabel" id="address_address_label">
                                  <property name="hexpand">True</property>
-@@ -239,7 +239,7 @@
+@@ -243,7 +243,7 @@
                          <property name="orientation">vertical</property>
                          <child>
                            <object class="GtkBox">
@@ -387,7 +387,7 @@ index ce7934d..9da4778 100644
                              <child>
                                <object class="GtkLabel" id="routes_address_label">
                                  <property name="hexpand">True</property>
-@@ -315,19 +315,19 @@
+@@ -319,19 +319,19 @@
      </child>
    </template>
    <object class="GtkSizeGroup" id="routes_metric_sizegroup">
@@ -410,10 +410,10 @@ index ce7934d..9da4778 100644
      <widgets>
        <widget name="address_stub_box" />
      </widgets>
-diff --git a/panels/network/connection-editor/ip6-page.ui b/panels/network/connection-editor/ip6-page.ui
-index c6ec8f5..694eb14 100644
---- a/panels/network/connection-editor/ip6-page.ui
-+++ b/panels/network/connection-editor/ip6-page.ui
+Index: gnome-control-center/panels/network/connection-editor/ip6-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/ip6-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/ip6-page.ui	2022-08-24 01:49:35.300000000 +0000
 @@ -9,13 +9,13 @@
            <object class="GtkViewport">
              <child>
@@ -519,7 +519,7 @@ index c6ec8f5..694eb14 100644
                              <child>
                                <object class="GtkLabel" id="address_address_label">
                                  <property name="hexpand">True</property>
-@@ -248,7 +248,7 @@
+@@ -253,7 +253,7 @@
                          <property name="orientation">vertical</property>
                          <child>
                            <object class="GtkBox">
@@ -528,7 +528,7 @@ index c6ec8f5..694eb14 100644
                              <child>
                                <object class="GtkLabel" id="routes_address_label">
                                  <property name="hexpand">True</property>
-@@ -324,19 +324,19 @@
+@@ -329,19 +329,19 @@
      </child>
    </template>
    <object class="GtkSizeGroup" id="routes_metric_sizegroup">
@@ -551,10 +551,10 @@ index c6ec8f5..694eb14 100644
      <widgets>
        <widget name="address_stub_box" />
      </widgets>
-diff --git a/panels/network/connection-editor/security-page.ui b/panels/network/connection-editor/security-page.ui
-index 9a1c0de..d1b121b 100644
---- a/panels/network/connection-editor/security-page.ui
-+++ b/panels/network/connection-editor/security-page.ui
+Index: gnome-control-center/panels/network/connection-editor/security-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/security-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/security-page.ui	2022-08-24 01:49:35.300000000 +0000
 @@ -2,14 +2,14 @@
  <interface>
    <!-- interface-requires gtk+ 3.0 -->
@@ -573,10 +573,10 @@ index 9a1c0de..d1b121b 100644
      <child>
        <object class="GtkLabel" id="security_label">
          <property name="xalign">1</property>
-diff --git a/panels/network/connection-editor/vpn-page.ui b/panels/network/connection-editor/vpn-page.ui
-index 98f801b..531be29 100644
---- a/panels/network/connection-editor/vpn-page.ui
-+++ b/panels/network/connection-editor/vpn-page.ui
+Index: gnome-control-center/panels/network/connection-editor/vpn-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/vpn-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/vpn-page.ui	2022-08-24 01:49:35.300000000 +0000
 @@ -2,15 +2,15 @@
  <interface>
    <!-- interface-requires gtk+ 3.0 -->
@@ -597,10 +597,10 @@ index 98f801b..531be29 100644
          <child>
            <object class="GtkLabel">
              <property name="xalign">1</property>
-diff --git a/panels/network/connection-editor/wifi-page.ui b/panels/network/connection-editor/wifi-page.ui
-index 6662b8f..ca0f818 100644
---- a/panels/network/connection-editor/wifi-page.ui
-+++ b/panels/network/connection-editor/wifi-page.ui
+Index: gnome-control-center/panels/network/connection-editor/wifi-page.ui
+===================================================================
+--- gnome-control-center.orig/panels/network/connection-editor/wifi-page.ui	2022-08-24 01:49:35.303000000 +0000
++++ gnome-control-center/panels/network/connection-editor/wifi-page.ui	2022-08-24 01:49:35.300000000 +0000
 @@ -2,14 +2,14 @@
  <interface>
    <!-- interface-requires gtk+ 3.0 -->
