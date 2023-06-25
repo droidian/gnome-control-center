@@ -1,3 +1,12 @@
+gnome-control-center (1:43.6-2~deb12u1mobian1) bookworm; urgency=medium
+
+  * d/gbp.conf: update for Mobian
+  * d/patches: import adaptive UI patches from Purism
+  * d/patches: add Mobian patches
+  * d/patches: backport upstream fixes for adaptive UI
+
+ -- Arnaud Ferraris <aferraris@debian.org>  Sun, 25 Jun 2023 12:32:58 +0200
+
 gnome-control-center (1:43.6-2~deb12u1) bookworm; urgency=medium
 
   * Team upload
