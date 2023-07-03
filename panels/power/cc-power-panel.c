@@ -866,6 +866,7 @@ setup_power_saving (CcPowerPanel *self)
   set_value_for_combo_row (self->blank_screen_row, value);
   g_signal_handlers_unblock_by_func (self->blank_screen_row, blank_screen_row_changed_cb, self);
 
+#if 0
   /* The default values for these settings are unfortunate for us;
    * timeout == 0, action == suspend means 'do nothing' - just
    * as timout === anything, action == nothing.
@@ -920,6 +921,7 @@ setup_power_saving (CcPowerPanel *self)
       set_ac_battery_ui_mode (self);
       update_automatic_suspend_label (self);
     }
+#endif
 }
 
 static const char *
