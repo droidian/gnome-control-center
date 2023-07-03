@@ -244,20 +244,6 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkLevelBar" id="local_strength_indicator">
-                    <property name="mode">continuous</property>
-                    <property name="max-value">5</property>
-                    <property name="margin-top">12</property>
-                    <offsets>
-                      <offset name="strength-weak" value="1"/>
-                      <offset name="strength-low" value="2"/>
-                      <offset name="strength-medium" value="3"/>
-                      <offset name="strength-good" value="4"/>
-                      <offset name="strength-high" value="5"/>
-                    </offsets>
-                  </object>
-                </child>
-                <child>
                   <object class="GtkLabel" id="local_password_hint">
                     <property name="halign">start</property>
                     <property name="wrap">True</property>

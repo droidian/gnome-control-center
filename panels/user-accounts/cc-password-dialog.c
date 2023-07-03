@@ -52,7 +52,6 @@ struct _CcPasswordDialog
         AdwPreferencesGroup *password_on_next_login_group;
         AdwPasswordEntryRow *password_entry;
         GtkLabel           *password_hint_label;
-        GtkLevelBar        *strength_indicator;
         AdwPasswordEntryRow *verify_entry;
         GtkLabel            *verify_label;
 
@@ -85,8 +84,6 @@ update_password_strength (CcPasswordDialog *self)
 
         pw_strength (password, old_password, username,
                      &hint, &strength_level);
-
-        gtk_level_bar_set_value (self->strength_indicator, strength_level);
         gtk_label_set_label (self->password_hint_label, hint);
 
         if (strength_level > 1) {
@@ -462,7 +459,6 @@ cc_password_dialog_class_init (CcPasswordDialogClass *klass)
         gtk_widget_class_bind_template_child (widget_class, CcPasswordDialog, password_on_next_login_group);
         gtk_widget_class_bind_template_child (widget_class, CcPasswordDialog, password_entry);
         gtk_widget_class_bind_template_child (widget_class, CcPasswordDialog, password_hint_label);
-        gtk_widget_class_bind_template_child (widget_class, CcPasswordDialog, strength_indicator);
         gtk_widget_class_bind_template_child (widget_class, CcPasswordDialog, verify_entry);
         gtk_widget_class_bind_template_child (widget_class, CcPasswordDialog, verify_label);
 

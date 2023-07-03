@@ -79,7 +79,6 @@ struct _CcAddUserDialog {
         AdwPreferencesPage *local_page;
         AdwActionRow       *local_password_row;
         GtkImage           *local_password_status_icon;
-        GtkLevelBar        *local_strength_indicator;
         GtkComboBoxText    *local_username_combo;
         GtkListStore       *local_username_model;
         GtkPasswordEntry   *local_password_entry;
@@ -267,8 +266,6 @@ update_password_strength (CcAddUserDialog *self)
         username = gtk_combo_box_text_get_active_text (self->local_username_combo);
 
         pw_strength (password, NULL, username, &hint, &strength_level);
-
-        gtk_level_bar_set_value (self->local_strength_indicator, strength_level);
         gtk_label_set_label (self->local_password_hint, hint);
 
         if (strength_level > 1) {
@@ -1670,7 +1667,6 @@ cc_add_user_dialog_class_init (CcAddUserDialogClass *klass)
         gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_username_entry);
         gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_username_row);
         gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_username_status_icon);
-        gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_strength_indicator);
         gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_verify_entry);
         gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_verify_password_row);
         gtk_widget_class_bind_template_child (widget_class, CcAddUserDialog, local_verify_status_icon);
