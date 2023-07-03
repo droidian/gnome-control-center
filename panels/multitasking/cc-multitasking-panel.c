@@ -24,6 +24,8 @@
 #include "cc-multitasking-resources.h"
 #include "cc-multitasking-row.h"
 
+#include "shell/cc-application.h"
+
 struct _CcMultitaskingPanel
 {
   CcPanel          parent_instance;
@@ -47,6 +49,20 @@ struct _CcMultitaskingPanel
 };
 
 CC_PANEL_REGISTER (CcMultitaskingPanel, cc_multitasking_panel)
+
+/* Static init function */
+
+void
+cc_multitasking_panel_static_init_func (void)
+{
+  const gchar *xdg_session_desktop = g_getenv("XDG_SESSION_DESKTOP");
+  gboolean visible = g_strcmp0(xdg_session_desktop, "phosh") != 0;
+
+  CcApplication *application = CC_APPLICATION (g_application_get_default ());
+  cc_shell_model_set_panel_visibility (cc_application_get_model (application),
+                                       "multitasking",
+                                       visible ? CC_PANEL_VISIBLE : CC_PANEL_VISIBLE_IN_SEARCH);
+}
 
 /* GObject overrides */
 

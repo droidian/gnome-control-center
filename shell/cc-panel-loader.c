@@ -78,6 +78,7 @@ extern GType cc_diagnostics_panel_get_type (void);
 
 /* Static init functions */
 extern void cc_diagnostics_panel_static_init_func (void);
+extern void cc_multitasking_panel_static_init_func (void);
 #ifdef BUILD_NETWORK
 extern void cc_wifi_panel_static_init_func (void);
 #endif /* BUILD_NETWORK */
@@ -116,7 +117,7 @@ static CcPanelLoaderVtable default_panels[] =
   // PANEL_TYPE("firmware-security",cc_firmware_security_panel_get_type,    cc_firmware_security_panel_static_init_func),
   PANEL_TYPE("microphone",       cc_microphone_panel_get_type,           NULL),
   PANEL_TYPE("mouse",            cc_mouse_panel_get_type,                NULL),
-  PANEL_TYPE("multitasking",     cc_multitasking_panel_get_type,         NULL),
+  PANEL_TYPE("multitasking",     cc_multitasking_panel_get_type,         cc_multitasking_panel_static_init_func),
 #ifdef BUILD_NETWORK
   PANEL_TYPE("network",          cc_network_panel_get_type,              NULL),
   PANEL_TYPE("wifi",             cc_wifi_panel_get_type,                 cc_wifi_panel_static_init_func),
