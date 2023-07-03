@@ -23,6 +23,8 @@
 #include "cc-search-locations-dialog.h"
 #include "cc-search-resources.h"
 
+#include "shell/cc-application.h"
+
 #include <gio/gdesktopappinfo.h>
 #include <glib/gi18n.h>
 
@@ -45,6 +47,20 @@ struct _CcSearchPanel
 CC_PANEL_REGISTER (CcSearchPanel, cc_search_panel)
 
 #define SHELL_PROVIDER_GROUP "Shell Search Provider"
+
+/* Static init function */
+
+void
+cc_search_panel_static_init_func (void)
+{
+  const gchar *xdg_session_desktop = g_getenv("XDG_SESSION_DESKTOP");
+  gboolean visible = g_strcmp0(xdg_session_desktop, "phosh") != 0;
+
+  CcApplication *application = CC_APPLICATION (g_application_get_default ());
+  cc_shell_model_set_panel_visibility (cc_application_get_model (application),
+                                       "search",
+                                       visible ? CC_PANEL_VISIBLE : CC_PANEL_VISIBLE_IN_SEARCH);
+}
 
 static gboolean
 keynav_failed_cb (CcSearchPanel *self, GtkDirectionType direction, GtkWidget *list)

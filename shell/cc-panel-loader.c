@@ -79,6 +79,7 @@ extern GType cc_diagnostics_panel_get_type (void);
 /* Static init functions */
 extern void cc_diagnostics_panel_static_init_func (void);
 extern void cc_multitasking_panel_static_init_func (void);
+extern void cc_search_panel_static_init_func (void);
 #ifdef BUILD_NETWORK
 extern void cc_wifi_panel_static_init_func (void);
 #endif /* BUILD_NETWORK */
@@ -129,7 +130,7 @@ static CcPanelLoaderVtable default_panels[] =
   PANEL_TYPE("region",           cc_region_panel_get_type,               NULL),
   PANEL_TYPE("removable-media",  cc_removable_media_panel_get_type,      NULL),
   PANEL_TYPE("screen",           cc_screen_panel_get_type,               NULL),
-  PANEL_TYPE("search",           cc_search_panel_get_type,               NULL),
+  PANEL_TYPE("search",           cc_search_panel_get_type,               cc_search_panel_static_init_func),
   PANEL_TYPE("sharing",          cc_sharing_panel_get_type,              NULL),
   PANEL_TYPE("sound",            cc_sound_panel_get_type,                NULL),
 #ifdef BUILD_THUNDERBOLT
