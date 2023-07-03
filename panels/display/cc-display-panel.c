@@ -102,6 +102,7 @@ struct _CcDisplayPanel
   AdwLeaflet     *leaflet;
   AdwComboRow    *primary_display_row;
   AdwPreferencesGroup *single_display_settings_group;
+  AdwPreferencesGroup *night_light_settings_group;
 
   GtkShortcutController *toplevel_shortcuts;
   GtkShortcut *escape_shortcut;
@@ -598,6 +599,7 @@ cc_display_panel_class_init (CcDisplayPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, night_light_state_label);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, primary_display_row);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, single_display_settings_group);
+  gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, night_light_settings_group);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, toplevel_shortcuts);
 
   gtk_widget_class_bind_template_callback (widget_class, apply_current_configuration);
@@ -832,6 +834,10 @@ rebuild_ui (CcDisplayPanel *panel)
 
       move_display_settings_to_main_page (panel);
     }
+
+  const gchar *xdg_session_desktop = g_getenv("XDG_SESSION_DESKTOP");
+  gboolean night_light_group_visible = g_strcmp0(xdg_session_desktop, "phosh") != 0;
+  gtk_widget_set_visible(GTK_WIDGET (panel->night_light_settings_group), night_light_group_visible);
 
   cc_display_settings_set_multimonitor (panel->settings,
                                         n_outputs > 1 &&

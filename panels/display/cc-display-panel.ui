@@ -170,7 +170,7 @@
 
                         <!-- Night Light -->
                         <child>
-                          <object class="AdwPreferencesGroup">
+                          <object class="AdwPreferencesGroup" id="night_light_settings_group">
                             <child>
                               <object class="AdwActionRow">
                                 <property name="activatable">True</property>
