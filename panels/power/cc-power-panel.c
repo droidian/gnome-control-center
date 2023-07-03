@@ -27,6 +27,7 @@
 #include <gio/gdesktopappinfo.h>
 
 #include "shell/cc-object-storage.h"
+#include "cc-batman-config-control.h"
 #include "cc-battery-row.h"
 #include "cc-power-profile-row.h"
 #include "cc-power-profile-info-row.h"
@@ -43,6 +44,15 @@ struct _CcPowerPanel
   GtkWindow         *automatic_suspend_dialog;
   GtkLabel          *automatic_suspend_label;
   GtkListBoxRow     *automatic_suspend_row;
+  AdwEntryRow       *batman_max_cpu_row;
+  GtkSwitch         *batman_btsave_switch;
+  GtkSwitch         *batman_bussave_switch;
+  GtkSwitch         *batman_chargesave_switch;
+  GtkSwitch         *batman_gpusave_switch;
+  GtkSwitch         *batman_powersave_switch;
+  GtkSwitch         *batman_offline_switch;
+  GtkSwitch         *batman_service_enabled_switch;
+  GtkSwitch         *batman_service_switch;
   GtkListBox        *battery_listbox;
   AdwActionRow      *battery_percentage_row;
   GtkSwitch         *battery_percentage_switch;
@@ -1415,6 +1425,80 @@ battery_sort_func (GtkListBoxRow *a, GtkListBoxRow *b, gpointer data)
   return a_kind - b_kind;
 }
 
+int
+check_batman_active()
+{
+  char *line = NULL;
+  size_t len = 0;
+  int result = FALSE;
+  FILE *file = popen("systemctl is-active batman", "r");
+  if (!file) return -1;
+  if (getline(&line, &len, file) != -1)
+    result = strcmp(line, "active\n") == 0;
+  else result = -1;
+  pclose(file);
+  free(line);
+  return result;
+}
+
+int
+check_batman_enabled()
+{
+  char *line = NULL;
+  size_t len = 0;
+  int result = FALSE;
+  FILE *file = popen("systemctl is-enabled batman", "r");
+  if (!file) return -1;
+  if (getline(&line, &len, file) != -1)
+    result = strcmp(line, "enabled\n") == 0;
+  else result = -1;
+  pclose(file);
+  free(line);
+  return result;
+}
+
+void
+batman_ctl_active_cb(GObject* src_ctl, GAsyncResult*, gpointer sender)
+{
+    int active = check_batman_active();
+    gtk_switch_set_state(GTK_SWITCH(sender), active == TRUE);
+    gtk_switch_set_active(GTK_SWITCH(sender), active == TRUE);
+
+    g_object_unref(src_ctl);
+}
+
+void
+batman_ctl_enabled_cb(GObject* src_ctl, GAsyncResult*, gpointer sender)
+{
+    int enabled = check_batman_enabled();
+    gtk_switch_set_state(GTK_SWITCH(sender), enabled == TRUE);
+    gtk_switch_set_active(GTK_SWITCH(sender), enabled == TRUE);
+
+    g_object_unref(src_ctl);
+}
+
+gboolean
+batman_service_active_switch_state_set(GtkSwitch* sender, gboolean state, gpointer)
+{
+    const gchar* ctl_argv[] = {
+        "pkexec", "systemctl", (state) ? "start" : "stop", "batman", NULL
+    };
+    GSubprocess* ctl_proc = g_subprocess_newv(ctl_argv, G_SUBPROCESS_FLAGS_NONE, NULL);
+    g_subprocess_communicate_async(ctl_proc, NULL, NULL, batman_ctl_active_cb, sender);
+    return TRUE;
+}
+
+gboolean
+batman_service_enabled_switch_state_set(GtkSwitch* sender, gboolean state, gpointer)
+{
+    const gchar* ctl_argv[] = {
+        "pkexec", "systemctl", (state) ? "enable" : "disable", "batman", NULL
+    };
+    GSubprocess* ctl_proc = g_subprocess_newv(ctl_argv, G_SUBPROCESS_FLAGS_NONE, NULL);
+    g_subprocess_communicate_async(ctl_proc, NULL, NULL, batman_ctl_enabled_cb, sender);
+    return TRUE;
+}
+
 static void
 cc_power_panel_dispose (GObject *object)
 {
@@ -1457,6 +1541,15 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, automatic_suspend_dialog);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, automatic_suspend_label);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, automatic_suspend_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_max_cpu_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_btsave_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_bussave_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_chargesave_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_gpusave_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_powersave_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_offline_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_service_enabled_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_service_switch);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_listbox);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_percentage_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_percentage_switch);
@@ -1541,4 +1634,37 @@ cc_power_panel_init (CcPowerPanel *self)
                              G_CALLBACK (up_client_changed), self, G_CONNECT_SWAPPED);
   }
   up_client_changed (self);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_service_switch), check_batman_active() == TRUE);
+  g_signal_connect(self->batman_service_switch, "state-set", G_CALLBACK(batman_service_active_switch_state_set), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_service_enabled_switch), check_batman_enabled() == TRUE);
+  g_signal_connect(self->batman_service_enabled_switch, "state-set", G_CALLBACK(batman_service_enabled_switch_state_set), NULL);
+
+  read_batman_config();
+
+  GString *max_cpu_str = g_string_new(NULL);
+  g_string_printf(max_cpu_str, "%d", batman_config.max_cpu_usage);
+  gtk_editable_set_text(GTK_EDITABLE(self->batman_max_cpu_row), max_cpu_str->str);
+  g_string_free(max_cpu_str, TRUE);
+
+  g_signal_connect(self->batman_max_cpu_row, "apply", G_CALLBACK(max_cpu_entry_apply), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_btsave_switch), batman_config.btsave);
+  g_signal_connect(self->batman_btsave_switch, "state-set", G_CALLBACK(btsave_switch_state_set), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_bussave_switch), batman_config.bussave);
+  g_signal_connect(self->batman_bussave_switch, "state-set", G_CALLBACK(bussave_switch_state_set), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_chargesave_switch), batman_config.chargesave);
+  g_signal_connect(self->batman_chargesave_switch, "state-set", G_CALLBACK(chargesave_switch_state_set), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_gpusave_switch), batman_config.gpusave);
+  g_signal_connect(self->batman_gpusave_switch, "state-set", G_CALLBACK(gpusave_switch_state_set), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_powersave_switch), batman_config.powersave);
+  g_signal_connect(self->batman_powersave_switch, "state-set", G_CALLBACK(powersave_switch_state_set), NULL);
+
+  gtk_switch_set_state(GTK_SWITCH(self->batman_offline_switch), batman_config.offline);
+  g_signal_connect(self->batman_offline_switch, "state-set", G_CALLBACK(offline_switch_state_set), NULL);
 }
