@@ -17,6 +17,7 @@ i18n.merge_file(
 )
 
 sources = files(
+  'cc-batman-config-control.c',
   'cc-battery-row.c',
   'cc-power-panel.c',
   'cc-power-profile-row.c',
