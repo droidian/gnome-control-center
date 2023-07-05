@@ -35,7 +35,7 @@
 #include "cc-repeat-keys-dialog.h"
 #include "cc-typing-dialog.h"
 #include "cc-visual-alerts-dialog.h"
-#include "cc-zoom-options-dialog.h"
+/* #include "cc-zoom-options-dialog.h" */
 
 #define DPI_FACTOR_LARGE 1.25
 #define DPI_FACTOR_NORMAL 1.0
@@ -130,8 +130,8 @@ struct _CcUaPanel
   AdwActionRow      *sound_keys_row;
   GtkLabel          *visual_alerts_label;
   AdwActionRow      *visual_alerts_row;
-  GtkLabel          *zoom_label;
-  AdwActionRow     *zoom_row;
+/*  GtkLabel          *zoom_label; */
+/*  AdwActionRow     *zoom_row; */
 
   GSettings *wm_settings;
   GSettings *a11y_settings;
@@ -158,11 +158,13 @@ run_dialog (CcUaPanel *self, GtkDialog *dialog)
 static void
 activate_row (CcUaPanel *self, AdwActionRow *row)
 {
+#if 0
   if (row == self->zoom_row)
     {
       run_dialog (self, GTK_DIALOG (cc_zoom_options_dialog_new ()));
     }
-  else if (row == self->cursor_size_row)
+#endif
+  if (row == self->cursor_size_row)
     {
       run_dialog (self, GTK_DIALOG (cc_cursor_size_dialog_new ()));
     }
@@ -249,8 +251,8 @@ cc_ua_panel_class_init (CcUaPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcUaPanel, sound_keys_row);
   gtk_widget_class_bind_template_child (widget_class, CcUaPanel, visual_alerts_label);
   gtk_widget_class_bind_template_child (widget_class, CcUaPanel, visual_alerts_row);
-  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, zoom_label);
-  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, zoom_row);
+/*  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, zoom_label); */
+/*  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, zoom_row); */
   gtk_widget_class_bind_template_callback (widget_class, activate_row);
 }
 
@@ -436,6 +438,7 @@ cc_ua_panel_init_seeing (CcUaPanel *self)
                                 cursor_size_label_mapping_get,
                                 NULL, NULL, NULL);
 
+#if 0
   /* zoom */
 
   g_settings_bind_with_mapping (self->application_settings, "screen-magnifier-enabled",
@@ -443,6 +446,7 @@ cc_ua_panel_init_seeing (CcUaPanel *self)
                                 "label", G_SETTINGS_BIND_GET,
                                 on_off_label_mapping_get,
                                 NULL, NULL, NULL);
+#endif
 }
 
 /* hearing/sound section */

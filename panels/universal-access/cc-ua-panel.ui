@@ -111,6 +111,7 @@
                 </child>
               </object>
             </child>
+<!--
             <child>
               <object class="AdwActionRow" id="zoom_row">
                 <property name="title" translatable="yes">_Zoom</property>
@@ -131,6 +132,7 @@
                 </child>
               </object>
             </child>
+-->
           </object>
         </child>
         <child>
