@@ -106,8 +106,8 @@ struct _CcUaPanel
 {
   CcPanel    parent_instance;
 
-  GtkLabel          *accessx_label;
-  AdwActionRow      *accessx_row;
+/*  GtkLabel          *accessx_label;
+  AdwActionRow      *accessx_row; */
   GtkLabel          *click_assist_label;
   AdwActionRow      *click_assist_row;
   GtkLabel          *cursor_blinking_label;
@@ -180,10 +180,12 @@ activate_row (CcUaPanel *self, AdwActionRow *row)
     {
       run_dialog (self, GTK_DIALOG (cc_cursor_blinking_dialog_new ()));
     }
+#if 0
   else if (row == self->accessx_row)
     {
       run_dialog (self, GTK_DIALOG (cc_typing_dialog_new ()));
     }
+#endif
   else if (row == self->click_assist_row)
     {
       run_dialog (self, GTK_DIALOG (cc_pointing_dialog_new ()));
@@ -227,8 +229,8 @@ cc_ua_panel_class_init (CcUaPanelClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/control-center/universal-access/cc-ua-panel.ui");
 
-  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, accessx_label);
-  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, accessx_row);
+/*  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, accessx_label);
+  gtk_widget_class_bind_template_child (widget_class, CcUaPanel, accessx_row); */
   gtk_widget_class_bind_template_child (widget_class, CcUaPanel, click_assist_label);
   gtk_widget_class_bind_template_child (widget_class, CcUaPanel, click_assist_row);
   gtk_widget_class_bind_template_child (widget_class, CcUaPanel, cursor_blinking_label);
@@ -485,6 +487,7 @@ on_cursor_blinking_toggled (CcUaPanel *self)
 static void
 update_accessx_label (CcUaPanel *self)
 {
+#if 0
   gboolean on;
 
   on = g_settings_get_boolean (self->kb_settings, KEY_STICKYKEYS_ENABLED) ||
@@ -492,6 +495,8 @@ update_accessx_label (CcUaPanel *self)
        g_settings_get_boolean (self->kb_settings, KEY_BOUNCEKEYS_ENABLED);
 
   gtk_label_set_text (self->accessx_label, on ? _("On") : _("Off"));
+#endif
+  return 0;
 }
 
 static void
@@ -511,11 +516,12 @@ cc_ua_panel_init_keyboard (CcUaPanel *self)
   g_signal_connect_object (self->interface_settings, "changed",
                            G_CALLBACK (on_cursor_blinking_toggled), self, G_CONNECT_SWAPPED);
   on_cursor_blinking_toggled (self);
-
+#if 0
   /* accessx */
   g_signal_connect_object (self->kb_settings, "changed",
                            G_CALLBACK (update_accessx_label), self, G_CONNECT_SWAPPED);
   update_accessx_label (self);
+#endif
 }
 
 /* mouse/pointing & clicking section */

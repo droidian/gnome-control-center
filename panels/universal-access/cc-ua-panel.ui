@@ -215,7 +215,7 @@
                 </child>
               </object>
             </child>
-            <child>
+<!--            <child>
               <object class="AdwActionRow" id="accessx_row">
                 <property name="title" translatable="yes">_Typing Assist (AccessX)</property>
                 <property name="use-underline">True</property>
@@ -234,7 +234,7 @@
                   </object>
                 </child>
               </object>
-            </child>
+            </child> -->
           </object>
         </child>
         <child>
