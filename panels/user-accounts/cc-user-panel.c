@@ -947,8 +947,9 @@ show_user (ActUser *user, CcUserPanel *self)
         gtk_widget_set_visible (GTK_WIDGET (self->remove_user_button), !show);
         gtk_widget_set_visible (GTK_WIDGET (self->back_button), !show);
         show_or_hide_back_button(self);
+#if 0
         gtk_widget_set_visible (GTK_WIDGET (self->other_users), show);
-
+#endif
         /* Last login: show when administrator or current user */
         current = act_user_manager_get_user_by_id (self->um, getuid ());
         show = act_user_get_uid (user) == getuid () ||
@@ -1413,6 +1414,7 @@ setup_main_window (CcUserPanel *self)
         g_autoptr(GError) error = NULL;
         gboolean loaded;
 
+#if 0
         self->other_users_model = g_list_store_new (ACT_TYPE_USER);
         gtk_list_box_bind_model (self->other_users_listbox,
                                  G_LIST_MODEL (self->other_users_model),
@@ -1420,6 +1422,7 @@ setup_main_window (CcUserPanel *self)
                                  self,
                                  NULL);
 
+#endif
         add_unlock_tooltip (GTK_WIDGET (self->user_avatar));
 
         self->permission = (GPermission *)polkit_permission_new_sync (USER_ACCOUNTS_PERMISSION, NULL, NULL, &error);
