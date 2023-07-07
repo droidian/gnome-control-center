@@ -33,6 +33,7 @@
 #include <NetworkManager.h>
 
 #define QR_IMAGE_SIZE 180
+#define IS_DROID 1
 
 typedef enum
 {
@@ -440,6 +441,47 @@ remove_wifi_device (CcWifiPanel *self,
   update_devices_names (self);
 }
 
+#if IS_DROID
+static void
+check_main_stack_page (CcWifiPanel *self)
+{
+  const gchar *nm_version;
+  gboolean airplane_mode_active;
+  gboolean wireless_enabled;
+  gchar *standard_output = NULL;
+  gchar *standard_error = NULL;
+  gint exit_status = 0;
+
+  nm_version = nm_client_get_version (self->client);
+  wireless_enabled = nm_client_wireless_get_enabled (self->client);
+
+  if (!g_spawn_command_line_sync ("systemctl is-active -q ofono",
+                                  &standard_output,
+                                  &standard_error,
+                                  &exit_status,
+                                  NULL))
+  {
+    g_printerr ("Error running command: %s\n", standard_error);
+    g_free (standard_output);
+    g_free (standard_error);
+    return;
+  }
+
+  airplane_mode_active = (exit_status != 0);
+
+  if (!nm_version)
+    gtk_stack_set_visible_child_name (self->main_stack, "nm-not-running");
+  else if (!wireless_enabled && airplane_mode_active)
+    gtk_stack_set_visible_child_name (self->main_stack, "airplane-mode");
+  else if (!wireless_enabled || self->devices->len == 0)
+    gtk_stack_set_visible_child_name (self->main_stack, "no-wifi-devices");
+  else
+    gtk_stack_set_visible_child_name (self->main_stack, "wifi-connections");
+
+  g_free (standard_output);
+  g_free (standard_error);
+}
+#else
 static void
 check_main_stack_page (CcWifiPanel *self)
 {
@@ -460,6 +502,7 @@ check_main_stack_page (CcWifiPanel *self)
   else
     gtk_stack_set_visible_child_name (self->main_stack, "wifi-connections");
 }
+#endif
 
 static void
 load_wifi_devices (CcWifiPanel *self)
@@ -496,6 +539,42 @@ get_cached_rfkill_property (CcWifiPanel *self,
   return result ? g_variant_get_boolean (result) : FALSE;
 }
 
+#if IS_DROID
+static void
+sync_airplane_mode_switch (CcWifiPanel *self)
+{
+  gboolean enabled;
+  gchar *standard_output = NULL;
+  gchar *standard_error = NULL;
+  gint exit_status = 0;
+
+  if (!g_spawn_command_line_sync ("systemctl is-active -q ofono",
+                                  &standard_output,
+                                  &standard_error,
+                                  &exit_status,
+                                  NULL))
+  {
+    g_printerr ("Error running command: %s\n", standard_error);
+    g_free (standard_output);
+    g_free (standard_error);
+    return;
+  }
+
+  enabled = (exit_status != 0);
+
+  g_signal_handlers_block_by_func (self->rfkill_row,
+                                   rfkill_switch_notify_activate_cb,
+                                   self);
+  g_object_set (self->rfkill_row, "active", enabled, NULL);
+  check_main_stack_page (self);
+  g_signal_handlers_unblock_by_func (self->rfkill_row,
+                                     rfkill_switch_notify_activate_cb,
+                                     self);
+
+  g_free (standard_output);
+  g_free (standard_error);
+}
+#else
 static void
 sync_airplane_mode_switch (CcWifiPanel *self)
 {
@@ -529,6 +608,7 @@ sync_airplane_mode_switch (CcWifiPanel *self)
 
   check_main_stack_page (self);
 }
+#endif
 
 static void
 update_devices_names (CcWifiPanel *self)
@@ -801,6 +881,30 @@ rfkill_proxy_acquired_cb (GObject      *source_object,
   sync_airplane_mode_switch (self);
 }
 
+#if IS_DROID
+static void
+rfkill_switch_notify_activate_cb (CcListRow   *row,
+                                  GParamSpec  *pspec,
+                                  CcWifiPanel *self)
+{
+  gboolean enable;
+  gchar *command;
+  GError *error = NULL;
+
+  enable = cc_list_row_get_active (row);
+
+  if (enable) {
+    command = "systemctl disable --now ModemManager ofono";
+  } else {
+    command = "systemctl enable --now ModemManager ofono";
+  }
+
+  if (!g_spawn_command_line_sync (command, NULL, NULL, NULL, &error)) {
+    g_printerr ("Error executing command: %s\n", error->message);
+    g_error_free (error);
+  }
+}
+#else
 static void
 rfkill_switch_notify_activate_cb (CcListRow   *row,
                                   GParamSpec  *pspec,
@@ -821,6 +925,7 @@ rfkill_switch_notify_activate_cb (CcListRow   *row,
                      NULL,
                      NULL);
 }
+#endif
 
 static void
 on_stack_visible_child_changed_cb (GtkStack    *stack,
