@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="CcUsbPanel" parent="CcPanel">
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+          </object>
+        </child>
+        <property name="content">
+          <object class="AdwClamp">
+            <child>
+              <object class="GtkScrolledWindow">
+                <child>
+                  <object class="AdwPreferencesPage">
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">USB Settings</property>
+                        <child>
+                          <object class="AdwActionRow" id="row_none">
+                            <property name="activatable_widget">radio_none</property>
+                            <property name="title" translatable="yes">None</property>
+                            <property name="subtitle" translatable="yes">Disables all special USB functionalities.</property>
+                            <property name="use-underline">true</property>
+                            <child type="prefix">
+                              <object class="GtkCheckButton" id="radio_none">
+                                <property name="valign">center</property>
+                                <property name="action-name">app.usbconfig</property>
+                                <property name="action-target">"none"</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow" id="row_mtp">
+                            <property name="activatable_widget">radio_mtp</property>
+                            <property name="title" translatable="yes">File transfer</property>
+                            <property name="subtitle" translatable="yes">Allows you to transfer files via a USB connection.</property>
+                            <property name="use-underline">true</property>
+                            <child type="prefix">
+                              <object class="GtkCheckButton" id="radio_mtp">
+                                <property name="valign">center</property>
+                                <property name="action-name">app.usbconfig</property>
+                                <property name="action-target">"mtp"</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow" id="row_rndis">
+                            <property name="activatable_widget">radio_rndis</property>
+                            <property name="title" translatable="yes">Networking</property>
+                            <property name="subtitle" translatable="yes">Allows for USB networking and SSH over a USB connection.</property>
+                            <property name="use-underline">true</property>
+                            <child type="prefix">
+                              <object class="GtkCheckButton" id="radio_rndis">
+                                <property name="valign">center</property>
+                                <property name="action-name">app.usbconfig</property>
+                                <property name="action-target">"rndis"</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
