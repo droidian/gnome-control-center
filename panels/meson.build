@@ -13,6 +13,7 @@ panels = [
   'power',
   'printers',
   'privacy',
+  'mtp',
   'search',
   'sharing',
   'sound',
