@@ -18,6 +18,7 @@ panels = [
   'privacy',
   'region',
   'removable-media',
+  'mtp',
   'search',
   'sharing',
   'sound',

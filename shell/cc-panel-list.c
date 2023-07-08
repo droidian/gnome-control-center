@@ -378,6 +378,7 @@ static const gchar * const panel_order[] = {
   "keyboard",
   "printers",
   "removable-media",
+  "mtp",
   "wacom",
   "color",
 
