@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="CcMtpPanel" parent="CcPanel">
+    <child type="content">
+      <object class="AdwClamp">
+        <child>
+          <object class="GtkScrolledWindow">
+            <child>
+              <object class="AdwPreferencesPage">
+                <child>
+                  <object class="AdwPreferencesGroup">
+                    <property name="title" translatable="yes">MTP Settings</property>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title" translatable="yes">MTP</property>
+                        <property name="subtitle" translatable="yes">Enable MTP connections</property>
+                        <property name="use-underline">true</property>
+                        <child>
+                          <object class="GtkSwitch" id="mtp_enabled_switch">
+                            <property name="valign">center</property>
+                            <accessibility>
+                              <property name="label" translatable="yes">Enabled</property>
+                            </accessibility>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
