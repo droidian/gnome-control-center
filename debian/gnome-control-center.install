@@ -6,3 +6,4 @@ usr/share/dbus-1
 usr/share/gnome-shell
 usr/share/man
 usr/share/metainfo
+polkit/90-mtp.rules /usr/share/polkit-1/rules.d/
