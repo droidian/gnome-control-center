@@ -22,6 +22,7 @@ panels = [
   'printers',
   'region',
   'removable-media',
+  'mtp',
   'screen',
   'search',
   'sharing',
