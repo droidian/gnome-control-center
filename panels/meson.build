@@ -8,6 +8,7 @@ panels = [
   'keyboard',
   'mouse',
   'multitasking',
+  'nfc',
   'notifications',
   'online-accounts',
   'power',
