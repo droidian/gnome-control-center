@@ -30,6 +30,7 @@ if enable_droidian
     'droidian-encryption',
     'fingerprint',
     'usb',
+    'nfc',
   ]
 endif
 
