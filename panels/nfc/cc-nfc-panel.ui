@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="CcNfcPanel" parent="CcPanel">
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <child type="end">
+              <object class="GtkSwitch" id="nfc_enabled_switch">
+                <accessibility>
+                  <property name="label" translatable="yes">Enable NFC Server</property>
+                </accessibility>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <property name="content">
+          <object class="AdwClamp">
+            <child>
+              <object class="GtkScrolledWindow">
+                <child>
+                  <object class="AdwPreferencesPage">
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">NFC Settings</property>
+
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">NFC read</property>
+                            <property name="subtitle" translatable="yes">Read a NFC tag</property>
+                            <property name="use-underline">true</property>
+                            <child>
+                              <object class="GtkButton" id="nfc_read_button">
+                                <property name="label" translatable="yes">Read</property>
+                                <property name="valign">center</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">NFC read status</property>
+                            <property name="subtitle" translatable="yes">If reading was successful</property>
+                            <property name="activatable">false</property>
+                            <property name="use-underline">false</property>
+                            <child>
+                              <object class="GtkLabel" id="nfc_read_label">
+                                <property name="valign">center</property>
+                                <property name="ellipsize">end</property>
+                                <property name="selectable">true</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
