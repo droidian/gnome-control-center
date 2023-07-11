@@ -48,6 +48,7 @@ extern GType cc_multitasking_panel_get_type (void);
 extern GType cc_network_panel_get_type (void);
 extern GType cc_wifi_panel_get_type (void);
 #endif /* BUILD_NETWORK */
+extern GType cc_nfc_panel_get_type (void);
 extern GType cc_notifications_panel_get_type (void);
 extern GType cc_online_accounts_panel_get_type (void);
 extern GType cc_power_panel_get_type (void);
@@ -124,6 +125,7 @@ static CcPanelLoaderVtable default_panels[] =
   PANEL_TYPE("network",          cc_network_panel_get_type,              NULL),
   PANEL_TYPE("wifi",             cc_wifi_panel_get_type,                 cc_wifi_panel_static_init_func),
 #endif
+  PANEL_TYPE("nfc",              cc_nfc_panel_get_type,                  NULL),
   PANEL_TYPE("notifications",    cc_notifications_panel_get_type,        NULL),
   PANEL_TYPE("online-accounts",  cc_online_accounts_panel_get_type,      NULL),
   PANEL_TYPE("power",            cc_power_panel_get_type,                NULL),
