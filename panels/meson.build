@@ -31,6 +31,7 @@ panels = [
   'universal-access',
   'usage',
   'user-accounts',
+  'waydroid',
  'wwan',
 ]
 
