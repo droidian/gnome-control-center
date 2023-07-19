@@ -25,6 +25,7 @@ panels = [
   'sound',
   'universal-access',
   'user-accounts',
+  'waydroid',
  'wwan',
 ]
 
