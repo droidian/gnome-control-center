@@ -10,6 +10,7 @@ panels = [
   'diagnostics',
   'display',
   'firmware-security',
+  'fingerprint',
   'info-overview',
   'keyboard',
   'location',

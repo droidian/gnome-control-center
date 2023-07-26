@@ -416,6 +416,7 @@ static const gchar * const panel_order[] = {
   "display",
   "mouse",
   "keyboard",
+  "fingerprint",
   "printers",
   "removable-media",
   "waydroid",
