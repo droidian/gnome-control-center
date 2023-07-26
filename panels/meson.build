@@ -5,6 +5,7 @@ panels = [
   'background',
   'color',
   'display',
+  'fingerprint',
   'keyboard',
   'mouse',
   'mtp',
