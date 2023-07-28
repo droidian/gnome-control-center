@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright (C) 2023 Bardia Moshiri <fakeshell@bardia.tech>
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -19,6 +19,8 @@ struct _CcFingerprintPanel {
   GtkWidget        *remove_finger_button;
   GtkWidget        *enroll_finger_button;
   GtkWidget        *enroll_status_label;
+  GtkWidget        *identify_finger_button;
+  GtkWidget        *identify_status_label;
   GtkBox           *show_list_box;
   GtkToggleButton  *show_enrolled_list;
   GtkToggleButton  *show_unenrolled_list;
@@ -160,9 +162,10 @@ enroll_finger_thread (gpointer user_data)
     gtk_widget_set_sensitive(GTK_WIDGET(self->finger_select_combo), FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->show_unenrolled_list), FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->show_enrolled_list), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(self->identify_finger_button), FALSE);
 
     if (finger != NULL) {
-        gchar *command = g_strdup_printf("(rm -f /tmp/.enrollment_status; droidian-fpd-client enroll %s > /tmp/.enrollment_status 2>&1; echo 100 >> /tmp/.enrollment_status)", finger);
+        gchar *command = g_strdup_printf("(rm -f /tmp/.enrollment_status; droidian-fpd-client enroll %s > /tmp/.enrollment_status 2>&1; echo 100 >> /tmp/.enrollment_status; systemctl restart --user droidian-fpd-unlocker)", finger);
 
         system(command);
 
@@ -176,6 +179,7 @@ enroll_finger_thread (gpointer user_data)
     gtk_widget_set_sensitive(GTK_WIDGET(self->finger_select_combo), TRUE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->show_unenrolled_list), TRUE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->show_enrolled_list), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(self->identify_finger_button), TRUE);
 
     return NULL;
 }
@@ -235,6 +239,65 @@ update_enroll_status_label (gpointer data)
     return NULL;
 }
 
+static gboolean
+set_identify_label_text (gpointer data)
+{
+    LabelTextData *label_text_data = (LabelTextData *)data;
+    gchar *text_chomped = g_strchomp(g_strdup(label_text_data->text));
+    gchar *text_with_percent = g_strconcat(text_chomped, NULL);
+
+    gtk_widget_set_visible(GTK_WIDGET(label_text_data->label), TRUE);
+    gtk_label_set_text(GTK_LABEL(label_text_data->label), text_with_percent);
+
+    g_free(text_with_percent);
+    g_free(text_chomped);
+    g_free(label_text_data->text);
+    g_free(label_text_data);
+    return G_SOURCE_REMOVE;
+}
+
+static gpointer
+identify_finger_thread (gpointer user_data)
+{
+    CcFingerprintPanel *self = (CcFingerprintPanel *)user_data;
+
+    gtk_widget_set_sensitive(GTK_WIDGET(self->identify_finger_button), FALSE);
+
+    gchar *command = g_strdup_printf("droidian-fpd-client identify");
+    gchar *output = NULL;
+    gchar *error_output = NULL;
+    GError *error = NULL;
+
+    if (!g_spawn_command_line_sync(command, &error_output, &output, NULL, &error)) {
+        g_printerr("Failed to execute command: %s", error->message);
+        g_error_free(error);
+    } else {
+        LabelTextData *label_text_data = g_new(LabelTextData, 1);
+        label_text_data->label = self->identify_status_label;
+        label_text_data->text = g_strdup(output);
+        g_idle_add((GSourceFunc)set_identify_label_text, label_text_data);
+    }
+
+    if (output) {
+        g_free(output);
+    }
+
+    if (error_output) {
+        g_free(error_output);
+    }
+
+    g_free(command);
+
+    gtk_widget_set_sensitive(GTK_WIDGET(self->identify_finger_button), TRUE);
+
+    return NULL;
+}
+
+static void
+cc_fingerprint_panel_identify_finger(GtkButton *button, CcFingerprintPanel *self) {
+  g_thread_new(NULL, identify_finger_thread, self);
+}
+
 static void
 cc_fingerprint_panel_class_init (CcFingerprintPanelClass *klass)
 {
@@ -273,6 +336,14 @@ cc_fingerprint_panel_class_init (CcFingerprintPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class,
                                         CcFingerprintPanel,
                                         finger_select_combo);
+
+  gtk_widget_class_bind_template_child (widget_class,
+                                        CcFingerprintPanel,
+                                        identify_finger_button);
+
+  gtk_widget_class_bind_template_child (widget_class,
+                                        CcFingerprintPanel,
+                                        identify_status_label);
 }
 
 static void
@@ -293,6 +364,7 @@ cc_fingerprint_panel_init (CcFingerprintPanel *self)
 
     g_signal_connect(GTK_TOGGLE_BUTTON(self->show_enrolled_list), "toggled", G_CALLBACK(on_show_enrolled_list_toggled), self);
     g_signal_connect(GTK_TOGGLE_BUTTON(self->show_unenrolled_list), "toggled", G_CALLBACK(on_show_unenrolled_list_toggled), self);
+    g_signal_connect(G_OBJECT(self->identify_finger_button), "clicked", G_CALLBACK(cc_fingerprint_panel_identify_finger), self);
 
     refresh_enrolled_list(self);
     g_thread_new("update_label_thread", update_enroll_status_label, self->enroll_status_label);
@@ -300,6 +372,7 @@ cc_fingerprint_panel_init (CcFingerprintPanel *self)
     gtk_widget_set_sensitive(GTK_WIDGET(self->remove_finger_button), FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->finger_select_combo), FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->enroll_finger_button), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(self->identify_finger_button), FALSE);
     gtk_label_set_text(GTK_LABEL(self->enroll_status_label), "");
   }
 }
