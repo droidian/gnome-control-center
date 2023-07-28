@@ -2,6 +2,19 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <template class="CcWaydroidPanel" parent="CcPanel">
+
+    <child type="titlebar-end">
+      <object class="GtkToggleButton" id="install_waydroid_button">
+        <property name="use_underline">True</property>
+        <property name="valign">center</property>
+        <property name="label" translatable="yes">Install Waydroid</property>
+        <signal name="toggled" handler="cc_waydroid_panel_install_waydroid" swapped="yes"/>
+        <style>
+          <class name="text-button"/>
+        </style>
+      </object>
+    </child>
+
     <child type="content">
       <object class="AdwClamp">
         <child>
