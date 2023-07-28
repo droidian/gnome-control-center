@@ -11,6 +11,7 @@
                 <child>
                   <object class="AdwPreferencesGroup">
                     <property name="title" translatable="yes">Fingerprint Settings</property>
+
                     <child>
                       <object class="AdwActionRow" id="show_list_row">
                         <property name="title" translatable="yes">Finger list</property>
@@ -44,6 +45,7 @@
                          </child>
                       </object>
                     </child>
+
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Select Finger</property>
@@ -59,6 +61,7 @@
                         </child>
                       </object>
                     </child>
+
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Remove Finger</property>
@@ -75,6 +78,7 @@
                         </child>
                       </object>
                     </child>
+
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Enroll Finger</property>
@@ -90,6 +94,7 @@
                         </child>
                       </object>
                     </child>
+
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Enrollment Status</property>
@@ -102,6 +107,36 @@
                         </child>
                       </object>
                     </child>
+
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title" translatable="yes">Test finger</property>
+                        <property name="subtitle" translatable="yes">Test the selected finger</property>
+                        <child>
+                          <object class="GtkButton" id="identify_finger_button">
+                            <property name="label" translatable="yes">Test</property>
+                            <property name="valign">center</property>
+                            <accessibility>
+                              <property name="label" translatable="yes">Test Finger</property>
+                            </accessibility>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title" translatable="yes">Finger test result</property>
+                        <property name="subtitle" translatable="yes">Name of the tested finger</property>
+                        <child>
+                          <object class="GtkLabel" id="identify_status_label">
+                            <property name="label" translatable="yes">0</property>
+                            <property name="visible">false</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
                   </object>
                 </child>
               </object>
