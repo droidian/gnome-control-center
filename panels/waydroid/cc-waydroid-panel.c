@@ -470,8 +470,27 @@ reenable_switch_and_update_info(gpointer data)
     g_signal_connect(G_OBJECT(self->show_ui_button), "clicked", G_CALLBACK(cc_waydroid_panel_show_full_ui), self);
     g_signal_connect(self->refresh_app_list_button, "clicked", G_CALLBACK(cc_waydroid_refresh_button), self);
 
+    gchar *uevent_output;
+    gchar *uevent_error;
+    gint uevent_exit_status;
+
+    g_spawn_command_line_sync("sh -c \"waydroid prop get persist.waydroid.uevent\"", &uevent_output, &uevent_error, &uevent_exit_status, NULL);
+    gboolean uevent_state = g_strstr_len(uevent_output, -1, "true") != NULL ? 0 : 1;
+    g_signal_handlers_block_by_func(self->waydroid_uevent_switch, cc_waydroid_panel_toggle_uevent, self);
+
+    if (uevent_state == 0) {
+        gtk_switch_set_state(GTK_SWITCH(self->waydroid_uevent_switch), TRUE);
+    } else {
+        gtk_switch_set_state(GTK_SWITCH(self->waydroid_uevent_switch), FALSE);
+    }
+
+    g_signal_handlers_unblock_by_func(self->waydroid_uevent_switch, cc_waydroid_panel_toggle_uevent, self);
+
     g_usleep(5000000);
     update_app_list_threaded(self);
+
+    g_free(uevent_output);
+    g_free(uevent_error);
 
     return G_SOURCE_REMOVE;
 }
