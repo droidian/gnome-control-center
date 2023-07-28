@@ -26,6 +26,7 @@ struct _CcWaydroidPanel {
   GtkWidget        *show_ui_button;
   GtkWidget        *refresh_app_list_button;
   GtkWidget        *waydroid_uevent_switch;
+  GtkWidget        *install_waydroid_button;
 };
 
 typedef struct {
@@ -539,6 +540,37 @@ cc_waydroid_panel_enable_waydroid(GtkSwitch *widget, gboolean state, CcWaydroidP
 }
 
 static void
+cc_waydroid_panel_install_waydroid (CcWaydroidPanel *self, GtkWidget *button)
+{
+    if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
+        return;
+    }
+
+    gchar *command_output;
+    gchar *command_error;
+    gint exit_status;
+
+    gboolean success = g_spawn_command_line_sync("kgx -e 'sudo apt update && sudo apt install waydroid -y && sudo systemctl enable --now waydroid-container'",
+                                                 &command_output,
+                                                 &command_error,
+                                                 &exit_status,
+                                                 NULL);
+
+    if (success && g_file_test("/usr/bin/waydroid", G_FILE_TEST_EXISTS)) {
+        cc_waydroid_panel_init(self);
+    } else {
+        if (!success) {
+            g_print("Error running command: %s", command_error);
+        }
+    }
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
+
+    g_free(command_output);
+    g_free(command_error);
+}
+
+static void
 cc_waydroid_panel_class_init (CcWaydroidPanelClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -592,6 +624,14 @@ cc_waydroid_panel_class_init (CcWaydroidPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class,
                                         CcWaydroidPanel,
                                         waydroid_uevent_switch);
+
+  gtk_widget_class_bind_template_child (widget_class,
+                                        CcWaydroidPanel,
+                                        install_waydroid_button);
+
+  gtk_widget_class_bind_template_callback (widget_class,
+                                           cc_waydroid_panel_install_waydroid);
+
 }
 
 static void
@@ -602,9 +642,13 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
 
   self->app_list_store = g_list_store_new (G_TYPE_APP_INFO);
 
+  g_signal_connect(self->install_waydroid_button, "clicked", G_CALLBACK(cc_waydroid_panel_install_waydroid), self);
+
   if(g_file_test("/usr/bin/waydroid", G_FILE_TEST_EXISTS)) {
       g_signal_connect(G_OBJECT(self->waydroid_enabled_switch), "state-set", G_CALLBACK(cc_waydroid_panel_enable_waydroid), self);
       g_signal_connect(G_OBJECT(self->waydroid_uevent_switch), "state-set", G_CALLBACK(cc_waydroid_panel_toggle_uevent), self);
+
+      gtk_widget_set_sensitive(GTK_WIDGET(self->install_waydroid_button), FALSE);
 
       gchar *waydroid_output;
       gchar *waydroid_error;
@@ -673,6 +717,7 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
       g_free(waydroid_output);
       g_free(waydroid_error);
   } else {
+      gtk_widget_set_sensitive(GTK_WIDGET(self->install_waydroid_button), TRUE);
       gtk_switch_set_state(GTK_SWITCH(self->waydroid_enabled_switch), FALSE);
       gtk_widget_set_sensitive(self->waydroid_enabled_switch, FALSE);
       gtk_label_set_text(GTK_LABEL(self->waydroid_vendor_label), "");
