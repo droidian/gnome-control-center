@@ -27,6 +27,7 @@ struct _CcWaydroidPanel {
   GtkWidget        *refresh_app_list_button;
   GtkWidget        *waydroid_uevent_switch;
   GtkWidget        *install_waydroid_button;
+  GtkWidget        *waydroid_factory_reset;
 };
 
 typedef struct {
@@ -447,6 +448,25 @@ cc_waydroid_panel_toggle_uevent(GtkSwitch *widget, gboolean state, CcWaydroidPan
     return FALSE;
 }
 
+static void
+cc_waydroid_factory_reset_threaded (GtkWidget *widget, CcWaydroidPanel *self)
+{
+    GError *error = NULL;
+    gchar *command = "rm -rf $HOME/.local/share/waydroid";
+    gchar *home_env = g_strdup_printf("HOME=%s", g_get_home_dir());
+    gchar *argv[] = {"pkexec", "env", home_env, "/bin/sh", "-c", command, NULL};
+
+    if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, NULL, &error)) {
+        g_warning("Error running command: %s", error->message);
+        g_clear_error(&error);
+    } else {
+        gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_factory_reset), FALSE);
+        g_timeout_add_seconds(15, (GSourceFunc)gtk_widget_set_sensitive, self->waydroid_factory_reset);
+    }
+
+    g_free(home_env);
+}
+
 static gboolean
 reenable_switch_and_update_info(gpointer data)
 {
@@ -463,6 +483,7 @@ reenable_switch_and_update_info(gpointer data)
     gtk_widget_set_sensitive(GTK_WIDGET(self->show_ui_button), TRUE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->refresh_app_list_button), TRUE);
     gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_uevent_switch), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_factory_reset), FALSE);
 
     g_signal_connect(G_OBJECT(self->launch_app_button), "clicked", G_CALLBACK(cc_waydroid_panel_launch_app_threaded), self);
     g_signal_connect(G_OBJECT(self->remove_app_button), "clicked", G_CALLBACK(cc_waydroid_panel_uninstall_app), self);
@@ -553,6 +574,7 @@ cc_waydroid_panel_enable_waydroid(GtkSwitch *widget, gboolean state, CcWaydroidP
         gtk_widget_set_sensitive(GTK_WIDGET(self->show_ui_button), FALSE);
         gtk_widget_set_sensitive(GTK_WIDGET(self->refresh_app_list_button), FALSE);
         gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_uevent_switch), FALSE);
+        gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_factory_reset), TRUE);
     }
 
     return FALSE;
@@ -648,9 +670,12 @@ cc_waydroid_panel_class_init (CcWaydroidPanelClass *klass)
                                         CcWaydroidPanel,
                                         install_waydroid_button);
 
+  gtk_widget_class_bind_template_child (widget_class,
+                                        CcWaydroidPanel,
+                                        waydroid_factory_reset);
+
   gtk_widget_class_bind_template_callback (widget_class,
                                            cc_waydroid_panel_install_waydroid);
-
 }
 
 static void
@@ -666,6 +691,7 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
   if(g_file_test("/usr/bin/waydroid", G_FILE_TEST_EXISTS)) {
       g_signal_connect(G_OBJECT(self->waydroid_enabled_switch), "state-set", G_CALLBACK(cc_waydroid_panel_enable_waydroid), self);
       g_signal_connect(G_OBJECT(self->waydroid_uevent_switch), "state-set", G_CALLBACK(cc_waydroid_panel_toggle_uevent), self);
+      g_signal_connect(G_OBJECT(self->waydroid_factory_reset), "clicked", G_CALLBACK(cc_waydroid_factory_reset_threaded), self);
 
       gtk_widget_set_sensitive(GTK_WIDGET(self->install_waydroid_button), FALSE);
 
