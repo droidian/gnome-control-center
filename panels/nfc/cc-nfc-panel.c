@@ -25,28 +25,38 @@ cc_nfc_panel_finalize (GObject *object)
   G_OBJECT_CLASS (cc_nfc_panel_parent_class)->finalize (object);
 }
 
-static gboolean
-cc_nfc_panel_enable_nfc(GtkSwitch *widget, gboolean state, CcNfcPanel *self) {
-    gchar *standard_output = NULL;
-    gchar *standard_error = NULL;
+static void
+cc_nfc_panel_enable_nfc(GtkSwitch *widget, gboolean state, CcNfcPanel *self)
+{
     GError *error = NULL;
-    gint exit_status = 0;
+    gchar *command;
+    gchar *stderr_output = NULL;
+    gint exit_status;
 
-    if(state) {
-        g_spawn_command_line_sync("systemctl enable --now nfcd", &standard_output, &standard_error, &exit_status, &error);
+    gchar *argv[] = {"pkexec", "env", "/bin/sh", "-c", NULL, NULL};
+
+    if (state) {
+        command = "systemctl enable --now nfcd";
     } else {
-        g_spawn_command_line_sync("systemctl disable --now nfcd", &standard_output, &standard_error, &exit_status, &error);
+        command = "systemctl disable --now nfcd";
     }
 
-    if (error != NULL) {
-        g_printerr("Error: %s\n", error->message);
+    argv[4] = command;
+
+    if (!g_spawn_sync(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &stderr_output, &exit_status, &error)) {
+        g_warning("Failed to execute command: %s", error->message);
+    }
+
+    if (exit_status != 0) {
+        g_signal_handlers_block_by_func(widget, cc_nfc_panel_enable_nfc, self);
+        gtk_switch_set_state(widget, !state);
+        g_signal_handlers_unblock_by_func(widget, cc_nfc_panel_enable_nfc, self);
+    }
+
+    g_free(stderr_output);
+    if (error) {
         g_error_free(error);
     }
-
-    g_free(standard_output);
-    g_free(standard_error);
-
-    return FALSE;
 }
 
 static void
