@@ -78,6 +78,8 @@ extern void cc_wacom_panel_static_init_func (void);
 extern void cc_wwan_panel_static_init_func (void);
 #endif /* BUILD_WWAN */
 
+extern GType cc_droidian_encryption_panel_get_type (void);
+
 #define PANEL_TYPE(name, get_type, init_func) { name, get_type, init_func }
 
 static CcPanelLoaderVtable droidian_panels[] =
@@ -108,6 +110,7 @@ static CcPanelLoaderVtable droidian_panels[] =
 #ifdef BUILD_WWAN
   PANEL_TYPE("wwan",             cc_wwan_panel_get_type,                 cc_wwan_panel_static_init_func),
 #endif
+  PANEL_TYPE("droidian-encryption", cc_droidian_encryption_panel_get_type, NULL),
 };
 
 
@@ -143,6 +146,7 @@ static gchar * const droidian_panel_order[] = {
 
   "universal-access",
   "privacy",
+  "droidian-encryption",
   "system",
   "reset-settings",
 };
