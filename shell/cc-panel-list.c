@@ -380,6 +380,7 @@ static const gchar * const panel_order[] = {
   "waydroid",
   "mtp",
   "nfc",
+  "droidian-encryption",
   "wacom",
   "color",
 
