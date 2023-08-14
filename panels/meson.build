@@ -9,6 +9,7 @@ panels = [
   'default-apps',
   'diagnostics',
   'display',
+  'droidian-encryption',
   'firmware-security',
   'fingerprint',
   'info-overview',
