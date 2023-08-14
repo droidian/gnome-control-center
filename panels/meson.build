@@ -31,6 +31,7 @@ endif
 
 if enable_droidian
   panels += [
+    'droidian-encryption',
   ]
 endif
 
