@@ -7,6 +7,7 @@ panels = [
   'datetime',
   'default-apps',
   'display',
+  'droidian-encryption',
   'fingerprint',
   'info-overview',
   'keyboard',
