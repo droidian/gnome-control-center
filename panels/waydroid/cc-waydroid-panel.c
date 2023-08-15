@@ -730,6 +730,7 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
           gtk_widget_set_sensitive(GTK_WIDGET(self->show_ui_button), TRUE);
           gtk_widget_set_sensitive(GTK_WIDGET(self->refresh_app_list_button), TRUE);
           gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_uevent_switch), TRUE);
+          gtk_widget_set_sensitive(GTK_WIDGET(self->waydroid_factory_reset), FALSE);
 
           g_signal_connect(G_OBJECT(self->launch_app_button), "clicked", G_CALLBACK(cc_waydroid_panel_launch_app_threaded), self);
           g_signal_connect(G_OBJECT(self->remove_app_button), "clicked", G_CALLBACK(cc_waydroid_panel_uninstall_app), self);
