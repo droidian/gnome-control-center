@@ -352,7 +352,9 @@ cc_panel_set_folded (CcPanel  *panel,
 {
   CcPanelPrivate *priv;
 
-  g_return_if_fail (CC_IS_PANEL (panel));
+  if (!CC_IS_PANEL (panel))
+    /* Valid with the do-not-load-panel patch */
+    return;
 
   priv = cc_panel_get_instance_private (panel);
 
