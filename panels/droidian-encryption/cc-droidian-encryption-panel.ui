@@ -49,11 +49,13 @@
                 <child>
                   <object class="AdwPasswordEntryRow" id="passphrase_entry">
                     <property name="title" translatable="yes">Passphrase</property>
+                    <property name="visible">false</property>
                   </object>
                 </child>
                 <child>
                   <object class="AdwPasswordEntryRow" id="passphrase_confirm_entry">
                     <property name="title" translatable="yes">Passphrase (confirm)</property>
+                    <property name="visible">false</property>"
                   </object>
                 </child>
                 <child>
