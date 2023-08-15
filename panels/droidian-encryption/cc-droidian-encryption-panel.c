@@ -165,9 +165,11 @@ select_page (CcDroidianEncryptionPanel *self,
 static void
 select_enable_page (CcDroidianEncryptionPanel *self)
 {
-  /* Reset entries */
+  /* Reset and show entries */
   gtk_editable_set_text (GTK_EDITABLE (self->passphrase_entry), "");
   gtk_editable_set_text (GTK_EDITABLE (self->passphrase_confirm_entry), "");
+  gtk_widget_set_visible (GTK_WIDGET (self->passphrase_entry), TRUE);
+  gtk_widget_set_visible (GTK_WIDGET (self->passphrase_confirm_entry), TRUE);
 
   gtk_widget_grab_focus (GTK_WIDGET (self->passphrase_entry));
 
