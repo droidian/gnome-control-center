@@ -165,7 +165,7 @@ enroll_finger_thread (gpointer user_data)
     gtk_widget_set_sensitive(GTK_WIDGET(self->identify_finger_button), FALSE);
 
     if (finger != NULL) {
-        gchar *command = g_strdup_printf("(rm -f /tmp/.enrollment_status; droidian-fpd-client enroll %s > /tmp/.enrollment_status 2>&1; echo 100 >> /tmp/.enrollment_status; systemctl restart --user droidian-fpd-unlocker)", finger);
+        gchar *command = g_strdup_printf("(rm -f /tmp/.enrollment_status; droidian-fpd-client enroll %s > /tmp/.enrollment_status 2>&1; echo 100 >> /tmp/.enrollment_status; systemctl restart --user fpdlistener)", finger);
 
         system(command);
 
