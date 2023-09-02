@@ -1,3 +1,9 @@
+gnome-control-center (1:45~rc-1mobian1) unstable; urgency=medium
+
+  * d/patches: Rebase on 45-rc
+
+ -- Undef <debian@undef.tools>  Sat, 02 Sep 2023 08:41:09 +0000
+
 gnome-control-center (1:45~rc-1) unstable; urgency=medium
 
   * New upstream release
