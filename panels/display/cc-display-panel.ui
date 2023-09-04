@@ -147,21 +147,6 @@
                       </object>
                     </child>
 
-                    <!-- Night Light -->
-                    <child>
-                      <object class="AdwPreferencesGroup">
-                        <child>
-                          <object class="CcListRow" id="night_light_row">
-                            <property name="activatable">True</property>
-                            <property name="title" translatable="yes" comments="This is the redshift functionality where we suppress blue light when the sun has gone down">Night Light</property>
-                            <property name="show-arrow">True</property>
-                            <property name="action-name">navigation.push</property>
-                            <property name="action-target">'night-light'</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
                   </object>
                 </property>
               </object>
