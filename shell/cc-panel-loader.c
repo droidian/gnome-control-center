@@ -93,7 +93,7 @@ static CcPanelLoaderVtable default_panels[] =
 #ifdef BUILD_BLUETOOTH
   PANEL_TYPE("bluetooth",        cc_bluetooth_panel_get_type,            NULL),
 #endif
-  PANEL_TYPE("color",            cc_color_panel_get_type,                NULL),
+//  PANEL_TYPE("color",            cc_color_panel_get_type,                NULL),
   PANEL_TYPE("datetime",         cc_date_time_panel_get_type,            NULL),
   PANEL_TYPE("default-apps",     cc_default_apps_panel_get_type,         NULL),
   PANEL_TYPE("display",          cc_display_panel_get_type,              NULL),
