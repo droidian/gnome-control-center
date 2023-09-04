@@ -829,8 +829,11 @@ show_user (ActUser *user, CcUserPanel *self)
         gtk_widget_set_visible (GTK_WIDGET (self->remove_user_label), !show && act_user_is_logged_in_anywhere (user));
         gtk_widget_set_visible (GTK_WIDGET (self->back_button), !show);
         show_or_hide_back_button(self);
+
+#if 0
         gtk_widget_set_visible (GTK_WIDGET (self->other_users), other_user_show);
         gtk_widget_set_visible (GTK_WIDGET (self->add_user_button), show && is_admin);
+#endif
 
         on_permission_changed (self);
 }
@@ -1178,12 +1181,14 @@ setup_main_window (CcUserPanel *self)
         g_autoptr(GError) error = NULL;
         gboolean loaded;
 
+#if 0
         self->other_users_model = g_list_store_new (ACT_TYPE_USER);
         gtk_list_box_bind_model (self->other_users_listbox,
                                  G_LIST_MODEL (self->other_users_model),
                                  (GtkListBoxCreateWidgetFunc)create_user_row,
                                  self,
                                  NULL);
+#endif
 
         add_unlock_tooltip (GTK_WIDGET (self->user_avatar));
 
