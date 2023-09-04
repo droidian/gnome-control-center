@@ -77,17 +77,6 @@
                           </object>
                         </child>
 
-                        <!-- Zoom row -->
-                        <child>
-                          <object class="CcListRow" id="zoom_row">
-                            <property name="title" translatable="yes">_Zoom</property>
-                            <property name="icon-name">zoom-symbolic</property>
-                            <property name="use-underline">True</property>
-                            <property name="show-arrow">True</property>
-                            <property name="action-name">navigation.push</property>
-                            <property name="action-target">'zoom'</property>
-                          </object>
-                        </child>
                       </object> <!-- ./AdwPreferencesGroup -->
                     </child>
                   </object> <!-- ./AdwPreferencesPage main_page -->
@@ -111,10 +100,6 @@
 
         <child>
           <object class="CcUaMousePage" id="mouse_page"/>
-        </child>
-
-        <child>
-          <object class="CcUaZoomPage" id="zoom_page"/>
         </child>
 
       </object>
