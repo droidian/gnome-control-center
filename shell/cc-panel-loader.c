@@ -112,7 +112,7 @@ static CcPanelLoaderVtable default_panels[] =
   PANEL_TYPE("privacy",          cc_privacy_panel_get_type,              NULL),
   PANEL_TYPE("region",           cc_region_panel_get_type,               NULL),
   PANEL_TYPE("removable-media",  cc_removable_media_panel_get_type,      NULL),
-  PANEL_TYPE("search",           cc_search_panel_get_type,               NULL),
+//  PANEL_TYPE("search",           cc_search_panel_get_type,               NULL),
   PANEL_TYPE("sharing",          cc_sharing_panel_get_type,              NULL),
   PANEL_TYPE("sound",            cc_sound_panel_get_type,                NULL),
   PANEL_TYPE("universal-access", cc_ua_panel_get_type,                   NULL),
