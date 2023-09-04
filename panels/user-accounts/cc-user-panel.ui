@@ -128,25 +128,6 @@
                                 <signal name="activated" handler="change_fingerprint" object="CcUserPanel" swapped="yes"/>
                               </object>
                             </child>
-                            <child>
-                              <object class="AdwActionRow" id="autologin_row">
-                                <property name="title" translatable="yes">A_utomatic Login</property>
-                                <property name="use_underline">True</property>
-                                <property name="activatable_widget">autologin_switch</property>
-                                <child type="suffix">
-                                  <object class="CcListRowInfoButton">
-                                    <property name="valign">center</property>
-                                    <property name="text" translatable="yes">Automatic login opens the user account when the device starts, without requiring authentication. Authentication is still required at other times, such as when unlocking the screen.</property>
-                                  </object>
-                                </child>
-                                <child type="suffix">
-                                  <object class="GtkSwitch" id="autologin_switch">
-                                    <property name="valign">center</property>
-                                    <signal name="notify::active" handler="autologin_changed" object="CcUserPanel" swapped="yes"/>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
                           </object>
                         </child>
 
@@ -241,16 +222,6 @@
                                 <property name="visible">False</property>
                                 <property name="margin-top">12</property>
                                 <property name="label" translatable="yes">Users cannot be removed while logged in</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkButton" id="add_user_button">
-                                <property name="use_underline">True</property>
-                                <property name="label" translatable="yes">_Add User…</property>
-                                <signal name="clicked" handler="add_user" object="CcUserPanel" swapped="yes"/>
-                                <style>
-                                  <class name="suggested-action"/>
-                                </style>
                               </object>
                             </child>
                           </object>
