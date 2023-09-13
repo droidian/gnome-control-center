@@ -2,38 +2,45 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <template class="CcNfcPanel" parent="CcPanel">
-    <child type="content">
-      <object class="AdwClamp">
-        <child>
-          <object class="GtkScrolledWindow">
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar"></object>
+        </child>
+        <property name="content">
+          <object class="AdwClamp">
             <child>
-              <object class="AdwPreferencesPage">
+              <object class="GtkScrolledWindow">
                 <child>
-                  <object class="AdwPreferencesGroup">
-                    <property name="title" translatable="yes">NFC Settings</property>
+                  <object class="AdwPreferencesPage">
                     <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">NFC</property>
-                        <property name="subtitle" translatable="yes">Enable NFC connections</property>
-                        <property name="use-underline">true</property>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">NFC Settings</property>
                         <child>
-                          <object class="GtkSwitch" id="nfc_enabled_switch">
-                            <property name="valign">center</property>
-                            <accessibility>
-                              <property name="label" translatable="yes">Enabled</property>
-                            </accessibility>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">NFC</property>
+                            <property name="subtitle" translatable="yes">Enable NFC connections</property>
+                            <property name="use-underline">true</property>
+                            <child>
+                              <object class="GtkSwitch" id="nfc_enabled_switch">
+                                <property name="valign">center</property>
+                                <accessibility>
+                                  <property name="label" translatable="yes">Enabled</property>
+                                </accessibility>
+                              </object>
+                            </child>
                           </object>
                         </child>
+
                       </object>
                     </child>
-
                   </object>
                 </child>
               </object>
             </child>
           </object>
-        </child>
+        </property>
       </object>
-    </child>
+    </property>
   </template>
 </interface>
