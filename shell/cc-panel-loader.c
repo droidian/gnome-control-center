@@ -56,7 +56,7 @@ extern GType cc_privacy_panel_get_type (void);
 extern GType cc_waydroid_panel_get_type (void);
 extern GType cc_mtp_panel_get_type (void);
 extern GType cc_search_panel_get_type (void);
-extern GType cc_sharing_panel_get_type (void);
+//extern GType cc_sharing_panel_get_type (void);
 extern GType cc_sound_panel_get_type (void);
 extern GType cc_system_panel_get_type (void);
 extern GType cc_ua_panel_get_type (void);
@@ -113,7 +113,7 @@ static CcPanelLoaderVtable default_panels[] =
   //PANEL_TYPE("search",           cc_search_panel_get_type,               NULL),
   PANEL_TYPE("waydroid",         cc_waydroid_panel_get_type,             NULL),
   PANEL_TYPE("mtp",              cc_mtp_panel_get_type,                  NULL),
-  PANEL_TYPE("sharing",          cc_sharing_panel_get_type,              NULL),
+//  PANEL_TYPE("sharing",          cc_sharing_panel_get_type,              NULL),
   PANEL_TYPE("sound",            cc_sound_panel_get_type,                NULL),
   PANEL_TYPE("system",           cc_system_panel_get_type,               NULL),
   PANEL_TYPE("universal-access", cc_ua_panel_get_type,                   NULL),
