@@ -737,15 +737,13 @@ rfkill_proxy_acquired_cb (GObject      *source_object,
 
 #if IS_DROID
 static void
-rfkill_switch_notify_activate_cb (CcListRow   *row,
-                                  GParamSpec  *pspec,
-                                  CcWifiPanel *self)
+rfkill_switch_notify_activate_cb (CcWifiPanel *self)
 {
   gboolean enable;
   gchar *command;
   GError *error = NULL;
 
-  enable = cc_list_row_get_active (row);
+  enable = adw_switch_row_get_active (self->rfkill_row);
 
   if (enable) {
     command = "systemctl disable --now ModemManager ofono";
