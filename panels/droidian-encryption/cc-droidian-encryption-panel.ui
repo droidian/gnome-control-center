@@ -4,71 +4,104 @@
 
   <template class="CcDroidianEncryptionPanel" parent="CcPanel">
 
-    <child type="titlebar-end">
-      <object class="GtkBox" id="header_box">
-        <child>
-          <object class="GtkSwitch" id="enable_switch">
-            <property name="valign">center</property>
-            <accessibility>
-              <property name="label" translatable="yes">Enable</property>
-            </accessibility>
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <child type="end">
+              <object class="GtkSwitch" id="enable_switch">
+                <accessibility>
+                  <property name="label" translatable="yes">Enable Encryption</property>
+                </accessibility>
+              </object>
+            </child>
           </object>
         </child>
-      </object>
-    </child>
 
-    <child type="content">
-      <object class="GtkStack" id="stack">
-        <child>
-          <object class="AdwStatusPage" id="encryption_unknown_page">
-            <property name="icon-name">dialog-question-symbolic</property>
-            <property name="title" translatable="yes">Unknown status</property>
-            <property name="description" translatable="yes">Unable to determine encryption statuus</property>
-          </object>
-        </child>
-        <child>
-          <object class="AdwStatusPage" id="encryption_unsupported_page">
-            <property name="icon-name">face-sad-symbolic</property>
-            <property name="title" translatable="yes">Encryption unsupported</property>
-            <property name="description" translatable="yes">Your device doesn't support disk encryption</property>
-          </object>
-        </child>
-        <child>
-          <object class="AdwStatusPage" id="encryption_unconfigured_page">
-            <property name="icon-name">network-wireless-encrypted-symbolic</property>
-            <property name="title" translatable="yes">Encryption has not been configured</property>
-            <property name="description" translatable="yes">Keep your data at rest safe by enabling encryption</property>
-          </object>
-        </child>
-        <child>
-          <object class="AdwPreferencesPage" id="encryption_enable_page">
+        <property name="content">
+          <object class="GtkStack" id="stack">
             <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">Enable encryption</property>
-                <property name="description" translatable="yes">The passphrase will be used to unlock your device and will be asked at every boot</property>
+              <object class="AdwStatusPage" id="encryption_unknown_page">
+                <property name="icon-name">dialog-question-symbolic</property>
+                <property name="title" translatable="yes">Unknown status</property>
+                <property name="description" translatable="yes">Unable to determine encryption statuus</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwStatusPage" id="encryption_unsupported_page">
+                <property name="icon-name">face-sad-symbolic</property>
+                <property name="title" translatable="yes">Encryption unsupported</property>
+                <property name="description" translatable="yes">Your device doesn't support disk encryption</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwStatusPage" id="encryption_unconfigured_page">
+                <property name="icon-name">network-wireless-encrypted-symbolic</property>
+                <property name="title" translatable="yes">Encryption has not been configured</property>
+                <property name="description" translatable="yes">Keep your data at rest safe by enabling encryption</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPreferencesPage" id="encryption_enable_page">
                 <child>
-                  <object class="AdwPasswordEntryRow" id="passphrase_entry">
-                    <property name="title" translatable="yes">Passphrase</property>
-                    <property name="visible">false</property>
+                  <object class="AdwPreferencesGroup">
+                    <property name="title" translatable="yes">Enable encryption</property>
+                    <property name="description" translatable="yes">The passphrase will be used to unlock your device and will be asked at every boot</property>
+                    <child>
+                      <object class="AdwPasswordEntryRow" id="passphrase_entry">
+                        <property name="title" translatable="yes">Passphrase</property>
+                        <property name="visible">false</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwPasswordEntryRow" id="passphrase_confirm_entry">
+                        <property name="title" translatable="yes">Passphrase (confirm)</property>
+                        <property name="visible">false</property>"
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="subtitle">Once enabled, you will not be able to disable encryption</property>
+                        <child type="suffix">
+                          <object class="GtkButton" id="encryption_start_button">
+                            <property name="icon-name">emblem-ok-symbolic</property>
+                            <property name="valign">center</property>
+                            <style>
+                              <class name="suggested-action"/>
+                              <class name="circular" />
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPreferencesPage" id="encryption_status_page">
                 <child>
-                  <object class="AdwPasswordEntryRow" id="passphrase_confirm_entry">
-                    <property name="title" translatable="yes">Passphrase (confirm)</property>
-                    <property name="visible">false</property>"
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="subtitle">Once enabled, you will not be able to disable encryption</property>
-                    <child type="suffix">
-                      <object class="GtkButton" id="encryption_start_button">
-                        <property name="icon-name">emblem-ok-symbolic</property>
-                        <property name="valign">center</property>
-                        <style>
-                          <class name="suggested-action"/>
-                          <class name="circular" />
-                        </style>
+                  <object class="AdwPreferencesGroup">
+                    <property name="title" translatable="yes">Encryption</property>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title" translatable="yes">Status</property>
+                          <child>
+                            <object class="GtkSpinner" id="encryption_spinner">
+                              <property name="spinning">true</property>
+                                <style>
+                                  <class name="dim-label"/>
+                                </style>
+                            </object>
+                          </child>
+                          <child>
+                            <object class="GtkLabel" id="encryption_status">
+                              <property name="label" translatable="yes"></property>
+                              <style>
+                                <class name="dim-label"/>
+                              </style>
+                            </object>
+                          </child>
                       </object>
                     </child>
                   </object>
@@ -76,38 +109,8 @@
               </object>
             </child>
           </object>
-        </child>
-        <child>
-          <object class="AdwPreferencesPage" id="encryption_status_page">
-            <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">Encryption</property>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Status</property>
-                      <child>
-                        <object class="GtkSpinner" id="encryption_spinner">
-                          <property name="spinning">true</property>
-                            <style>
-                              <class name="dim-label"/>
-                            </style>
-                        </object>
-                      </child>
-                      <child>
-                        <object class="GtkLabel" id="encryption_status">
-                          <property name="label" translatable="yes"></property>
-                          <style>
-                            <class name="dim-label"/>
-                          </style>
-                        </object>
-                      </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
+        </property>
       </object>
-    </child>
+    </property>
   </template>
 </interface>
