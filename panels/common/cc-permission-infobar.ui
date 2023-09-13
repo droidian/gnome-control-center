@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="CcPermissionInfobar" parent="AdwBin">
+<!--
     <child>
       <object class="AdwBanner" id="banner">
         <property name="revealed">True</property>
@@ -9,5 +10,6 @@
         <signal name="button-clicked" handler="banner_button_clicked_cb" swapped="yes"/>
       </object>
     </child>
+-->
   </template>
 </interface>
