@@ -133,6 +133,7 @@
 
                         <child>
                           <object class="AdwPreferencesGroup" id="account_settings_box">
+<!--
                             <child>
                               <object class="AdwActionRow" id="account_type_row">
                                 <property name="title" translatable="yes">_Administrator</property>
@@ -153,7 +154,7 @@
                                 </child>
                               </object>
                             </child>
-
+-->
                             <child>
                               <object class="AdwActionRow" id="parental_controls_row">
                                 <property name="visible">False</property>
