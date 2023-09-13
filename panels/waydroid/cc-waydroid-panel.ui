@@ -3,206 +3,214 @@
   <requires lib="gtk" version="4.0"/>
   <template class="CcWaydroidPanel" parent="CcPanel">
 
-    <child type="titlebar-end">
-      <object class="GtkToggleButton" id="install_waydroid_button">
-        <property name="use_underline">True</property>
-        <property name="valign">center</property>
-        <property name="label" translatable="yes">Install Waydroid</property>
-        <signal name="toggled" handler="cc_waydroid_panel_install_waydroid" swapped="yes"/>
-        <style>
-          <class name="text-button"/>
-        </style>
-      </object>
-    </child>
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <child type="end">
+              <object class="GtkToggleButton" id="install_waydroid_button">
+                <property name="use_underline">True</property>
+                <property name="valign">center</property>
+                <property name="label" translatable="yes">Install Waydroid</property>
+                <signal name="toggled" handler="cc_waydroid_panel_install_waydroid" swapped="yes"/>
+                <style>
+                  <class name="text-button"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
 
-    <child type="content">
-      <object class="AdwClamp">
-        <child>
-          <object class="GtkScrolledWindow">
+        <property name="content">
+          <object class="AdwClamp">
             <child>
-              <object class="AdwPreferencesPage">
+              <object class="GtkScrolledWindow">
                 <child>
-                  <object class="AdwPreferencesGroup">
-                    <property name="title" translatable="yes">Waydroid Settings</property>
-
+                  <object class="AdwPreferencesPage">
                     <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Waydroid</property>
-                        <property name="subtitle" translatable="yes">Start Waydroid</property>
-                        <property name="use-underline">true</property>
-                        <child>
-                          <object class="GtkSwitch" id="waydroid_enabled_switch">
-                            <property name="valign">center</property>
-                            <accessibility>
-                              <property name="label" translatable="yes">Enabled</property>
-                            </accessibility>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">Waydroid Settings</property>
 
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Waydroid access hardware directly</property>
-                        <property name="subtitle" translatable="yes">Will improve stability of NFC and GPS</property>
-                        <property name="use-underline">true</property>
                         <child>
-                          <object class="GtkSwitch" id="waydroid_uevent_switch">
-                            <property name="valign">center</property>
-                            <accessibility>
-                              <property name="label" translatable="yes">Running</property>
-                            </accessibility>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Waydroid IP</property>
-                        <property name="subtitle" translatable="yes">IP Address of Waydroid</property>
-                        <property name="activatable">false</property>
-                        <property name="use-underline">false</property>
-                        <child>
-                          <object class="GtkLabel" id="waydroid_ip_label">
-                            <property name="valign">center</property>
-                            <property name="ellipsize">end</property>
-                            <property name="selectable">true</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Waydroid Vendor</property>
-                        <property name="subtitle" translatable="yes">Vendor type of Waydroid</property>
-                        <property name="activatable">false</property>
-                        <property name="use-underline">false</property>
-                        <child>
-                          <object class="GtkLabel" id="waydroid_vendor_label">
-                            <property name="valign">center</property>
-                            <property name="ellipsize">end</property>
-                            <property name="selectable">true</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Waydroid OS version</property>
-                        <property name="subtitle" translatable="yes">Waydroid LineageOS version</property>
-                        <property name="activatable">false</property>
-                        <property name="use-underline">false</property>
-                        <child>
-                          <object class="GtkLabel" id="waydroid_version_label">
-                            <property name="valign">center</property>
-                            <property name="ellipsize">end</property>
-                            <property name="selectable">true</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <child>
-                      <object class="AdwActionRow">
-                        <property name="title" translatable="yes">Apps</property>
-                        <property name="subtitle" translatable="yes">Choose</property>
-                        <property name="activatable">false</property>
-                        <property name="use-underline">false</property>
-                        <child>
-                          <object class="GtkDropDown" id="app_selector">
-                            <property name="valign">center</property>
-                            <property name="hexpand">TRUE</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <child>
-                      <object class="AdwActionRow">
-                        <child>
-                          <object class="GtkFlowBox">
-                            <property name="orientation">horizontal</property>
-                            <property name="row-spacing">10</property>
-                            <property name="column-spacing">10</property>
-                            <property name="homogeneous">TRUE</property>
-                            <property name="max-children-per-line">4</property>
-                            <property name="min-children-per-line">1</property>
-
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Waydroid</property>
+                            <property name="subtitle" translatable="yes">Start Waydroid</property>
+                            <property name="use-underline">true</property>
                             <child>
-                              <object class="GtkButton" id="launch_app_button">
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Launch</property>
-                                    <property name="wrap">FALSE</property>
-                                    <property name="ellipsize">none</property>
-                                  </object>
-                                </child>
+                              <object class="GtkSwitch" id="waydroid_enabled_switch">
+                                <property name="valign">center</property>
+                                <accessibility>
+                                  <property name="label" translatable="yes">Enabled</property>
+                                </accessibility>
                               </object>
                             </child>
+                          </object>
+                        </child>
 
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Waydroid access hardware directly</property>
+                            <property name="subtitle" translatable="yes">Will improve stability of NFC and GPS</property>
+                            <property name="use-underline">true</property>
                             <child>
-                              <object class="GtkButton" id="show_ui_button">
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Show Waydroid</property>
-                                    <property name="wrap">FALSE</property>
-                                    <property name="ellipsize">none</property>
-                                  </object>
-                                </child>
+                              <object class="GtkSwitch" id="waydroid_uevent_switch">
+                                <property name="valign">center</property>
+                                <accessibility>
+                                  <property name="label" translatable="yes">Running</property>
+                                </accessibility>
                               </object>
                             </child>
+                          </object>
+                        </child>
 
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Waydroid IP</property>
+                            <property name="subtitle" translatable="yes">IP Address of Waydroid</property>
+                            <property name="activatable">false</property>
+                            <property name="use-underline">false</property>
                             <child>
-                              <object class="GtkButton" id="install_app_button">
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Install</property>
-                                    <property name="wrap">FALSE</property>
-                                    <property name="ellipsize">end</property>
-                                  </object>
-                                </child>
+                              <object class="GtkLabel" id="waydroid_ip_label">
+                                <property name="valign">center</property>
+                                <property name="ellipsize">end</property>
+                                <property name="selectable">true</property>
                               </object>
                             </child>
+                          </object>
+                        </child>
 
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Waydroid Vendor</property>
+                            <property name="subtitle" translatable="yes">Vendor type of Waydroid</property>
+                            <property name="activatable">false</property>
+                            <property name="use-underline">false</property>
                             <child>
-                              <object class="GtkButton" id="refresh_app_list_button">
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Refresh</property>
-                                    <property name="wrap">FALSE</property>
-                                    <property name="ellipsize">end</property>
-                                  </object>
-                                </child>
+                              <object class="GtkLabel" id="waydroid_vendor_label">
+                                <property name="valign">center</property>
+                                <property name="ellipsize">end</property>
+                                <property name="selectable">true</property>
                               </object>
                             </child>
+                          </object>
+                        </child>
 
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Waydroid OS version</property>
+                            <property name="subtitle" translatable="yes">Waydroid LineageOS version</property>
+                            <property name="activatable">false</property>
+                            <property name="use-underline">false</property>
                             <child>
-                              <object class="GtkButton" id="waydroid_factory_reset">
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Wipe data</property>
-                                    <property name="wrap">FALSE</property>
-                                    <property name="ellipsize">end</property>
-                                  </object>
-                                </child>
+                              <object class="GtkLabel" id="waydroid_version_label">
+                                <property name="valign">center</property>
+                                <property name="ellipsize">end</property>
+                                <property name="selectable">true</property>
                               </object>
                             </child>
+                          </object>
+                        </child>
 
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Apps</property>
+                            <property name="subtitle" translatable="yes">Choose</property>
+                            <property name="activatable">false</property>
+                            <property name="use-underline">false</property>
                             <child>
-                              <object class="GtkButton" id="remove_app_button">
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Remove</property>
-                                    <property name="wrap">FALSE</property>
-                                    <property name="ellipsize">none</property>
-                                  </object>
-                                </child>
+                              <object class="GtkDropDown" id="app_selector">
+                                <property name="valign">center</property>
+                                <property name="hexpand">TRUE</property>
                               </object>
                             </child>
+                          </object>
+                        </child>
 
+                        <child>
+                          <object class="AdwActionRow">
+                            <child>
+                              <object class="GtkFlowBox">
+                                <property name="orientation">horizontal</property>
+                                <property name="row-spacing">10</property>
+                                <property name="column-spacing">10</property>
+                                <property name="homogeneous">TRUE</property>
+                                <property name="max-children-per-line">4</property>
+                                <property name="min-children-per-line">1</property>
+
+                                <child>
+                                  <object class="GtkButton" id="launch_app_button">
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Launch</property>
+                                        <property name="wrap">FALSE</property>
+                                        <property name="ellipsize">none</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="show_ui_button">
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Show Waydroid</property>
+                                        <property name="wrap">FALSE</property>
+                                        <property name="ellipsize">none</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="install_app_button">
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Install</property>
+                                        <property name="wrap">FALSE</property>
+                                        <property name="ellipsize">end</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="refresh_app_list_button">
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Refresh</property>
+                                        <property name="wrap">FALSE</property>
+                                        <property name="ellipsize">end</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="waydroid_factory_reset">
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Wipe data</property>
+                                        <property name="wrap">FALSE</property>
+                                        <property name="ellipsize">end</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton" id="remove_app_button">
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Remove</property>
+                                        <property name="wrap">FALSE</property>
+                                        <property name="ellipsize">none</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -212,8 +220,8 @@
               </object>
             </child>
           </object>
-        </child>
+        </property>
       </object>
-    </child>
+    </property>
   </template>
 </interface>
