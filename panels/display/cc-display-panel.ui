@@ -81,10 +81,9 @@
                         </child>
                       </object>
                     </child>
-
+<!--
                     <child>
                       <object class="AdwPreferencesGroup" id="display_multiple_displays">
-                        <!-- Config Type -->
                         <child>
                           <object class="AdwActionRow" id="config_type_switcher_row">
                             <property name="title" translatable="yes">Multiple Displays</property>
@@ -114,7 +113,7 @@
                         </child>
                       </object>
                     </child>
-
+-->
                     <child>
                       <object class="AdwPreferencesGroup" id="display_settings_group">
                         <!-- Display Arrangement -->
