@@ -15,7 +15,14 @@
 struct _CcNfcPanel {
   CcPanel            parent;
   GtkWidget        *nfc_enabled_switch;
+  GtkWidget        *nfc_read_button;
+  GtkWidget        *nfc_read_label;
 };
+
+typedef struct {
+    CcNfcPanel *self;
+    gint exit_status;
+} ThreadData;
 
 G_DEFINE_TYPE (CcNfcPanel, cc_nfc_panel, CC_TYPE_PANEL)
 
@@ -37,8 +44,10 @@ cc_nfc_panel_enable_nfc(GtkSwitch *widget, gboolean state, CcNfcPanel *self)
 
     if (state) {
         command = "systemctl enable --now nfcd";
+        gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), TRUE);
     } else {
         command = "systemctl disable --now nfcd";
+        gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), FALSE);
     }
 
     argv[4] = command;
@@ -59,6 +68,66 @@ cc_nfc_panel_enable_nfc(GtkSwitch *widget, gboolean state, CcNfcPanel *self)
     }
 }
 
+static gboolean
+update_label_idle (gpointer user_data)
+{
+    ThreadData *data = user_data;
+
+    if (data->exit_status == 0) {
+        gtk_label_set_text(GTK_LABEL(data->self->nfc_read_label), "Success");
+    } else if (data->exit_status == 1) {
+        gtk_label_set_text(GTK_LABEL(data->self->nfc_read_label), "Fail");
+    } else {
+        gtk_label_set_text(GTK_LABEL(data->self->nfc_read_label), "Unexpected");
+    }
+
+    g_free(data);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gpointer
+nfc_read_ndef (gpointer user_data)
+{
+    CcNfcPanel *self = (CcNfcPanel *)user_data;
+    gchar *nfc_read_error;
+    gboolean spawn_success;
+    gint nfc_read_exit_status;
+
+    const gchar *command = "bash -c 'stdbuf -oL ndef-read &> /tmp/nfcd-test & counter=0; "
+                           "while [ $counter -lt 20 ]; do ((counter++)); "
+                           "if cat /tmp/nfcd-test | grep -vE \"Waiting for tag|Giving up\" | grep -q .; then "
+                           "FOUND=1; break; fi; sleep 1; done; "
+                           "pkill -15 ndef-read; "
+                           "if [ \"$FOUND\" == \"1\" ]; then exit 0; else exit 1; fi'";
+
+    spawn_success = g_spawn_command_line_sync(command,
+                                              NULL,
+                                              &nfc_read_error,
+                                              &nfc_read_exit_status,
+                                              NULL);
+
+    if (!spawn_success) {
+        nfc_read_exit_status = -1;
+    }
+
+    ThreadData *data = g_new(ThreadData, 1);
+    data->self = self;
+    data->exit_status = nfc_read_exit_status;
+
+    g_idle_add(update_label_idle, data);
+
+    g_free(nfc_read_error);
+
+    return NULL;
+}
+
+static void
+nfc_read_ndef_threaded (CcNfcPanel *self)
+{
+    g_thread_new("nfc_read_ndef", nfc_read_ndef, self);
+}
+
 static void
 cc_nfc_panel_class_init (CcNfcPanelClass *klass)
 {
@@ -69,9 +138,18 @@ cc_nfc_panel_class_init (CcNfcPanelClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/gnome/control-center/nfc/cc-nfc-panel.ui");
+
   gtk_widget_class_bind_template_child (widget_class,
                                         CcNfcPanel,
                                         nfc_enabled_switch);
+
+  gtk_widget_class_bind_template_child (widget_class,
+                                        CcNfcPanel,
+                                        nfc_read_button);
+
+  gtk_widget_class_bind_template_child (widget_class,
+                                        CcNfcPanel,
+                                        nfc_read_label);
 }
 
 static void
@@ -90,6 +168,7 @@ cc_nfc_panel_init (CcNfcPanel *self)
           gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_enabled_switch), FALSE);
       } else {
           g_signal_connect(G_OBJECT(self->nfc_enabled_switch), "state-set", G_CALLBACK(cc_nfc_panel_enable_nfc), self);
+          g_signal_connect(G_OBJECT(self->nfc_read_button), "clicked", G_CALLBACK(nfc_read_ndef_threaded), self);
 
           // Check if nfcd is running
           gchar *nfc_output;
@@ -102,10 +181,12 @@ cc_nfc_panel_init (CcNfcPanel *self)
               g_signal_handlers_block_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
               gtk_switch_set_state(GTK_SWITCH(self->nfc_enabled_switch), TRUE);
               g_signal_handlers_unblock_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
+              gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), TRUE);
           } else {
               g_signal_handlers_block_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
               gtk_switch_set_state(GTK_SWITCH(self->nfc_enabled_switch), FALSE);
               g_signal_handlers_unblock_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
+              gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), FALSE);
           }
 
           g_free(nfc_output);
