@@ -1638,9 +1638,11 @@ cc_power_panel_init (CcPowerPanel *self)
   up_client_changed (self);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_service_switch), check_batman_active() == TRUE);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_service_switch), check_batman_active() == TRUE);
   g_signal_connect(self->batman_service_switch, "state-set", G_CALLBACK(batman_service_active_switch_state_set), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_service_enabled_switch), check_batman_enabled() == TRUE);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_service_enabled_switch), check_batman_enabled() == TRUE);
   g_signal_connect(self->batman_service_enabled_switch, "state-set", G_CALLBACK(batman_service_enabled_switch_state_set), NULL);
 
   read_batman_config();
@@ -1653,20 +1655,26 @@ cc_power_panel_init (CcPowerPanel *self)
   g_signal_connect(self->batman_max_cpu_row, "apply", G_CALLBACK(max_cpu_entry_apply), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_btsave_switch), batman_config.btsave);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_btsave_switch), batman_config.btsave);
   g_signal_connect(self->batman_btsave_switch, "state-set", G_CALLBACK(btsave_switch_state_set), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_bussave_switch), batman_config.bussave);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_bussave_switch), batman_config.bussave);
   g_signal_connect(self->batman_bussave_switch, "state-set", G_CALLBACK(bussave_switch_state_set), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_chargesave_switch), batman_config.chargesave);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_chargesave_switch), batman_config.chargesave);
   g_signal_connect(self->batman_chargesave_switch, "state-set", G_CALLBACK(chargesave_switch_state_set), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_gpusave_switch), batman_config.gpusave);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_gpusave_switch), batman_config.gpusave);
   g_signal_connect(self->batman_gpusave_switch, "state-set", G_CALLBACK(gpusave_switch_state_set), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_powersave_switch), batman_config.powersave);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_powersave_switch), batman_config.powersave);
   g_signal_connect(self->batman_powersave_switch, "state-set", G_CALLBACK(powersave_switch_state_set), NULL);
 
   gtk_switch_set_state(GTK_SWITCH(self->batman_offline_switch), batman_config.offline);
+  gtk_switch_set_active(GTK_SWITCH(self->batman_offline_switch), batman_config.offline);
   g_signal_connect(self->batman_offline_switch, "state-set", G_CALLBACK(offline_switch_state_set), NULL);
 }
