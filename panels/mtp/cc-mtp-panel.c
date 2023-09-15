@@ -171,8 +171,10 @@ cc_mtp_panel_init (CcMtpPanel *self)
 
       if (g_str_has_prefix(mtp_output, "active")) {
           gtk_switch_set_state(GTK_SWITCH(self->mtp_enabled_switch), TRUE);
+          gtk_switch_set_active(GTK_SWITCH(self->mtp_enabled_switch), TRUE);
       } else {
           gtk_switch_set_state(GTK_SWITCH(self->mtp_enabled_switch), FALSE);
+          gtk_switch_set_active(GTK_SWITCH(self->mtp_enabled_switch), FALSE);
       }
 
       g_free(mtp_output);
