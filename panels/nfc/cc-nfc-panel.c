@@ -180,11 +180,13 @@ cc_nfc_panel_init (CcNfcPanel *self)
           if(nfc_exit_status == 0) {
               g_signal_handlers_block_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
               gtk_switch_set_state(GTK_SWITCH(self->nfc_enabled_switch), TRUE);
+              gtk_switch_set_active(GTK_SWITCH(self->nfc_enabled_switch), TRUE);
               g_signal_handlers_unblock_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
               gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), TRUE);
           } else {
               g_signal_handlers_block_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
               gtk_switch_set_state(GTK_SWITCH(self->nfc_enabled_switch), FALSE);
+              gtk_switch_set_active(GTK_SWITCH(self->nfc_enabled_switch), FALSE);
               g_signal_handlers_unblock_by_func(self->nfc_enabled_switch, cc_nfc_panel_enable_nfc, self);
               gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), FALSE);
           }
