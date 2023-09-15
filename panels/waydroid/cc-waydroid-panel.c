@@ -501,8 +501,10 @@ reenable_switch_and_update_info(gpointer data)
 
     if (uevent_state == 0) {
         gtk_switch_set_state(GTK_SWITCH(self->waydroid_uevent_switch), TRUE);
+        gtk_switch_set_active(GTK_SWITCH(self->waydroid_uevent_switch), TRUE);
     } else {
         gtk_switch_set_state(GTK_SWITCH(self->waydroid_uevent_switch), FALSE);
+        gtk_switch_set_active(GTK_SWITCH(self->waydroid_uevent_switch), FALSE);
     }
 
     g_signal_handlers_unblock_by_func(self->waydroid_uevent_switch, cc_waydroid_panel_toggle_uevent, self);
@@ -707,6 +709,7 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
 
           g_signal_handlers_block_by_func(self->waydroid_enabled_switch, cc_waydroid_panel_enable_waydroid, self);
           gtk_switch_set_state(GTK_SWITCH(self->waydroid_enabled_switch), TRUE);
+          gtk_switch_set_active(GTK_SWITCH(self->waydroid_enabled_switch), TRUE);
           g_signal_handlers_unblock_by_func(self->waydroid_enabled_switch, cc_waydroid_panel_enable_waydroid, self);
 
           g_spawn_command_line_sync("sh -c \"waydroid prop get persist.waydroid.uevent\"", &uevent_output, &uevent_error, &uevent_exit_status, NULL);
@@ -717,8 +720,10 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
 
           if (uevent_state == 0) {
               gtk_switch_set_state(GTK_SWITCH(self->waydroid_uevent_switch), TRUE);
+              gtk_switch_set_active(GTK_SWITCH(self->waydroid_uevent_switch), TRUE);
           } else {
               gtk_switch_set_state(GTK_SWITCH(self->waydroid_uevent_switch), FALSE);
+              gtk_switch_set_active(GTK_SWITCH(self->waydroid_uevent_switch), FALSE);
           }
 
           g_signal_handlers_unblock_by_func(self->waydroid_uevent_switch, cc_waydroid_panel_toggle_uevent, self);
@@ -748,6 +753,7 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
       } else {
           g_signal_handlers_block_by_func(self->waydroid_enabled_switch, cc_waydroid_panel_enable_waydroid, self);
           gtk_switch_set_state(GTK_SWITCH(self->waydroid_enabled_switch), FALSE);
+          gtk_switch_set_active(GTK_SWITCH(self->waydroid_enabled_switch), FALSE);
           g_signal_handlers_unblock_by_func(self->waydroid_enabled_switch, cc_waydroid_panel_enable_waydroid, self);
           gtk_label_set_text(GTK_LABEL(self->waydroid_vendor_label), "");
           gtk_label_set_text(GTK_LABEL(self->waydroid_version_label), "");
@@ -765,6 +771,7 @@ cc_waydroid_panel_init (CcWaydroidPanel *self)
   } else {
       gtk_widget_set_sensitive(GTK_WIDGET(self->install_waydroid_button), TRUE);
       gtk_switch_set_state(GTK_SWITCH(self->waydroid_enabled_switch), FALSE);
+      gtk_switch_set_active(GTK_SWITCH(self->waydroid_enabled_switch), FALSE);
       gtk_widget_set_sensitive(self->waydroid_enabled_switch, FALSE);
       gtk_label_set_text(GTK_LABEL(self->waydroid_vendor_label), "");
       gtk_label_set_text(GTK_LABEL(self->waydroid_version_label), "");
