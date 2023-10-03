@@ -276,9 +276,11 @@
                     <property name="title" translatable="yes">Week Numbers</property>
                     <property name="use_underline">True</property>
                     <property name="activatable_widget">week_numbers_switch</property>
+                    <property name="visible">False</property>
                     <child>
                       <object class="GtkSwitch" id="week_numbers_switch">
                         <property name="valign">center</property>
+                        <property name="visible">False</property>
                       </object>
                     </child>
                   </object>
