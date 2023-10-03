@@ -166,6 +166,7 @@ cc_nfc_panel_init (CcNfcPanel *self)
   if(g_file_test("/usr/sbin/nfcd", G_FILE_TEST_EXISTS)) {
       if(exit_status == 0) {
           gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_enabled_switch), FALSE);
+          gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), FALSE);
       } else {
           g_signal_connect(G_OBJECT(self->nfc_enabled_switch), "state-set", G_CALLBACK(cc_nfc_panel_enable_nfc), self);
           g_signal_connect(G_OBJECT(self->nfc_read_button), "clicked", G_CALLBACK(nfc_read_ndef_threaded), self);
@@ -196,6 +197,7 @@ cc_nfc_panel_init (CcNfcPanel *self)
       }
   } else {
       gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_enabled_switch), FALSE);
+      gtk_widget_set_sensitive(GTK_WIDGET(self->nfc_read_button), FALSE);
   }
 
   g_free(output);
