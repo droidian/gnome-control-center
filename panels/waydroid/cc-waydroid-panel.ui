@@ -29,6 +29,64 @@
                   <object class="AdwPreferencesPage">
                     <child>
                       <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">Waydroid image</property>
+
+                        <child>
+                          <object class="AdwActionRow" id="show_list_row">
+                            <property name="title" translatable="yes">Image type</property>
+                            <property name="subtitle" translatable="yes">Waydroid image type</property>
+                            <property name="subtitle-lines">0</property>
+                            <child>
+                              <object class="GtkBox" id="show_list_box">
+                                <property name="valign">center</property>
+                                <property name="homogeneous">True</property>
+                                <property name="margin_top">12</property>
+                                <property name="margin_bottom">12</property>
+                                <style>
+                                <class name="linked"/>
+                                </style>
+                                <child>
+                                  <object class="GtkToggleButton" id="install_vanilla">
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Vanilla</property>
+                                    <property name="height_request">35</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkToggleButton" id="install_gapps">
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">GAPPS</property>
+                                    <property name="group">install_gapps</property>
+                                    <property name="height_request">35</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Install image</property>
+                            <property name="subtitle" translatable="yes">Install selected image</property>
+                            <property name="use-underline">true</property>
+                            <child>
+                              <object class="GtkButton" id="install_image_button">
+                                <property name="label" translatable="yes">Install</property>
+                                <property name="valign">center</property>
+                                <accessibility>
+                                  <property name="label" translatable="yes">Install image</property>
+                                </accessibility>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="AdwPreferencesGroup">
                         <property name="title" translatable="yes">Waydroid Settings</property>
 
                         <child>
