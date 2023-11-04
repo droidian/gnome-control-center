@@ -33,6 +33,7 @@
 #include <string.h>
 #include <glib/gi18n.h>
 #include <nma-mobile-providers.h>
+#include <gio/gio.h>
 
 #include "cc-wwan-data.h"
 
@@ -1104,6 +1105,49 @@ cc_wwan_data_get_enabled (CcWwanData *self)
   return nm_setting_connection_get_autoconnect (setting);
 }
 
+void cc_wwan_data_set_roaming_allowance(CcWwanData *self, gboolean allow_roaming) {
+    GVariantBuilder builder;
+    GVariant *value;
+    GError *error = NULL;
+    GDBusConnection *connection;
+    gint32 roaming_allowance_value;
+
+    g_return_if_fail(CC_IS_WWAN_DATA(self));
+
+    roaming_allowance_value = allow_roaming ? 1 : 0;
+
+    g_variant_builder_init(&builder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&builder, "{sv}", "roaming-allowance", g_variant_new_int32(roaming_allowance_value));
+
+    value = g_variant_builder_end(&builder);
+
+    connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error);
+    if (error) {
+        g_warning("Error getting system bus: %s", error->message);
+        g_error_free(error);
+        return;
+    }
+
+    g_dbus_connection_call_sync(connection,
+                                "org.freedesktop.ModemManager1",
+                                "/org/freedesktop/ModemManager1/Modem/0",
+                                "org.freedesktop.ModemManager1.Modem.Modem3gpp.ProfileManager",
+                                "Set",
+                                g_variant_new_tuple(&value, 1),
+                                NULL,
+                                G_DBUS_CALL_FLAGS_NONE,
+                                -1,
+                                NULL,
+                                &error);
+
+    if (error) {
+        g_warning("Error calling ModemManager1: %s", error->message);
+        g_error_free(error);
+    }
+
+    g_object_unref(connection);
+}
+
 /**
  * cc_wwan_data_set_enabled:
  * @self: A #CcWwanData
@@ -1161,8 +1205,10 @@ cc_wwan_data_set_roaming_enabled (CcWwanData *self,
 
   self->home_only = !enable_roaming;
 
-  if (self->default_apn)
+  if (self->default_apn) {
     self->default_apn->modified = TRUE;
+    cc_wwan_data_set_roaming_allowance(self, enable_roaming);
+  }
 }
 
 static void
