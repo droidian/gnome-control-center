@@ -125,26 +125,6 @@ template $CcUserPage: Adw.NavigationPage {
         }
 
         Adw.PreferencesGroup account_settings_box {
-          $CcListRow account_type_row {
-            sensitive: bind template.editable;
-            has-tooltip: bind template.editable no-sync-create inverted;
-            tooltip-text: _("Unlock to Change This Setting");
-            title: _("_Administrator");
-            subtitle-lines: 0;
-            use-underline: true;
-
-            [suffix]
-            $CcListRowInfoButton {
-              valign: center;
-              text: _("Administrators have extra abilities, including adding and removing users, changing login settings, and removing software. Parental controls cannot be applied to administrators.");
-            }
-
-            Switch account_type_switch {
-              valign: center;
-              notify::active => $account_type_changed(template);
-            }
-          }
-
           $CcListRow parental_controls_row {
             title: _("_Parental Controls");
             subtitle: _("Open the Parental Controls app");
