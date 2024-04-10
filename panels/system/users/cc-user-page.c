@@ -141,6 +141,11 @@ would_demote_only_admin (ActUser *user)
 static gboolean
 get_autologin_possible (ActUser *user)
 {
+#ifdef IS_DROIDIAN
+    (void) user;
+
+    return FALSE;
+#else
     gboolean locked;
     gboolean set_password_at_login;
 
@@ -148,6 +153,7 @@ get_autologin_possible (ActUser *user)
     set_password_at_login = (act_user_get_password_mode (user) == ACT_USER_PASSWORD_MODE_SET_AT_LOGIN);
 
     return !(locked || set_password_at_login);
+#endif /* IS_DROIDIAN */
 }
 
 static gchar *
@@ -725,7 +731,6 @@ cc_user_page_set_user (CcUserPage  *self,
     setup_avatar_for_user (self->avatar, self->user);
     gtk_widget_set_visible (GTK_WIDGET (self->avatar_remove_button),
                             adw_avatar_get_custom_image (self->avatar) != NULL);
-
 
     gtk_editable_set_text (GTK_EDITABLE (self->fullname_row), act_user_get_real_name (user));
 
