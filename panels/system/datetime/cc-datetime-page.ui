@@ -227,13 +227,6 @@
                     <property name="use_underline">True</property>
                   </object>
                 </child>
-                <child>
-                  <object class="AdwSwitchRow" id="week_numbers_row">
-                    <property name="title" translatable="yes">Week _Numbers</property>
-                    <property name="subtitle" translatable="yes">Shown in the dropdown calendar</property>
-                    <property name="use_underline">True</property>
-                  </object>
-                </child>
               </object>
             </child>
           </object>
