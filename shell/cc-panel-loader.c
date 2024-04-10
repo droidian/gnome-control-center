@@ -89,7 +89,7 @@ static CcPanelLoaderVtable default_panels[] =
 #ifdef BUILD_BLUETOOTH
   PANEL_TYPE("bluetooth",        cc_bluetooth_panel_get_type,            NULL),
 #endif
-  PANEL_TYPE("color",            cc_color_panel_get_type,                NULL),
+//  PANEL_TYPE("color",            cc_color_panel_get_type,                NULL),
   PANEL_TYPE("display",          cc_display_panel_get_type,              NULL),
   PANEL_TYPE("keyboard",         cc_keyboard_panel_get_type,             NULL),
   PANEL_TYPE("mouse",            cc_mouse_panel_get_type,                NULL),
