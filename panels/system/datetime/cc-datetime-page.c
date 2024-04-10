@@ -94,7 +94,7 @@ struct _CcDateTimePage
   AdwSwitchRow *weekday_row;
   AdwSwitchRow *date_row;
   AdwSwitchRow *seconds_row;
-  AdwSwitchRow *week_numbers_row;
+//  AdwSwitchRow *week_numbers_row;
   GtkLockButton *lock_button;
   GtkListBox *date_box;
   GtkSingleSelection *month_model;
@@ -822,7 +822,7 @@ cc_date_time_page_class_init (CcDateTimePageClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, weekday_row);
   gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, date_row);
   gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, seconds_row);
-  gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, week_numbers_row);
+//  gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, week_numbers_row);
   gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, lock_button);
   gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, month_model);
   gtk_widget_class_bind_template_child (widget_class, CcDateTimePage, month_popover);
@@ -947,9 +947,9 @@ cc_date_time_page_init (CcDateTimePage *self)
   /* Calendar settings */
   self->calendar_settings = g_settings_new (CALENDAR_SCHEMA);
 
-  g_settings_bind (self->calendar_settings, CALENDAR_SHOW_WEEK_NUMBERS_KEY,
+/*  g_settings_bind (self->calendar_settings, CALENDAR_SHOW_WEEK_NUMBERS_KEY,
                    self->week_numbers_row, "active",
-                   G_SETTINGS_BIND_DEFAULT);
+                   G_SETTINGS_BIND_DEFAULT);*/
 
   update_time (self);
 
