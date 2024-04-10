@@ -71,7 +71,7 @@
                       </object>
                     </child>
 
-                    <!-- Zoom row -->
+                    <!-- Zoom row --> <!--
                     <child>
                       <object class="CcListRow" id="zoom_row">
                         <property name="title" translatable="yes">_Zoom</property>
@@ -80,7 +80,7 @@
                         <property name="action-name">navigation.push</property>
                         <property name="action-target">'zoom'</property>
                       </object>
-                    </child>
+                    </child> -->
                   </object> <!-- ./AdwPreferencesGroup -->
                 </child>
               </object> <!-- ./AdwPreferencesPage main_page -->
