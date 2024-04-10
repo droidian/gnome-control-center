@@ -187,6 +187,115 @@
                 </child>
               </object>
             </child>
+            <child>
+              <object class="AdwPreferencesGroup" id="batman_section">
+                <property name="title" translatable="yes">Batman Options</property>
+                <child>
+                  <object class="AdwActionRow" id="batman_service_row">
+                    <property name="title" translatable="yes">_Batman service</property>
+                    <property name="subtitle" translatable="yes">Start/stop Batman daemon.</property>
+                    <property name="use_underline">True</property>
+                    <property name="activatable_widget">batman_service_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_service_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="batman_service_enabled_row">
+                    <property name="title" translatable="yes">Auto-start Batman</property>
+                    <property name="subtitle" translatable="yes">Start Batman daemon automatically on boot</property>
+                    <property name="activatable_widget">batman_service_enabled_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_service_enabled_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwEntryRow" id="batman_max_cpu_row">
+                    <property name="title" translatable="yes">CPU usage threshold to leave powersave</property>
+                    <property name="input_purpose">number</property>
+                    <property name="show_apply_button">true</property>
+                  </object>
+                 </child>
+                 <child>
+                  <object class="AdwActionRow" id="batman_powersave_row">
+                    <property name="title" translatable="yes">Powersave</property>
+                    <property name="subtitle" translatable="yes">Allow batman to set the CPU into powersave mode when discharging</property>
+                    <property name="activatable_widget">batman_powersave_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_powersave_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="batman_chargesave_row">
+                    <property name="title" translatable="yes">Charge save</property>
+                    <property name="subtitle" translatable="yes">Allow batman to set the CPU into powersave mode when charging</property>
+                    <property name="activatable_widget">batman_chargesave_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_chargesave_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="batman_offline_row">
+                    <property name="title" translatable="yes">Offlining</property>
+                    <property name="subtitle" translatable="yes">Allow batman to turn off CPU cores</property>
+                    <property name="activatable_widget">batman_offline_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_offline_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="batman_gpusave_row">
+                    <property name="title" translatable="yes">GPU save</property>
+                    <property name="subtitle" translatable="yes">Allow batman to turn on the GPU powersave mode</property>
+                    <property name="activatable_widget">batman_gpusave_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_gpusave_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="batman_bussave_row">
+                    <property name="title" translatable="yes">Bus save</property>
+                    <property name="subtitle" translatable="yes">Allow batman to turn on powersave mode in devfreq bus nodes</property>
+                    <property name="activatable_widget">batman_bussave_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_bussave_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="batman_btsave_row">
+                    <property name="title" translatable="yes">Bluetooth save</property>
+                    <property name="subtitle" translatable="yes">Allow batman to turn off bluetooth according to device usage</property>
+                    <property name="activatable_widget">batman_btsave_switch</property>
+                    <child>
+                      <object class="GtkSwitch" id="batman_btsave_switch">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </property>
       </object>
