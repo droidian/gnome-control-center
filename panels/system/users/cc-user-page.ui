@@ -118,29 +118,6 @@
                 <child>
                   <object class="AdwPreferencesGroup" id="account_settings_box">
                     <child>
-                      <object class="CcListRow" id="account_type_row">
-                        <property name="sensitive" bind-source="CcUserPage" bind-property="editable" bind-flags="sync-create"/>
-                        <property name="has-tooltip" bind-source="CcUserPage" bind-property="editable" bind-flags="invert-boolean"/>
-                        <property name="tooltip-text" translatable="yes">Unlock to Change This Setting</property>
-                        <property name="title" translatable="yes">_Administrator</property>
-                        <property name="subtitle-lines">0</property>
-                        <property name="use_underline">True</property>
-                        <child type="suffix">
-                          <object class="CcListRowInfoButton">
-                            <property name="valign">center</property>
-                            <property name="text" translatable="yes">Administrators have extra abilities, including adding and removing users, changing login settings, and removing software. Parental controls cannot be applied to administrators.</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkSwitch" id="account_type_switch">
-                            <property name="valign">center</property>
-                            <signal name="notify::active" handler="account_type_changed" object="CcUserPage" swapped="yes"/>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <child>
                       <object class="CcListRow" id="parental_controls_row">
                         <property name="visible" bind-source="CcUserPage" bind-property="is-admin" bind-flags="invert-boolean|sync-create"/>
                         <property name="title" translatable="yes">_Parental Controls</property>
