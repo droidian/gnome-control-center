@@ -270,7 +270,7 @@ update_ui (CcWifiConnectionRow *self)
 
   gtk_widget_set_visible (GTK_WIDGET (self->active_label), active);
   gtk_widget_set_visible (GTK_WIDGET (self->options_button), active || connecting || self->known_connection);
-  gtk_widget_set_visible (GTK_WIDGET (self->qr_code_button), (active || connecting || self->known_connection) && is_qr_code_supported (self->connection));
+  gtk_widget_set_visible (GTK_WIDGET (self->qr_code_button), (active || self->known_connection) && is_qr_code_supported (self->connection));
 
   if (security != NM_AP_SEC_UNKNOWN && security != NM_AP_SEC_NONE && security != NM_AP_SEC_OWE && security != NM_AP_SEC_OWE_TM)
     {
@@ -326,6 +326,7 @@ update_ui (CcWifiConnectionRow *self)
       gtk_widget_set_child_visible (GTK_WIDGET (self->strength_icon), TRUE);
 
       description = g_strdup_printf(_("Signal strength %d%%"), strength);
+      gtk_widget_set_tooltip_text (GTK_WIDGET (self->strength_icon), description);
       gtk_accessible_update_property (GTK_ACCESSIBLE (self->strength_icon),
                                       GTK_ACCESSIBLE_PROPERTY_DESCRIPTION,
                                       description,

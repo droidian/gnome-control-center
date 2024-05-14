@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="CcMtpPanel" parent="CcPanel">
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <child type="end">
+              <object class="GtkSwitch" id="mtp_enabled_switch">
+                <accessibility>
+                  <property name="label" translatable="yes">Enable MTP Server</property>
+                </accessibility>
+              </object>
+            </child>
+          </object>
+        </child>
+        <property name="content">
+          <object class="AdwClamp">
+            <child>
+              <object class="GtkScrolledWindow">
+                <child>
+                  <object class="AdwPreferencesPage">
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">MTP Settings</property>
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">USB State</property>
+                            <property name="subtitle" translatable="yes">Choose the USB state</property>
+                            <property name="use-underline">true</property>
+                            <child>
+                              <object class="GtkComboBoxText" id="usb_state_dropdown">
+                                <property name="valign">center</property>
+                                <items>
+                                  <item id="mtp">MTP</item>
+                                  <item id="rndis">RNDIS</item>
+                                  <item id="none">None</item>
+                                </items>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Help</property>
+                            <property name="subtitle" translatable="yes">USB State info</property>
+                            <property name="use-underline">true</property>
+                            <child>
+                              <object class="GtkButton" id="help_button">
+                                <property name="label" translatable="yes">Help</property>
+                                <property name="valign">center</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>

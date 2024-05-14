@@ -28,6 +28,7 @@
 #include "cc-night-light-page.h"
 
 #include "shell/cc-object-storage.h"
+#include "cc-hostname.h"
 #include "cc-display-config-manager-dbus.h"
 
 struct _CcNightLightPage {
@@ -43,7 +44,7 @@ struct _CcNightLightPage {
   GtkWidget           *infobar_unsupported_description;
   GtkWidget           *infobar_disabled;
   GtkWidget           *scale_color_temperature;
-  GtkWidget           *night_light_toggle_switch;
+  AdwSwitchRow        *night_light_toggle_row;
   AdwComboRow         *schedule_type_row;
   GtkWidget           *from_spinbuttons_box;
   GtkSpinButton       *spinbutton_from_hours;
@@ -123,49 +124,6 @@ dialog_adjustments_set_frac_hours (CcNightLightPage *self,
 
   gtk_widget_set_visible (GTK_WIDGET (stack), !is_24h);
   gtk_stack_set_visible_child (stack, is_pm ? GTK_WIDGET (button_pm) : GTK_WIDGET (button_am));
-}
-
-static gboolean
-is_virtualized ()
-{
-  g_autoptr(GDBusConnection) connection = NULL;
-  g_autoptr(GError) error = NULL;
-  g_autoptr(GVariant) variant = NULL;
-  g_autoptr(GVariant) chassis_variant = NULL;
-  const gchar *chassis_type;
-
-  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
-  if (!connection)
-    {
-      g_warning ("System bus not available: %s", error->message);
-
-      return FALSE;
-    }
-
-  variant = g_dbus_connection_call_sync (connection,
-                                         "org.freedesktop.hostname1",
-                                         "/org/freedesktop/hostname1",
-                                         "org.freedesktop.DBus.Properties",
-                                         "Get",
-                                         g_variant_new ("(ss)",
-                                                        "org.freedesktop.hostname1",
-                                                        "Chassis"),
-                                         NULL,
-                                         G_DBUS_CALL_FLAGS_NONE,
-                                         -1,
-                                         NULL,
-                                         &error);
-  if (!variant)
-   {
-     g_warning ("Cannot get org.freedesktop.hostname1.Chassis: %s", error->message);
-
-     return FALSE;
-   }
-
-   g_variant_get (variant, "(v)", &chassis_variant);
-   chassis_type = g_variant_get_string (chassis_variant, NULL);
-
-   return (g_strcmp0 (chassis_type, "vm") == 0);
 }
 
 static void
@@ -262,7 +220,7 @@ dialog_update_state (CcNightLightPage *self)
       gtk_widget_set_visible (self->infobar_disabled, FALSE);
       gtk_widget_set_sensitive (self->night_light_settings, FALSE);
 
-      if (is_virtualized ())
+      if (cc_hostname_is_vm_chassis (cc_hostname_get_default ()))
         {
           gtk_label_set_text (GTK_LABEL (self->infobar_unsupported_description),
                               _("Night Light cannot be used from a virtual machine."));
@@ -649,8 +607,7 @@ cc_night_light_page_finalize (GObject *object)
   g_clear_object (&self->proxy_color_props);
   g_clear_object (&self->settings_display);
   g_clear_object (&self->settings_clock);
-  if (self->timer_id > 0)
-    g_source_remove (self->timer_id);
+  g_clear_handle_id (&self->timer_id, g_source_remove);
 
   G_OBJECT_CLASS (cc_night_light_page_parent_class)->finalize (object);
 }
@@ -679,7 +636,7 @@ cc_night_light_page_class_init (CcNightLightPageClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, infobar_unsupported);
   gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, infobar_unsupported_description);
   gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, infobar_disabled);
-  gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, night_light_toggle_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, night_light_toggle_row);
   gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, schedule_type_row);
   gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, scale_color_temperature);
   gtk_widget_class_bind_template_child (widget_class, CcNightLightPage, from_spinbuttons_box);
@@ -737,11 +694,11 @@ cc_night_light_page_init (CcNightLightPage *self)
   build_schedule_combo_row (self);
 
   g_settings_bind (self->settings_display, "night-light-enabled",
-                   self->night_light_toggle_switch, "active",
+                   self->night_light_toggle_row, "active",
                    G_SETTINGS_BIND_DEFAULT);
 
   g_settings_bind_writable (self->settings_display, "night-light-enabled",
-                            self->night_light_toggle_switch, "sensitive",
+                            self->night_light_toggle_row, "sensitive",
                             FALSE);
 
   g_settings_bind_writable (self->settings_display, "night-light-schedule-from",

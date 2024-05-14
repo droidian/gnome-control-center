@@ -7,9 +7,9 @@
   <name xml:lang="en">GNOME Settings</name>
   <shortdesc xml:lang="en">GNOME's main interface to configure various aspects of the desktop</shortdesc>
   <description xml:lang="en">GNOME's main interface to configure various aspects of the desktop</description>
-  <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gnomecc-list" />
-  <download-page rdf:resource="http://download.gnome.org/sources/gnome-control-center/" />
-  <bug-database rdf:resource="http://gitlab.gnome.org/GNOME/gnome-control-center/issues" />
+  <support-forum rdf:resource="https://discourse.gnome.org/c/desktop/" />
+  <download-page rdf:resource="https://download.gnome.org/sources/gnome-control-center/" />
+  <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gnome-control-center/issues" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
   <programming-language>C</programming-language>
 
@@ -22,30 +22,12 @@
     </foaf:Person>
   </maintainer>
 
-  <!-- General -->
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>Robert Ancell</foaf:name>
-      <foaf:mbox rdf:resource="mailto:robert.ancell@canonical.com" />
-      <gnome:userid>rancell</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-
   <!-- Bluetooth -->
   <maintainer>
     <foaf:Person>
       <foaf:name>Bastien Nocera</foaf:name>
       <foaf:mbox rdf:resource="mailto:hadess@gnome.org" />
       <gnome:userid>hadess</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-
-  <!-- Display -->
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>Benjamin Berg</foaf:name>
-      <foaf:mbox rdf:resource="mailto:bberg@gnome.org" />
-      <gnome:userid>bberg</gnome:userid>
     </foaf:Person>
   </maintainer>
 

@@ -20,16 +20,17 @@
 #include <gsound.h>
 #include <gtk/gtk.h>
 #include <pulse/pulseaudio.h>
+#include <glib/gi18n.h>
 
 G_BEGIN_DECLS
 
 #define CC_TYPE_SPEAKER_TEST_BUTTON (cc_speaker_test_button_get_type ())
 G_DECLARE_FINAL_TYPE (CcSpeakerTestButton, cc_speaker_test_button, CC, SPEAKER_TEST_BUTTON, GtkButton)
 
-CcSpeakerTestButton *cc_speaker_test_button_new (GSoundContext         *context,
-                                                 pa_channel_position_t  position);
+GtkWidget *cc_speaker_test_button_new (GSoundContext         *context,
+                                       pa_channel_position_t  position);
 
-void                 cc_speaker_test_button_set_channel_position (CcSpeakerTestButton  *button,
-                                                                  pa_channel_position_t position);
+void       cc_speaker_test_button_set_channel_position (CcSpeakerTestButton   *button,
+                                                        pa_channel_position_t  position);
 
 G_END_DECLS

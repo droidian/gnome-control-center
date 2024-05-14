@@ -1,8 +1,8 @@
 project(
   'gnome-control-center', 'c',
-        version : '45.0',
+        version : '46.0.1',
         license : 'GPL2+',
-  meson_version : '>= 0.57.0'
+  meson_version : '>= 0.58.0'
 )
 
 control_center_prefix = get_option('prefix')
@@ -39,12 +39,15 @@ else
 endif
 application_id = 'org.gnome.Settings@0@'.format(profile)
 
+version_split = meson.project_version().split('.')
+
 # defines
 set_defines = [
   # package
   ['PACKAGE', meson.project_name()],
   ['PACKAGE_VERSION', meson.project_version()],
   ['VERSION', meson.project_version()],
+  ['MAJOR_VERSION', version_split[0]],
   ['PROFILE', get_option('profile')],
   # i18n
   ['GETTEXT_PACKAGE', control_center_gettext]
@@ -72,6 +75,15 @@ config_h.set('USER_DIR_MODE', '0700',
 
 # compiler flags
 common_flags = ['-DHAVE_CONFIG_H']
+
+# We have so many deprecation warnings that it becomes impossible to notice any other useful
+# warning, thus making the compiler output completely useless. Ideally, we should fix all
+# of those but, until then, it's better to add this flag so that we avoid adding even more
+# warnings by accident. If you want to fix some of those, just build Settings with:
+# meson _build -Ddeprecated-declarions=enabled
+if get_option('deprecated-declarations').disabled()
+  common_flags += '-Wno-deprecated-declarations'
+endif
 
 # Only add this when optimizing is enabled (default)
 optimized_src = '''
@@ -114,7 +126,7 @@ libgvc = subproject(
 )
 libgvc_dep = libgvc.get_variable('libgvc_dep')
 
-goa_req_version = '>= 3.25.3'
+goa_req_version = '>= 3.49.1'
 pulse_req_version = '>= 2.0'
 
 gtk_dep = dependency(
@@ -167,13 +179,13 @@ accounts_dep = dependency('accountsservice', version: '>= 0.6.39')
 colord_dep = dependency('colord', version: '>= 0.1.34')
 gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: '>= 2.23.0')
 gio_dep = dependency('gio-2.0')
-glib_dep = dependency('glib-2.0', version: '>= 2.75.0')
+glib_dep = dependency('glib-2.0', version: '>= 2.76.6')
 gnome_desktop_dep = dependency('gnome-desktop-4')
 gnome_bg_dep = dependency('gnome-bg-4')
 gnome_rr_dep = dependency('gnome-rr-4')
 gnome_settings_dep = dependency('gnome-settings-daemon', version: '>= 41.0')
 goa_dep = dependency('goa-1.0', version: goa_req_version)
-gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 42.alpha')
+gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 46.beta')
 libxml_dep = dependency('libxml-2.0')
 pulse_dep = dependency('libpulse', version: pulse_req_version)
 pulse_mainloop_dep = dependency('libpulse-mainloop-glib', version: pulse_req_version)
@@ -182,7 +194,7 @@ gudev_dep = dependency('gudev-1.0', version: '>= 232')
 x11_dep = dependency('x11', version: '>= 1.8')
 xi_dep = dependency('xi', version: '>= 1.2')
 epoxy_dep = dependency('epoxy')
-gcr_dep = dependency('gcr-base-3')
+gcr_dep = dependency('gcr-4', version: '>= 4.1.0')
 pwquality_dep = dependency('pwquality', version: '>= 1.2.2')
 
 m_dep = cc.find_library('m')
@@ -246,9 +258,8 @@ config_h.set10('HAVE_FN_EXPLICIT_BZERO',
 # Snap support
 enable_snap = get_option('snap')
 if enable_snap
-  snapd_glib_deps = [
-    dependency('snapd-glib-2', version: '>= 1.62')
-  ]
+  json_glib_dep = dependency('json-glib-1.0')
+  libsoup_dep = dependency('libsoup-3.0')
 endif
 config_h.set('HAVE_SNAP', enable_snap,
              description: 'Define to 1 if Snap support is enabled')
@@ -286,13 +297,11 @@ if host_is_linux_not_s390
   # gnome-bluetooth
   gnome_bluetooth_dep = dependency('gnome-bluetooth-ui-3.0')
 
-  libwacom_dep = dependency('libwacom', version: '>= 0.7')
+  libwacom_dep = dependency('libwacom', version: '>= 1.4')
 
   wacom_deps = [
     libwacom_dep,
   ]
-  config_h.set('HAVE_WACOM_3D_STYLUS', libwacom_dep.version().version_compare('>= 0.27'),
-               description: 'Define to 1 if libwacom provides definition for 3D styli')
 else
   message('Bluetooth and Wacom panels will not be built (no USB support on this platform)')
   message('Thunderbolt panel will not be built (not supported on this platform)')
@@ -305,7 +314,7 @@ config_h.set('BUILD_WACOM', host_is_linux_not_s390,
              description: 'Define to 1 to build the Wacom panel')
 config_h.set('HAVE_WACOM', host_is_linux_not_s390,
              description: 'Define to 1 if Wacom is supportted')
-config_h.set('BUILD_THUNDERBOLT', host_is_linux_not_s390,
+config_h.set('BUILD_THUNDERBOLT', false,
              description: 'Define to 1 to build the Thunderbolt panel')
 
 gnome = import('gnome')

@@ -41,6 +41,18 @@ struct _CcVolumeSlider
 
 G_DEFINE_TYPE (CcVolumeSlider, cc_volume_slider, GTK_TYPE_WIDGET)
 
+static void notify_is_muted_cb (CcVolumeSlider *self);
+
+static void
+update_mute_button_tooltip (CcVolumeSlider *self,
+                            gdouble         volume)
+{
+  const gchar *tooltip;
+
+  tooltip = (volume == 0.0) ? _("Unmute") : _("Mute");
+  gtk_widget_set_tooltip_text (GTK_WIDGET (self->mute_button), tooltip);
+}
+
 static void
 update_volume_icon (CcVolumeSlider *self)
 {
@@ -49,6 +61,8 @@ update_volume_icon (CcVolumeSlider *self)
 
   volume = gtk_adjustment_get_value (self->volume_adjustment);
   fraction = (100.0 * volume) / gtk_adjustment_get_upper (self->volume_adjustment);
+
+  update_mute_button_tooltip (self, volume);
 
   switch (self->type)
     {
@@ -137,7 +151,10 @@ update_ranges (CcVolumeSlider *self)
   gtk_adjustment_set_page_increment (self->volume_adjustment, vol_max_norm / 100.0);
 
   if (self->stream)
-    notify_volume_cb (self);
+    {
+      notify_volume_cb (self);
+      notify_is_muted_cb (self);
+    }
 }
 
 static void

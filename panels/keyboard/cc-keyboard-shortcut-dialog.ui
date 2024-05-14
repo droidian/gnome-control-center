@@ -19,18 +19,7 @@
             <property name="child">
               <object class="AdwToolbarView">
                 <child type="top">
-                  <object class="AdwHeaderBar">
-
-                    <!-- Reset All… button -->
-                    <child>
-                      <object class="GtkButton" id="reset_all_button">
-                        <property name="label" translatable="yes">Reset All…</property>
-                        <property name="tooltip-text" translatable="yes">Reset all shortcuts to their default keybindings</property>
-                        <signal name="clicked" handler="reset_all_clicked_cb" swapped="yes" />
-                      </object>
-                    </child>
-
-                  </object> <!-- ./AdwHeaderBar main_header_bar -->
+                  <object class="AdwHeaderBar"/>
                 </child>
 
                 <!-- Search Entry -->
@@ -43,8 +32,8 @@
                         <child>
                           <object class="GtkSearchEntry" id="search_entry">
                             <property name="placeholder_text" translatable="yes">Search shortcuts</property>
-                            <property name="hexpand">True</property>
                             <signal name="search-changed" handler="shortcut_search_entry_changed_cb" swapped="yes" />
+                            <signal name="stop-search" handler="shortcut_search_entry_stopped_cb" swapped="yes" />
                             <accessibility>
                               <property name="label" translatable="yes">Search Shortcuts</property>
                             </accessibility>
@@ -75,6 +64,22 @@
                             </child>
                           </object>
                         </child>
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <child>
+                              <object class="GtkButton" id="reset_all_button">
+                                <property name="label" translatable="yes">_Reset All…</property>
+                                <property name="use-underline">True</property>
+                                <property name="halign">center</property>
+                                <signal name="clicked" handler="reset_all_clicked_cb" swapped="yes" />
+                                <style>
+                                  <class name="destructive-action"/>
+                                  <class name="pill"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
 
@@ -86,7 +91,7 @@
                         <property name="vexpand">True</property>
                         <property name="icon_name">edit-find-symbolic</property>
                         <property name="title" translatable="yes">No keyboard shortcut found</property>
-                        <property name="description" translatable="yes">Try a different search.</property>
+                        <property name="description" translatable="yes">Try a different search</property>
                       </object>
                     </child>
 
@@ -99,6 +104,7 @@
 
         <child>
           <object class="AdwNavigationPage" id="subview_page">
+            <property name="title"> </property>
             <property name="child">
               <object class="AdwToolbarView">
                 <child type="top">
@@ -118,7 +124,7 @@
                         <property name="vexpand">True</property>
                         <property name="icon-name">input-keyboard-symbolic</property>
                         <property name="title" translatable="yes">Add Custom Shortcuts</property>
-                        <property name="description" translatable="yes">Set up custom shortcuts for launching apps, running scripts, and more.</property>
+                        <property name="description" translatable="yes">Set up custom shortcuts for launching apps, running scripts, and more</property>
                         <child>
                           <object class="GtkButton">
                             <property name="halign">center</property>

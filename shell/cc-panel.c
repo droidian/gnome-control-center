@@ -44,32 +44,23 @@ typedef struct
 {
   CcShell      *shell;
   GCancellable *cancellable;
-} CcPanelPrivate;
 
-static void cc_panel_buildable_init (GtkBuildableIface *iface);
+  gchar *subpage;
+} CcPanelPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (CcPanel, cc_panel, ADW_TYPE_NAVIGATION_PAGE,
                                   G_ADD_PRIVATE (CcPanel))
-
-static GtkBuildableIface *parent_buildable_iface;
-
-enum
-{
-  SIDEBAR_ACTIVATED,
-  LAST_SIGNAL
-};
 
 enum
 {
   PROP_0,
   PROP_SHELL,
   PROP_PARAMETERS,
+  PROP_SUBPAGE,
   N_PROPS
 };
 
 static GParamSpec *properties [N_PROPS];
-
-static guint signals [LAST_SIGNAL] = { 0 };
 
 /* GtkBuildable interface */
 
@@ -107,7 +98,12 @@ cc_panel_set_property (GObject      *object,
 
         g_variant_get_child (parameters, 0, "v", &v);
 
-        if (!g_variant_is_of_type (v, G_VARIANT_TYPE_DICTIONARY))
+        if (g_variant_is_of_type (v, G_VARIANT_TYPE_STRING))
+          {
+            g_set_str (&priv->subpage, g_variant_get_string (v, NULL));
+            g_object_notify_by_pspec (object, properties[PROP_SUBPAGE]);
+          }
+        else if (!g_variant_is_of_type (v, G_VARIANT_TYPE_DICTIONARY))
           g_warning ("Wrong type for the first argument GVariant, expected 'a{sv}' but got '%s'",
                      (gchar *)g_variant_get_type (v));
         else if (g_variant_n_children (v) > 0)
@@ -139,6 +135,10 @@ cc_panel_get_property (GObject    *object,
       g_value_set_object (value, priv->shell);
       break;
 
+    case PROP_SUBPAGE:
+      g_value_set_string (value, priv->subpage);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -152,6 +152,7 @@ cc_panel_finalize (GObject *object)
 
   g_cancellable_cancel (priv->cancellable);
   g_clear_object (&priv->cancellable);
+  g_clear_pointer (&priv->subpage, g_free);
 
   G_OBJECT_CLASS (cc_panel_parent_class)->finalize (object);
 }
@@ -160,18 +161,10 @@ static void
 cc_panel_class_init (CcPanelClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->get_property = cc_panel_get_property;
   object_class->set_property = cc_panel_set_property;
   object_class->finalize = cc_panel_finalize;
-
-  signals[SIDEBAR_ACTIVATED] = g_signal_new ("sidebar-activated",
-                                             G_TYPE_FROM_CLASS (object_class),
-                                             G_SIGNAL_RUN_LAST,
-                                             0, NULL, NULL,
-                                             g_cclosure_marshal_VOID__VOID,
-                                             G_TYPE_NONE, 0);
 
   properties[PROP_SHELL] = g_param_spec_object ("shell",
                                                 "Shell",
@@ -185,6 +178,12 @@ cc_panel_class_init (CcPanelClass *klass)
                                                       G_VARIANT_TYPE ("av"),
                                                       NULL,
                                                       G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS);
+
+  properties[PROP_SUBPAGE] = g_param_spec_string ("subpage",
+                                                  "Subpage parameters",
+                                                  "Additional parameter extracted from the parameters property to launch a panel subpage",
+                                                  NULL,
+                                                  G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -221,24 +220,6 @@ cc_panel_get_help_uri (CcPanel *panel)
 
   if (class->get_help_uri)
     return class->get_help_uri (panel);
-
-  return NULL;
-}
-
-AdwNavigationPage*
-cc_panel_get_sidebar_widget (CcPanel *panel)
-{
-  CcPanelClass *class = CC_PANEL_GET_CLASS (panel);
-
-  if (class->get_sidebar_widget)
-    {
-      AdwNavigationPage *sidebar_widget;
-
-      sidebar_widget = class->get_sidebar_widget (panel);
-      g_assert (sidebar_widget != NULL);
-
-      return sidebar_widget;
-    }
 
   return NULL;
 }

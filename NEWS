@@ -1,3 +1,298 @@
+==============
+Version 46.0.1
+==============
+
+- Handle legacy panel arguments
+- Added/updated/fixed translations
+
+Accessibility
+- Allow launching subpages directly
+
+Privacy
+- Fix Thunderbolt panel not launching
+
+System
+- Avoid setting auto time sync when it isn't needed
+- Improve startup time by loading subpages on demand
+
+============
+Version 46.0
+============
+
+- Various translation updates
+- Update links in appdata file
+- Improve sidebar search results
+
+Appearance
+- Add a transition to the selected background check
+
+Color
+- Fix visibility of calibration button
+
+Online Accounts
+- Reorder online account providers list
+
+Privacy & Security
+- Allow launching subpages of the privacy panel directly
+
+Wacom
+- Bump libwacom dependency requirement to >= 1.4
+- Add AES styli as separate stylus SVG
+- Accept eraser types of button when matching stylus IDs
+
+=============
+Version 46.rc
+=============
+
+- Allow launching some subpages from the command line
+- Various ports of custom widgets to libadwaita widgets
+
+Appearance
+- Track current active background better
+
+Display
+- Add support for Variable Refresh Rate (VRR) modes
+- Show the full VRR range for a monitor when possible
+
+System
+- Introduce the "Remote Login" settings
+- Rename the old "Remote Desktop" settings to "Desktop Sharing"
+- Reintroduce some of "System" pages as search results
+
+Users
+- Fix issue with newly created user page showing other user's info
+- Introduce a new "Add Enterprise User" dialog
+
+
+=================
+Version 46.beta.1
+=================
+
+Exceptional release to fix translations
+https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/2893
+
+=================
+Version 46.beta.1
+=================
+
+Exceptional release to include gnome-online-accounts changes
+(Freeze break exception https://gitlab.gnome.org/Teams/Releng/freeze-breaks/-/issues/164)
+
+===============
+Version 46.beta
+===============
+
+- Drop pkexec dependency
+- Bump gcr dependency to gcr4
+- Reorder sidebar/panel list
+- Use g_clear_handle_id with g_source_remove to remove GSources
+- Add CcHostname as a wrapper to interact with system-hostnamed
+- Remove periods in subtitles/descriptions/labels according to the HIG
+- Various string/sentence rewording (for clarity)
+- Various style changes in symbolic icons
+- Various ports of custom widgets to modern libadwaita alternatives
+- Various new mnemonics added
+- Various CI fixes
+
+Accessibility
+- Expose new "show-status-shapes" setting
+- Rephrase overamplification string in the "Hearing" settings
+- Stop tracking old GTK theme
+- Stop forcing HighContrast icon theme (The theme is considered deprecated)
+
+Apps
+- Tweak headings & descriptions from Default Apps sections
+- Tweak the autorun-never option design (inverting the autorun-never option logic)
+- Use modern libadwaita widgets in the Removable Media settings
+
+Keyboard
+- Use AdwActionRow to show the key modifier options (improves accessibility)
+
+Network
+- Fix missing VPN entries
+
+Mouse
+- Add "Test Settings" button to the body of the panel
+- Modernize mouse test dialog (adds secondary-click test)
+
+Printers
+- Add padding to the sidebar items from "Printer Options"
+- Add .suggested-action style class to "Test Page" button
+
+Privacy
+- Hide non-functional microphone panel
+
+Search
+- Add commandline parameter for opening the Search Locations dialog directly
+- Stop removing non-existent folders from tracker
+- Expose single directory setting
+- Add placeholder for custom locations
+- Set title for non-existent bookmarks
+- Always show switch for default/bookmarks
+- Handle unset XDG dirs
+- Tweak search locations labels
+
+Sharing
+- Fix alignment of networks section in the File/Media sharing dialogs
+- Use edit-delete-symbolic in networks list rather than window-close-symbolic
+- Move main switches from dialog headerbars into the dialog's content area
+
+Sound
+- Show radio buttons as prefix for the Alert Sound rows
+- Add tooltips to all speaker test buttons
+
+System
+- Move "Remote Login" from sharing panel to System (now named "Secure Shell")
+- Use polkit to request permissions to enable/disable sshd
+- Create CcSystemDetailsWindow upon opening (speed up System panel startup time)
+- Fix crash in About page after dark mode switch
+- Don't show Remote Desktop settings when backend is not available
+- Show gnome-control-center version on the "GNOME Version" row in the About page
+- Fix language chooser dialog not closing in Users page
+
+Wacom
+- Port some widgets to modern libadwaita alternatives
+- Switch to using a dialog for stylus button assignments
+- Highlight the currently active stylus
+- Give proper ids and classes to the stylus SVG components
+- Provide connector name for disambiguation
+- Drop list to handle pads
+- Pair only builtin pads with tablets
+- Prefer the stylus over the eraser
+- Don't call the standard styli "Standard stylus"
+
+Wi-Fi
+- Show password when sharing QR Code
+- Fix crash with toast notifications in the Saved Networks dialog
+
+================
+Version 46.alpha
+================
+
+- Introduce the new "System" panel, grouping the settings of Region & Language, Date & Time, Users, Remote Desktop, and About.
+- Add an "About Settings" dialog
+- Various appdata improvements
+- Various mnemonics added
+- Various tooltips added
+- Various CI fixes
+- Various accessibility fixes
+- Make "gnome-control-center --version" work on non-supported environments
+- Bump meson dependency to >= 0.58
+- Disable "deprecated-declarations" by default for builds 
+- Introduce -Ddeprecated-declarations=enabled meson build option
+- Add CODEOWNERS file
+
+Accessibility
+- Rename "Overlay Scrollbars" to "Always Show Scrollbars" and invert this setting logic
+- Reword the "Accessibility Menu" row
+- Add description text to "Cursor Size" dialog
+- Port Cursor Size dialog to AdwWindow
+- Use AdwSpinRow in Zoom -> Magnification Factor row
+ 
+Appearance
+- Improve overall load and resize performance of background thumbnails
+- Improve background chooser performance
+- Make background preview thumbnails sharpier
+
+Apps
+- Drop sidebar by implementing a new mockup with a search bar inside the panel
+- Move "Default Apps" and "Removable Media" panels into the "Apps" panel
+- Add a banner indicating when an app isn't sandboxed
+- Separate the "Required Permissions" row into its own section
+- Add headings to rows from the app settings section
+- Port "Removable Media Settings" row to AdwSwitchRow
+- Ignore symlinks when measuring cache/data size to improve accuracy
+- Use "computer-fail-symbolic" icon instead of GNOME Software's icon
+- Fix "File & Link Associations" crash
+- Fix "File & Link Associations" UI not updating
+- Fix launching an app page from the command line (ex.: "gnome-control-center application $APP_ID)
+- Replace snapd-glib with a native implementation
+
+Cellular
+- Various HIG compliance changes
+
+Date & Time
+- Add description to "Week Numbers" row
+
+Displays
+- Port custom switch rows to AdwSwitchRow
+
+Keyboard
+- Add "Left Ctrl" key to Compose Key options
+- Add "Insert" key to Compose Key options
+- Port Shortcut Editor from deprecated GtkDialog to AdwWindow/AdwToolbarView
+- Fix showing window decoration buttons when showing the "Unsupported network daemon" status page
+- Show title buttons at the initial state of "Set Shortcuts" dialog
+- Add visual outline to shortcut graphic arrows
+
+Mouse
+- Add "Secondary Click" option for Touchpads (aka "Click Method")
+- Add "Disable While Typing" setting to Touchpad page
+- Update edge-scroll animation to represent better dimensions of physical devices
+- Port custom switch rows to AdwSwitchRow
+- Split "Scroll Method" and "Direction" into separate row groups
+- Prevent test window arrows from interferingf with scrolling events
+- Fix illustrations looking blurry on small window sizes
+- Fix the linked-style of the primary mouse button setting to work on RTL languages
+
+Network
+- Use period as thousands separator on network speed label
+- Avoid critical warning for floating reference in hotspot dialog
+- Various UI spacing and alignment changes in the connection editor pages
+- Share WPA3 (SAE) networks with QRCode
+- Hide QRCode icon when connection not successful
+- Handle bluetooth device connections ourselves (instead of depending on NM connection-editor)
+- Don't show "Saved Wi-Fi Networks" row when there's nothing to show
+- Use a "Undo" toast to allow users to undo forgetting a network in "Saved Wi-Fi Networks"
+- Make the "forget network" button show only an icon (instead of a icon+label)
+- Fix sensitivity of DNS and route configuration widgets
+- Warn user if both automatic and manual DNS is configured
+- Unset DNS entry errors when entry is empty
+- Disable Wi-Fi Hotspot row when Wi-Fi is not active
+
+Notifications
+- Stop listing system services on the panel
+
+Online Accounts
+- Various memory leak fixes
+
+Power
+- Add mnemonics to help navigate the automatic suspend dialog
+- Modernize the Suspend dialog
+
+Privacy & Security
+- Rename panel from "Privacy" to "Privacy & Security"
+- Update panel description text
+- Rename "Location Services" page to "Location"
+- Make icons larger in Location/Camera/Microphone pages
+- Make page visibility checks cancellable to avoid crashes
+- Fix crashes on Camera and Firmware Security pages
+- Rename location switch title to "Automatic Device Location"
+- Reword and re-style the "Privacy" policy text 
+
+Region
+- Preview measurement format in current locale
+
+Remote Desktop
+- Use "rdp" instead of "ms-rd" for hostname URL
+- Add documentation link to instruct how to use remote desktop
+
+Sharing
+- Make panel adaptative
+- Use AdwPreferencesPage/AdwPreferencesGroup in all dialogs
+
+Users
+- Port to AdwNavigationView/Page widgets
+- Move into the "System" panel
+- Use AdwAvatar to generate default user icon and mark generated avatars as such
+
+Wacom
+- Update illustration style
+- Generate a smooth pressure curve instead of just 7
+- Introduce mark indicating the center-point of the stylus pressure curve
+- Extend ther pressurecurve range by 25% in each direction
+- Use the ExpressKey Remote name for the EKR
+
 ============
 Version 45.0
 ============

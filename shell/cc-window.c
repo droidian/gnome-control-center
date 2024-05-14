@@ -50,16 +50,11 @@ struct _CcWindow
 {
   AdwApplicationWindow parent;
 
-  GtkMessageDialog  *development_warning_dialog;
-  AdwHeaderBar      *header;
+  AdwMessageDialog  *development_warning_dialog;
   AdwNavigationSplitView *split_view;
-  AdwNavigationView *sidebar_view;
-  AdwNavigationPage *main_sidebar_page;
   CcPanelList       *panel_list;
   GtkSearchBar      *search_bar;
-  GtkToggleButton   *search_button;
   GtkSearchEntry    *search_entry;
-  AdwWindowTitle    *sidebar_title_widget;
 
   GtkWidget  *old_panel;
   GtkWidget  *current_panel;
@@ -116,12 +111,6 @@ in_flatpak_sandbox (void)
   return g_strcmp0 (PROFILE, "development") == 0;
 }
 
-static void
-on_sidebar_activated_cb (CcWindow *self)
-{
-  adw_navigation_split_view_set_show_content (self->split_view, TRUE);
-}
-
 static gboolean
 activate_panel (CcWindow          *self,
                 const gchar       *id,
@@ -131,7 +120,7 @@ activate_panel (CcWindow          *self,
                 CcPanelVisibility  visibility)
 {
   g_autoptr(GTimer) timer = NULL;
-  gdouble ellapsed_time;
+  gdouble elapsed_time;
 
   CC_ENTRY;
 
@@ -153,17 +142,12 @@ activate_panel (CcWindow          *self,
 
   adw_navigation_split_view_set_content (self->split_view, ADW_NAVIGATION_PAGE (self->current_panel));
 
-  /* Ensure we show the panel when the split view is collapsed and a sidebar
-   * widget's row is activated.
-   */
-  g_signal_connect_object (self->current_panel, "sidebar-activated", G_CALLBACK (on_sidebar_activated_cb), self, G_CONNECT_SWAPPED);
-
   /* Finish profiling */
   g_timer_stop (timer);
 
-  ellapsed_time = g_timer_elapsed (timer, NULL);
+  elapsed_time = g_timer_elapsed (timer, NULL);
 
-  g_debug ("Time to open panel '%s': %lfs", name, ellapsed_time);
+  g_debug ("Time to open panel '%s': %lfs", name, elapsed_time);
 
   g_settings_set_string (self->settings, "last-panel", id);
 
@@ -257,7 +241,6 @@ setup_model (CcWindow *self)
       g_autofree gchar *id = NULL;
       g_auto(GStrv) keywords = NULL;
       CcPanelVisibility visibility;
-      gboolean has_sidebar;
       const gchar *icon_name = NULL;
 
       gtk_tree_model_get (model, &iter,
@@ -268,7 +251,6 @@ setup_model (CcWindow *self)
                           COL_NAME, &name,
                           COL_KEYWORDS, &keywords,
                           COL_VISIBILITY, &visibility,
-                          COL_HAS_SIDEBAR, &has_sidebar,
                           -1);
 
       if (G_IS_THEMED_ICON (icon))
@@ -281,8 +263,7 @@ setup_model (CcWindow *self)
                                description,
                                keywords,
                                icon_name,
-                               visibility,
-                               has_sidebar);
+                               visibility);
 
       valid = gtk_tree_model_iter_next (model, &iter);
     }
@@ -302,6 +283,8 @@ set_active_panel_from_id (CcWindow     *self,
   g_autoptr(GIcon) gicon = NULL;
   g_autofree gchar *name = NULL;
   CcPanelVisibility visibility;
+  CcPanelCategory category;
+  g_autoptr(GVariant) system_param_overwrite = NULL;
   GtkTreeIter iter;
   CcPanelListView view;
   gboolean activated;
@@ -314,15 +297,6 @@ set_active_panel_from_id (CcWindow     *self,
   /* When loading the same panel again, just set its parameters */
   if (g_strcmp0 (self->current_panel_id, start_id) == 0)
     {
-      AdwNavigationPage *sidebar_widget;
-      sidebar_widget = cc_panel_get_sidebar_widget (CC_PANEL (self->current_panel));
-
-      if (sidebar_widget)
-        {
-          adw_navigation_view_push (self->sidebar_view, sidebar_widget);
-          CC_RETURN (TRUE);
-        }
-
       g_object_set (G_OBJECT (self->current_panel), "parameters", parameters, NULL);
       if (force_moving_to_the_panel || self->previous_list_view == view)
         adw_navigation_split_view_set_show_content (self->split_view, TRUE);
@@ -346,10 +320,31 @@ set_active_panel_from_id (CcWindow     *self,
                       COL_NAME, &name,
                       COL_GICON, &gicon,
                       COL_VISIBILITY, &visibility,
+                      COL_CATEGORY, &category,
                       -1);
 
+  /* Handle "System" subpages by overwriting the start_id and parameters arguments.
+   * This is needed because they have their own desktop files. */
+  if (category == CC_CATEGORY_SYSTEM)
+    {
+      g_autofree gchar *param_str = NULL;
+
+      param_str = g_strdup_printf ("[<'%s'>]", start_id);
+      system_param_overwrite = g_variant_new_parsed (param_str);
+      g_variant_ref_sink (system_param_overwrite);
+
+      g_warning ("The direct access to `%s` is now deprecated. Please, use `system %s` instead.", start_id, start_id);
+
+      start_id = "system";
+    }
+
   /* Activate the panel */
-  activated = activate_panel (self, start_id, parameters, name, gicon, visibility);
+  activated = activate_panel (self,
+                              start_id,
+                              system_param_overwrite != NULL ? system_param_overwrite : parameters,
+                              name,
+                              gicon,
+                              visibility);
 
   /* Failed to activate the panel for some reason, let's keep the old
    * panel around instead */
@@ -429,26 +424,32 @@ on_split_view_collapsed_changed_cb (CcWindow *self)
   selection_mode = collapsed ? GTK_SELECTION_NONE : GTK_SELECTION_SINGLE;
   cc_panel_list_set_selection_mode (self->panel_list, selection_mode);
 
-  if (collapsed && self->current_panel && adw_navigation_view_get_visible_page (self->sidebar_view) == self->main_sidebar_page)
-    {
-      AdwNavigationPage *sidebar_widget;
-      sidebar_widget = cc_panel_get_sidebar_widget (CC_PANEL (self->current_panel));
-
-      if (sidebar_widget)
-        adw_navigation_view_push (self->sidebar_view, sidebar_widget);
-    }
-
   g_object_notify (G_OBJECT (self), "collapsed");
 }
 
 static void
 show_panel_cb (CcWindow    *self,
-               const gchar *panel_id)
+               const gchar *panel_id,
+               const gchar *parent_id)
 {
+  GVariant *parameters;
+  GVariantBuilder builder;
+
   if (!panel_id)
     return;
 
-  set_active_panel_from_id (self, panel_id, NULL, TRUE, FALSE, NULL);
+  if (!parent_id)
+    {
+      set_active_panel_from_id (self, panel_id, NULL, TRUE, FALSE, NULL);
+
+      return;
+    }
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("av"));
+  g_variant_builder_add (&builder, "v", g_variant_new_string (panel_id));
+  parameters = g_variant_builder_end (&builder);
+
+  set_active_panel_from_id (self, parent_id, parameters, TRUE, FALSE, NULL);
 }
 
 static void
@@ -747,15 +748,10 @@ cc_window_class_init (CcWindowClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/Settings/gtk/cc-window.ui");
 
   gtk_widget_class_bind_template_child (widget_class, CcWindow, development_warning_dialog);
-  gtk_widget_class_bind_template_child (widget_class, CcWindow, header);
   gtk_widget_class_bind_template_child (widget_class, CcWindow, split_view);
-  gtk_widget_class_bind_template_child (widget_class, CcWindow, sidebar_view);
-  gtk_widget_class_bind_template_child (widget_class, CcWindow, main_sidebar_page);
   gtk_widget_class_bind_template_child (widget_class, CcWindow, panel_list);
   gtk_widget_class_bind_template_child (widget_class, CcWindow, search_bar);
-  gtk_widget_class_bind_template_child (widget_class, CcWindow, search_button);
   gtk_widget_class_bind_template_child (widget_class, CcWindow, search_entry);
-  gtk_widget_class_bind_template_child (widget_class, CcWindow, sidebar_title_widget);
 
   gtk_widget_class_bind_template_callback (widget_class, on_split_view_collapsed_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, on_development_warning_dialog_responded_cb);

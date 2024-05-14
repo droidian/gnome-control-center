@@ -27,6 +27,7 @@
 #include "cc-firmware-security-boot-dialog.h"
 #include "cc-firmware-security-help-dialog.h"
 #include "cc-firmware-security-utils.h"
+#include "cc-hostname.h"
 #include "cc-util.h"
 
 #include <gio/gdesktopappinfo.h>
@@ -64,6 +65,7 @@ struct _CcFirmwareSecurityPage
   GtkWidget        *firmware_security_log_pgroup;
 
   GCancellable     *cancellable;
+  guint             timeout_id;
 
   GDBusProxy       *bus_proxy;
   GDBusProxy       *properties_bus_proxy;
@@ -383,6 +385,7 @@ on_timeout_cb (gpointer user_data)
 {
   CcFirmwareSecurityPage *self = CC_FIRMWARE_SECURITY_PAGE (user_data);
   show_loading_page (self, "panel_show");
+  self->timeout_id = 0;
   return 0;
 }
 
@@ -391,6 +394,7 @@ on_timeout_unavaliable (gpointer user_data)
 {
   CcFirmwareSecurityPage *self = CC_FIRMWARE_SECURITY_PAGE (user_data);
   show_loading_page (self, "panel_unavaliable");
+  self->timeout_id = 0;
   return 0;
 }
 
@@ -406,13 +410,13 @@ on_bus_done (GObject      *source,
   val = g_dbus_proxy_call_finish (G_DBUS_PROXY (source), res, &error);
   if (val == NULL)
     {
-      g_timeout_add (1500, on_timeout_unavaliable, self);
+      self->timeout_id = g_timeout_add (1500, on_timeout_unavaliable, self);
       return;
     }
 
   parse_array_from_variant (self, val, FALSE);
   set_secure_boot_button_view (self);
-  g_timeout_add (1500, on_timeout_cb, self);
+  self->timeout_id = g_timeout_add (1500, on_timeout_cb, self);
 }
 
 static void
@@ -627,44 +631,15 @@ on_properties_bus_ready_cb (GObject      *source_object,
 static void
 update_page_visibility (CcFirmwareSecurityPage *self)
 {
-  g_autoptr(GDBusConnection) connection = NULL;
-  g_autoptr(GError) error = NULL;
-  g_autoptr(GVariant) inner = NULL;
-  g_autoptr(GVariant) variant = NULL;
+  CcHostname *hostname;
   gboolean visible = TRUE;
-  const gchar *chassis_type;
+  g_autofree gchar *chassis_type = NULL;
 
-  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
-  if (!connection)
-    {
-      g_warning ("system bus not available: %s", error->message);
-      return;
-    }
-  variant = g_dbus_connection_call_sync (connection,
-                                         "org.freedesktop.hostname1",
-                                         "/org/freedesktop/hostname1",
-                                         "org.freedesktop.DBus.Properties",
-                                         "Get",
-                                         g_variant_new ("(ss)",
-                                                        "org.freedesktop.hostname1",
-                                                        "Chassis"),
-                                         NULL,
-                                         G_DBUS_CALL_FLAGS_NONE,
-                                         -1,
-                                         NULL,
-                                         &error);
-  if (!variant)
-    {
-      g_warning ("Cannot get org.freedesktop.hostname1.Chassis: %s", error->message);
-      return;
-    }
-  g_variant_get (variant, "(v)", &inner);
-
-  chassis_type = g_variant_get_string (inner, NULL);
-
-  /* there's no point showing this */
-  if (g_strcmp0 (chassis_type, "vm") == 0 || g_strcmp0 (chassis_type, "") == 0)
+  hostname = cc_hostname_get_default ();
+  chassis_type = cc_hostname_get_chassis_type (hostname);
+  if (cc_hostname_is_vm_chassis (hostname) || g_strcmp0 (chassis_type, "") == 0)
     visible = FALSE;
+
   gtk_widget_set_visible (GTK_WIDGET (self), visible);
   g_debug ("Firmware Security page visible: %s as chassis was %s",
            visible ? "yes" : "no",
@@ -688,6 +663,9 @@ cc_firmware_security_page_finalize (GObject *object)
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
+
+  if (self->timeout_id)
+    g_clear_handle_id (&self->timeout_id, g_source_remove);
 
   G_OBJECT_CLASS (cc_firmware_security_page_parent_class)->finalize (object);
 }

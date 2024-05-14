@@ -46,6 +46,7 @@
 
                 <child>
                   <object class="GtkMenuButton">
+                    <property name="tooltip-text" translatable="yes">View More</property>
                     <property name="menu-model">printer_menu</property>
                     <property name="icon_name">view-more-symbolic</property>
                     <style>
@@ -68,6 +69,7 @@
                 <property name="label" translatable="yes">Model</property>
                 <property name="ellipsize">middle</property>
                 <property name="xalign">1</property>
+                <property name="mnemonic-widget">printer_model</property>
                 <layout>
                   <property name="column">0</property>
                   <property name="row">0</property>
@@ -94,6 +96,7 @@
               <object class="GtkLabel" id="printer_location_label">
                 <property name="label" translatable="yes">Location</property>
                 <property name="xalign">1</property>
+                <property name="mnemonic-widget">printer_location_address_label</property>
                 <layout>
                   <property name="column">0</property>
                   <property name="row">1</property>
@@ -120,6 +123,7 @@
               <object class="GtkLabel">
                 <property name="label" translatable="yes">Status</property>
                 <property name="xalign">1</property>
+                <property name="mnemonic-widget">printer_status</property>
                 <layout>
                   <property name="column">0</property>
                   <property name="row">2</property>
@@ -146,6 +150,7 @@
               <object class="GtkLabel" id="printer_inklevel_label">
                 <property name="label" translatable="yes">Ink Level</property>
                 <property name="xalign">1</property>
+                <property name="mnemonic-widget">supply_frame</property>
                 <layout>
                   <property name="column">0</property>
                   <property name="row">3</property>

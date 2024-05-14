@@ -114,6 +114,9 @@ cc_util_get_smart_date (GDateTime *date)
         g_autoptr(GDateTime) local = NULL;
         GTimeSpan span;
 
+        if (date == NULL)
+          return NULL;
+
         /* Set today date */
         local = g_date_time_new_now_local ();
         today = g_date_time_new_local (g_date_time_get_year (local),
@@ -135,6 +138,7 @@ cc_util_get_smart_date (GDateTime *date)
             if (g_date_time_get_year (date) == g_date_time_get_year (today))
               {
                 /* Translators: This is a date format string in the style of "Feb 24". */
+                /* xgettext:no-c-format */
                 return g_date_time_format (date, _("%b %e"));
               }
             else
