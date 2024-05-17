@@ -3,13 +3,11 @@
   <template class="CcListRowInfoButton" parent="GtkWidget">
     <child>
       <object class="GtkMenuButton" id="button">
+        <property name="tooltip-text" translatable="yes">More Information</property>
         <property name="icon-name">info-symbolic</property>
         <style>
           <class name="flat"/>
         </style>
-        <accessibility>
-          <property name="label" translatable="yes">More information</property>
-        </accessibility>
         <property name="popover">
           <object class="GtkPopover" id="popover">
             <child>

@@ -32,19 +32,6 @@ stages:
 .Build procedure: &build_procedure
   echo "== Building ==" &&
   dnf install -y dnf5-plugins &&
-  git clone https://gitlab.gnome.org/GNOME/glib.git &&
-  cd glib &&
-  dnf5 builddep -y glib &&
-  meson setup . _build -Dprefix=/usr -Dlibdir=lib64 &&
-  ninja -C _build install &&
-  cd .. && rm -rf _build/ &&
-  git clone https://gitlab.gnome.org/GNOME/gtk.git &&
-  cd gtk &&
-  dnf5 builddep -y gtk4 &&
-  meson setup . _build -Dprefix=/usr -Dlibdir=lib64 &&
-  ninja -C _build install &&
-  cd .. &&
-  rm -rf _build/ &&
   meson . _build ${BUILD_OPTS} -Dprofile=development &&
   ninja -C _build 2>&1 | tee compilation.log
 
@@ -65,7 +52,7 @@ stages:
     # stable branch.
     # Could probably also switch away from rawhide,
     # to stable fedora branch as well.
-    FDO_DISTRIBUTION_TAG: '2023-06-07.0-main'
+    FDO_DISTRIBUTION_TAG: '2024-02-26.0-main'
     FDO_DISTRIBUTION_VERSION: rawhide
 
 #############################################
@@ -93,6 +80,7 @@ build.container.fedora@x86_64:
       accountsservice-devel
       cheese-libs-devel
       chrpath
+      clang-tools-extra
       colord-devel colord-gtk-devel
       cups-devel
       desktop-file-utils
@@ -104,7 +92,6 @@ build.container.fedora@x86_64:
       gobject-introspection-devel
       gnome-bluetooth-libs-devel
       gnome-desktop3-devel
-      gnome-online-accounts-devel
       grilo-devel
       gsettings-desktop-schemas-devel
       gsound-devel
@@ -138,13 +125,12 @@ build.container.fedora@x86_64:
       mesa-dri-drivers
       libsecret-devel
       geocode-glib2-devel
-      libgweather-devel
+      libgweather4-devel
       lcms2-devel
       geoclue2-devel
       libnotify-devel
       alsa-lib-devel
       nss-devel
-      gcr3-devel
       gcr-devel
       setxkbmap
       appstream-devel
@@ -190,7 +176,14 @@ build.container.fedora@x86_64:
         meson . _build --prefix=/usr && \
         ninja -C _build && \
         ninja -C _build install && \
-        cd ..
+        cd .. && \
+      git clone https://gitlab.gnome.org/GNOME/gnome-online-accounts.git && \
+        cd gnome-online-accounts && \
+        meson . _build --prefix=/usr -Dfedora=true  && \
+        ninja -C _build && \
+        ninja -C _build install && \
+        cd .. && \
+      dnf remove -y systemtap-runtime
 
 ##
 # Stage: Build
@@ -227,8 +220,21 @@ build:
 ##
 # Stage: Test
 #
+# Runs static checks.
 # Runs the unit tests.
 ##
+style-check-diff:
+  extends:
+  - '.fdo.distribution-image@fedora'
+  - '.fedora.container.common'
+  needs:
+  - build.container.fedora@x86_64
+  stage: test
+  when: always
+  allow_failure: true
+  script:
+    - .gitlab-ci/run-style-check-diff.sh
+
 test:
   extends:
     - '.fdo.distribution-image@fedora'

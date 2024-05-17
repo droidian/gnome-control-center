@@ -26,6 +26,7 @@
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
 
+#include "cc-list-row.h"
 #include "cc-notifications-panel.h"
 #include "cc-notifications-resources.h"
 #include "cc-app-notifications-dialog.h"
@@ -231,7 +232,8 @@ static void
 add_application (CcNotificationsPanel *self,
                  Application          *app)
 {
-  GtkWidget *w, *row;
+  CcListRow *row;
+  GtkWidget *w;
   g_autoptr(GIcon) icon = NULL;
   const gchar *app_name;
 
@@ -245,36 +247,50 @@ add_application (CcNotificationsPanel *self,
   else
     g_object_ref (icon);
 
-  row = adw_action_row_new ();
-  gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), TRUE);
+  row = g_object_new (CC_TYPE_LIST_ROW, "show-arrow", TRUE, NULL);
   adw_preferences_row_set_title (ADW_PREFERENCES_ROW (row),
                                  g_markup_escape_text (app_name, -1));
 
   g_object_set_qdata_full (G_OBJECT (row), application_quark (),
                            app, (GDestroyNotify) application_free);
 
-  gtk_list_box_append (self->app_listbox, row);
+  gtk_list_box_append (self->app_listbox, GTK_WIDGET (row));
 
   w = gtk_image_new_from_gicon (icon);
   gtk_widget_add_css_class (w, "lowres-icon");
   gtk_image_set_icon_size (GTK_IMAGE (w), GTK_ICON_SIZE_LARGE);
   adw_action_row_add_prefix (ADW_ACTION_ROW (row), w);
 
-  w = gtk_label_new ("");
   g_settings_bind_with_mapping (app->settings, "enable",
-                                w, "label",
+                                row, "secondary-label",
                                 G_SETTINGS_BIND_GET |
                                 G_SETTINGS_BIND_NO_SENSITIVITY,
                                 on_off_label_mapping_get,
                                 NULL,
                                 NULL,
                                 NULL);
-  adw_action_row_add_suffix (ADW_ACTION_ROW (row), w);
-
-  w = gtk_image_new_from_icon_name ("go-next-symbolic");
-  adw_action_row_add_suffix (ADW_ACTION_ROW (row), w);
 
   g_hash_table_add (self->known_applications, g_strdup (app->canonical_app_id));
+}
+
+static gboolean
+app_is_system_service (GDesktopAppInfo *app)
+{
+  g_auto(GStrv) split = NULL;
+  const gchar *categories;
+
+  categories = g_desktop_app_info_get_categories (app);
+  if (categories == NULL || categories[0] == '\0')
+    return FALSE;
+
+  split = g_strsplit (categories, ";", -1);
+  if (g_strv_contains ((const gchar* const*) split, "X-GNOME-Settings-Panel") ||
+      g_strv_contains ((const gchar* const*) split, "Settings") ||
+      g_strv_contains ((const gchar* const*) split, "System")) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 static void
@@ -304,6 +320,11 @@ maybe_add_app_id (CcNotificationsPanel *self,
     g_debug ("Not adding application '%s' (canonical app ID: %s)",
              full_app_id, canonical_app_id);
     /* The application cannot be found, probably it was uninstalled */
+    return;
+  }
+
+  if (app_is_system_service (G_DESKTOP_APP_INFO (app_info))) {
+    /* We don't want to show system services in the notification list */
     return;
   }
 
@@ -396,6 +417,11 @@ load_apps (CcNotificationsPanel *self)
 
       app = iter->data;
       if (g_desktop_app_info_get_boolean (app, "X-GNOME-UsesNotifications")) {
+        if (app_is_system_service (app)) {
+          g_debug ("Skipped app '%s', as it is a system service", g_app_info_get_id (G_APP_INFO (app)));
+          continue;
+        }
+
         process_app_info (self, G_APP_INFO (app));
         g_debug ("Processing app '%s'", g_app_info_get_id (G_APP_INFO (app)));
       } else {

@@ -199,6 +199,7 @@ add_camera_app (CcCameraPage *self,
 
   icon = g_app_info_get_icon (G_APP_INFO (app_info));
   w = gtk_image_new_from_gicon (icon);
+  gtk_image_set_icon_size (GTK_IMAGE (w), GTK_ICON_SIZE_LARGE);
   gtk_widget_set_valign (w, GTK_ALIGN_CENTER);
   gtk_size_group_add_widget (self->camera_icon_size_group, w);
   adw_action_row_add_prefix (ADW_ACTION_ROW (row), w);
@@ -210,6 +211,7 @@ add_camera_app (CcCameraPage *self,
   gtk_switch_set_active (GTK_SWITCH (w), enabled);
   gtk_widget_set_valign (w, GTK_ALIGN_CENTER);
   adw_action_row_add_suffix (ADW_ACTION_ROW (row), w);
+  adw_action_row_set_activatable_widget (ADW_ACTION_ROW (row), w);
 
   g_settings_bind_with_mapping (self->privacy_settings,
                                 "disable-camera",
@@ -323,7 +325,7 @@ on_perm_store_ready (GObject      *source_object,
                      gpointer      user_data)
 {
   CcCameraPage *self;
-  g_autoptr(GVariant) params = NULL;
+  GVariant *params;
   g_autoptr(GError) error = NULL;
   GDBusProxy *proxy;
 

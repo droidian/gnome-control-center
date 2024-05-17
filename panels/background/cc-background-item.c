@@ -31,6 +31,7 @@
 
 #include "cc-background-item.h"
 #include "gdesktop-enums-types.h"
+#include "cc-background-enum-types.h"
 
 typedef struct {
         int        width;
@@ -87,8 +88,11 @@ enum {
         PROP_FLAGS,
         PROP_SIZE,
         PROP_NEEDS_DOWNLOAD,
-        PROP_MODIFIED
+        PROP_MODIFIED,
+        N_PROPS
 };
+
+static GParamSpec *props [N_PROPS];
 
 static void     cc_background_item_finalize       (GObject               *object);
 
@@ -168,6 +172,9 @@ update_size (CcBackgroundItem *item)
 		if (gnome_bg_has_multiple_sizes (item->bg) || gnome_bg_changes_with_time (item->bg)) {
 			item->size = g_strdup (_("multiple sizes"));
 		} else {
+			gdk_pixbuf_get_file_info (gnome_bg_get_filename (item->bg),
+						  &item->width,
+						  &item->height);
 			/* translators: 100 × 100px
 			 * Note that this is not an "x", but U+00D7 MULTIPLICATION SIGN */
 			item->size = g_strdup_printf (_("%d × %d"),
@@ -177,19 +184,6 @@ update_size (CcBackgroundItem *item)
 	}
 }
 
-static GdkPixbuf *
-render_at_size (GnomeBG *bg,
-                gint width,
-                gint height)
-{
-        GdkPixbuf *pixbuf;
-
-        pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, FALSE, 8, width, height);
-        gnome_bg_draw (bg, pixbuf);
-
-        return pixbuf;
-}
-
 GdkPixbuf *
 cc_background_item_get_frame_thumbnail (CcBackgroundItem             *item,
                                         GnomeDesktopThumbnailFactory *thumbs,
@@ -197,13 +191,15 @@ cc_background_item_get_frame_thumbnail (CcBackgroundItem             *item,
                                         int                           height,
                                         int                           scale_factor,
                                         int                           frame,
-                                        gboolean                      force_size,
                                         gboolean                      dark)
 {
-        g_autoptr(GdkPixbuf) pixbuf = NULL;
-        g_autoptr(GdkPixbuf) retval = NULL;
+        GdkPixbuf *pixbuf;
         CachedThumbnail *thumbnail;
         GnomeBG *bg;
+        g_autoptr(GdkMonitor) monitor = NULL;
+        GdkDisplay *display;
+        GListModel *monitors;
+        GdkRectangle monitor_layout;
 
 	g_return_val_if_fail (CC_IS_BACKGROUND_ITEM (item), NULL);
 	g_return_val_if_fail (width > 0 && height > 0, NULL);
@@ -221,62 +217,36 @@ cc_background_item_get_frame_thumbnail (CcBackgroundItem             *item,
 
         set_bg_properties (item);
 
-        if (force_size) {
-                /* FIXME: this doesn't play nice with slideshow stepping at all,
-                 * because it will always render the current slideshow frame, which
-                 * might not be what we want.
-                 * We're lacking an API to draw a high-res GnomeBG manually choosing
-                 * the slideshow frame though, so we can't do much better than this
-                 * for now.
-                 */
-                pixbuf = render_at_size (bg, width, height);
+        display = gdk_display_get_default ();
+        monitors = gdk_display_get_monitors (display);
+        monitor = g_list_model_get_item (monitors, 0);
+        gdk_monitor_get_geometry (monitor, &monitor_layout);
+
+        if (frame >= 0) {
+                pixbuf = gnome_bg_create_frame_thumbnail (bg,
+                                                          thumbs,
+                                                          &monitor_layout,
+                                                          scale_factor * width,
+                                                          scale_factor * height,
+                                                          frame);
         } else {
-                g_autoptr(GdkMonitor) monitor = NULL;
-                GdkDisplay *display;
-                GListModel *monitors;
-                GdkRectangle monitor_layout;
-
-
-                display = gdk_display_get_default ();
-                monitors = gdk_display_get_monitors (display);
-                monitor = g_list_model_get_item (monitors, 0);
-                gdk_monitor_get_geometry (monitor, &monitor_layout);
-
-                if (frame >= 0) {
-                        pixbuf = gnome_bg_create_frame_thumbnail (bg,
-                                                                  thumbs,
-                                                                  &monitor_layout,
-                                                                  width,
-                                                                  height,
-                                                                  frame);
-                } else {
-                        pixbuf = gnome_bg_create_thumbnail (bg,
-                                                            thumbs,
-                                                            &monitor_layout,
-                                                            width,
-                                                            height);
-                }
+                pixbuf = gnome_bg_create_thumbnail (bg,
+                                                    thumbs,
+                                                    &monitor_layout,
+                                                    scale_factor * width,
+                                                    scale_factor * height);
         }
-
-        retval = g_steal_pointer (&pixbuf);
-
-        gnome_bg_get_image_size (bg,
-                                 thumbs,
-                                 width,
-                                 height,
-                                 &item->width,
-                                 &item->height);
 
         update_size (item);
 
         /* Cache the new thumbnail */
-        g_set_object (&thumbnail->thumbnail, retval);
+        g_set_object (&thumbnail->thumbnail, pixbuf);
         thumbnail->width = width;
         thumbnail->height = height;
         thumbnail->scale_factor = scale_factor;
         thumbnail->frame = frame;
 
-        return g_steal_pointer (&retval);
+        return pixbuf;
 }
 
 
@@ -288,7 +258,7 @@ cc_background_item_get_thumbnail (CcBackgroundItem             *item,
                                   int                           scale_factor,
                                   gboolean                      dark)
 {
-        return cc_background_item_get_frame_thumbnail (item, thumbs, width, height, scale_factor, -1, FALSE, dark);
+        return cc_background_item_get_frame_thumbnail (item, thumbs, width, height, scale_factor, -1, dark);
 }
 
 static void
@@ -385,6 +355,14 @@ cc_background_item_get_name (CcBackgroundItem *item)
 }
 
 static void
+_add_flag (CcBackgroundItem      *item,
+           CcBackgroundItemFlags  flag)
+{
+        item->flags |= flag;
+        g_object_notify_by_pspec (G_OBJECT (item), props[PROP_FLAGS]);
+}
+
+static void
 _set_uri (CcBackgroundItem *item,
 	  const char       *value)
 {
@@ -396,6 +374,7 @@ _set_uri (CcBackgroundItem *item,
 			g_warning ("URI '%s' is invalid", value);
 		item->uri = g_strdup (value);
 	}
+        _add_flag (item, CC_BACKGROUND_ITEM_HAS_URI);
 }
 
 
@@ -411,6 +390,7 @@ _set_uri_dark (CcBackgroundItem *item,
 			g_warning ("URI '%s' is invalid", value);
 		item->uri_dark = g_strdup (value);
 	}
+        _add_flag (item, CC_BACKGROUND_ITEM_HAS_URI_DARK);
 }
 
 const char *
@@ -434,6 +414,7 @@ _set_placement (CcBackgroundItem        *item,
                 GDesktopBackgroundStyle  value)
 {
         item->placement = value;
+        _add_flag (item, CC_BACKGROUND_ITEM_HAS_PLACEMENT);
 }
 
 static void
@@ -441,6 +422,7 @@ _set_shading (CcBackgroundItem          *item,
               GDesktopBackgroundShading  value)
 {
         item->shading = value;
+        _add_flag (item, CC_BACKGROUND_ITEM_HAS_SHADING);
 }
 
 static void
@@ -449,6 +431,7 @@ _set_primary_color (CcBackgroundItem *item,
 {
         g_free (item->primary_color);
         item->primary_color = g_strdup (value);
+        _add_flag (item, CC_BACKGROUND_ITEM_HAS_PCOLOR);
 }
 
 const char *
@@ -465,6 +448,7 @@ _set_secondary_color (CcBackgroundItem *item,
 {
         g_free (item->secondary_color);
         item->secondary_color = g_strdup (value);
+        _add_flag (item, CC_BACKGROUND_ITEM_HAS_SCOLOR);
 }
 
 const char *
@@ -528,13 +512,6 @@ cc_background_item_get_source_xml (CcBackgroundItem *item)
 	g_return_val_if_fail (CC_IS_BACKGROUND_ITEM (item), NULL);
 
 	return item->source_xml;
-}
-
-static void
-_set_flags (CcBackgroundItem      *item,
-            CcBackgroundItemFlags  value)
-{
-	item->flags = value;
 }
 
 CcBackgroundItemFlags
@@ -623,9 +600,6 @@ cc_background_item_set_property (GObject      *object,
 		break;
 	case PROP_SOURCE_XML:
 		_set_source_xml (self, g_value_get_string (value));
-		break;
-	case PROP_FLAGS:
-		_set_flags (self, g_value_get_flags (value));
 		break;
 	case PROP_NEEDS_DOWNLOAD:
 		_set_needs_download (self, g_value_get_boolean (value));
@@ -722,117 +696,96 @@ cc_background_item_class_init (CcBackgroundItemClass *klass)
         object_class->constructor = cc_background_item_constructor;
         object_class->finalize = cc_background_item_finalize;
 
-        g_object_class_install_property (object_class,
-                                         PROP_NAME,
-                                         g_param_spec_string ("name",
-                                                              "name",
-                                                              "name",
-                                                              NULL,
-                                                              G_PARAM_READWRITE));
-        g_object_class_install_property (object_class,
-                                         PROP_URI,
-                                         g_param_spec_string ("uri",
-                                                              "uri",
-                                                              "uri",
-                                                              NULL,
-                                                              G_PARAM_READWRITE));
-        g_object_class_install_property (object_class,
-                                         PROP_URI_DARK,
-                                         g_param_spec_string ("uri-dark",
-                                                              "uri-dark",
-                                                              "uri-dark",
-                                                              NULL,
-                                                              G_PARAM_READWRITE));
-        g_object_class_install_property (object_class,
-                                         PROP_PLACEMENT,
-					 g_param_spec_enum ("placement",
-							    "placement",
-							    "placement",
-							    G_DESKTOP_TYPE_DESKTOP_BACKGROUND_STYLE,
-							    G_DESKTOP_BACKGROUND_STYLE_SCALED,
-							    G_PARAM_READWRITE));
+        props[PROP_NAME] = g_param_spec_string ("name",
+                                                "name",
+                                                "name",
+                                                NULL,
+                                                G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_SHADING,
-                                         g_param_spec_enum ("shading",
-							    "shading",
-							    "shading",
-							    G_DESKTOP_TYPE_DESKTOP_BACKGROUND_SHADING,
-							    G_DESKTOP_BACKGROUND_SHADING_SOLID,
-							    G_PARAM_READWRITE));
-        g_object_class_install_property (object_class,
-                                         PROP_PRIMARY_COLOR,
-                                         g_param_spec_string ("primary-color",
-                                                              "primary-color",
-                                                              "primary-color",
-                                                              "#000000000000",
-                                                              G_PARAM_READWRITE));
-        g_object_class_install_property (object_class,
-                                         PROP_SECONDARY_COLOR,
-                                         g_param_spec_string ("secondary-color",
-                                                              "secondary-color",
-                                                              "secondary-color",
-                                                              "#000000000000",
-                                                              G_PARAM_READWRITE));
+        props[PROP_URI] = g_param_spec_string ("uri",
+                                               "uri",
+                                               "uri",
+                                               NULL,
+                                               G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_IS_DELETED,
-                                         g_param_spec_boolean ("is-deleted",
-                                                               NULL,
-                                                               NULL,
-                                                               FALSE,
-                                                               G_PARAM_READWRITE));
+        props[PROP_URI_DARK] = g_param_spec_string ("uri-dark",
+                                                    "uri-dark",
+                                                    "uri-dark",
+                                                    NULL,
+                                                    G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_SOURCE_URL,
-                                         g_param_spec_string ("source-url",
-                                                              "source-url",
-                                                              "source-url",
-                                                              NULL,
-                                                              G_PARAM_READWRITE));
+        props[PROP_PLACEMENT] = g_param_spec_enum ("placement",
+                                                   "placement",
+                                                   "placement",
+                                                   G_DESKTOP_TYPE_DESKTOP_BACKGROUND_STYLE,
+                                                   G_DESKTOP_BACKGROUND_STYLE_SCALED,
+                                                   G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_SOURCE_XML,
-                                         g_param_spec_string ("source-xml",
-                                                              "source-xml",
-                                                              "source-xml",
-                                                              NULL,
-                                                              G_PARAM_READWRITE));
+        props[PROP_SHADING] = g_param_spec_enum ("shading",
+                                                 "shading",
+                                                 "shading",
+                                                 G_DESKTOP_TYPE_DESKTOP_BACKGROUND_SHADING,
+                                                 G_DESKTOP_BACKGROUND_SHADING_SOLID,
+                                                 G_PARAM_READWRITE);
 
-	g_object_class_install_property (object_class,
-					 PROP_FLAGS,
-					 g_param_spec_flags ("flags",
-							     "flags",
-							     "flags",
-							     G_DESKTOP_TYPE_BACKGROUND_ITEM_FLAGS,
-							     0,
-							     G_PARAM_READWRITE));
+        props[PROP_PRIMARY_COLOR] = g_param_spec_string ("primary-color",
+                                                         "primary-color",
+                                                         "primary-color",
+                                                         "#000000000000",
+                                                         G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_SIZE,
-                                         g_param_spec_string ("size",
-                                                              "size",
-                                                              "size",
-                                                              NULL,
-                                                              G_PARAM_READABLE));
+        props[PROP_SECONDARY_COLOR] = g_param_spec_string ("secondary-color",
+                                                           "secondary-color",
+                                                           "secondary-color",
+                                                           "#000000000000",
+                                                           G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_NEEDS_DOWNLOAD,
-                                         g_param_spec_boolean ("needs-download",
-                                                               NULL,
-                                                               NULL,
-                                                               TRUE,
-                                                               G_PARAM_READWRITE));
+        props[PROP_IS_DELETED] = g_param_spec_boolean ("is-deleted",
+                                                       NULL,
+                                                       NULL,
+                                                       FALSE,
+                                                       G_PARAM_READWRITE);
 
-        g_object_class_install_property (object_class,
-                                         PROP_MODIFIED,
-                                         g_param_spec_uint64 ("modified",
-                                                              "modified",
-                                                              NULL,
-                                                              0,
-                                                              G_MAXUINT64,
-                                                              0,
-                                                              G_PARAM_READWRITE));
+        props[PROP_SOURCE_URL] = g_param_spec_string ("source-url",
+                                                      "source-url",
+                                                      "source-url",
+                                                      NULL,
+                                                      G_PARAM_READWRITE);
+
+        props[PROP_SOURCE_XML] = g_param_spec_string ("source-xml",
+                                                      "source-xml",
+                                                      "source-xml",
+                                                      NULL,
+                                                      G_PARAM_READWRITE);
+
+        props[PROP_FLAGS] = g_param_spec_flags ("flags",
+                                                "flags",
+                                                "flags",
+                                                CC_TYPE_BACKGROUND_ITEM_FLAGS,
+                                                0,
+                                                G_PARAM_READABLE);
+
+        props[PROP_SIZE] = g_param_spec_string ("size",
+                                                "size",
+                                                "size",
+                                                NULL,
+                                                G_PARAM_READABLE);
+
+        props[PROP_NEEDS_DOWNLOAD] = g_param_spec_boolean ("needs-download",
+                                                           NULL,
+                                                           NULL,
+                                                           TRUE,
+                                                           G_PARAM_READWRITE);
+
+        props[PROP_MODIFIED] = g_param_spec_uint64 ("modified",
+                                                    "modified",
+                                                    NULL,
+                                                    0,
+                                                    G_MAXUINT64,
+                                                    0,
+                                                    G_PARAM_READWRITE);
+
+        g_object_class_install_properties (object_class, N_PROPS, props);
 }
 
 static void
@@ -918,7 +871,7 @@ flags_to_str (CcBackgroundItemFlags flag)
 	GFlagsClass *fclass;
 	GFlagsValue *value;
 
-	fclass = G_FLAGS_CLASS (g_type_class_peek (G_DESKTOP_TYPE_BACKGROUND_ITEM_FLAGS));
+	fclass = G_FLAGS_CLASS (g_type_class_peek (CC_TYPE_BACKGROUND_ITEM_FLAGS));
 	value = g_flags_get_first_value (fclass, flag);
 
 	g_assert (value);
@@ -987,24 +940,17 @@ files_equal (const char *a,
 {
 	g_autoptr(GFile) file1 = NULL;
 	g_autoptr(GFile) file2 = NULL;
-	gboolean retval;
 
-	if (a == NULL &&
-	    b == NULL)
+	if (a == NULL && b == NULL)
 		return TRUE;
 
-	if (a == NULL ||
-	    b == NULL)
+	if (a == NULL || b == NULL)
 		return FALSE;
 
 	file1 = g_file_new_for_commandline_arg (a);
 	file2 = g_file_new_for_commandline_arg (b);
-	if (g_file_equal (file1, file2) == FALSE)
-		retval = FALSE;
-	else
-		retval = TRUE;
 
-	return retval;
+	return g_file_equal (file1, file2);
 }
 
 static gboolean

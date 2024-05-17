@@ -48,6 +48,7 @@ struct _CcMousePanel
   GtkToggleButton   *primary_button_left;
   GtkToggleButton   *primary_button_right;
   AdwPreferencesPage*preferences;
+  CcSplitRow        *two_finger_push_row;
   GtkStack          *title_stack;
   CcIllustratedRow  *tap_to_click_row;
   GtkSwitch         *tap_to_click_switch;
@@ -57,8 +58,8 @@ struct _CcMousePanel
   CcSplitRow        *touchpad_scroll_method_row;
   GtkListBoxRow     *touchpad_speed_row;
   GtkScale          *touchpad_speed_scale;
-  AdwActionRow      *touchpad_toggle_row;
-  GtkSwitch         *touchpad_toggle_switch;
+  AdwSwitchRow      *touchpad_toggle_row;
+  AdwSwitchRow      *touchpad_typing_row;
 
   GSettings         *mouse_settings;
   GSettings         *touchpad_settings;
@@ -88,6 +89,7 @@ setup_illustrations (CcMousePanel *self)
     const gchar *alternative_resource;
   } row_resources[] = {
     { self->mouse_scroll_direction_row, "scroll-traditional", "scroll-natural" },
+    { self->two_finger_push_row, "push-to-click-anywhere", "push-areas" },
     { self->touchpad_scroll_method_row, "scroll-2finger", "edge-scroll" },
     { self->touchpad_scroll_direction_row, "touch-scroll-traditional", "touch-scroll-natural" },
   };
@@ -214,6 +216,31 @@ touchpad_enabled_set_mapping (const GValue              *value,
   return g_variant_new_string (enabled ? "enabled" : "disabled");
 }
 
+static gboolean
+click_method_get_mapping (GValue    *value,
+                          GVariant  *variant,
+                          gpointer   user_data)
+{
+  gboolean is_default;
+
+  is_default = g_strcmp0 (g_variant_get_string (variant, NULL), "fingers") == 0;
+  g_value_set_boolean (value, is_default);
+
+  return TRUE;
+}
+
+static GVariant *
+click_method_set_mapping (const GValue       *value,
+                          const GVariantType *type,
+                          gpointer            user_data)
+{
+  gboolean is_default;
+
+  is_default = g_value_get_boolean (value);
+
+  return g_variant_new_string (is_default ? "fingers" : "areas");
+}
+
 static void
 pressed_cb (GtkButton *button)
 {
@@ -254,15 +281,33 @@ mouse_accel_set_mapping (const GValue       *value,
     return g_variant_new_string (g_value_get_boolean (value) ? "default" : "flat");
 }
 
+static void
+update_primary_mouse_button_order (CcMousePanel *self)
+{
+  /* Manually reorder Left/Right buttons to preserve direction in RTL instead
+   * of calling gtk_widget_set_direction (self->primary_button_box, GTK_TEXT_DIR_LTR)
+   * which won't preserve the correct behavior of the CSS "linked" style class.
+   * See https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/1101
+   * and https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/2649 */
+  if (gtk_widget_get_direction (GTK_WIDGET (self)) == GTK_TEXT_DIR_RTL) {
+    gtk_box_reorder_child_after (self->primary_button_box,
+                                 GTK_WIDGET (self->primary_button_left),
+                                 GTK_WIDGET (self->primary_button_right));
+  } else {
+    gtk_box_reorder_child_after (self->primary_button_box,
+                                 GTK_WIDGET (self->primary_button_right),
+                                 GTK_WIDGET (self->primary_button_left));
+  }
+}
+
 /* Set up the property editors in the dialog. */
 static void
 setup_dialog (CcMousePanel *self)
 {
   GtkToggleButton *button;
 
+  update_primary_mouse_button_order (self);
   self->mouse_test = GTK_WINDOW (cc_mouse_test_new ());
-
-  gtk_widget_set_direction (GTK_WIDGET (self->primary_button_box), GTK_TEXT_DIR_LTR);
 
   self->left_handed = g_settings_get_boolean (self->mouse_settings, "left-handed");
   button = self->left_handed ? self->primary_button_right : self->primary_button_left;
@@ -305,8 +350,15 @@ setup_dialog (CcMousePanel *self)
   gtk_widget_set_visible (GTK_WIDGET (self->touchpad_toggle_row), can_disable_touchpad (self));
 
   g_settings_bind_with_mapping (self->touchpad_settings, "send-events",
-                                self->touchpad_toggle_switch, "active",
+                                self->touchpad_toggle_row, "active",
                                 G_SETTINGS_BIND_DEFAULT,
+                                touchpad_enabled_get_mapping,
+                                touchpad_enabled_set_mapping,
+                                NULL, NULL);
+
+  g_settings_bind_with_mapping (self->touchpad_settings, "send-events",
+                                self->touchpad_typing_row, "sensitive",
+                                G_SETTINGS_BIND_GET,
                                 touchpad_enabled_get_mapping,
                                 touchpad_enabled_set_mapping,
                                 NULL, NULL);
@@ -326,6 +378,13 @@ setup_dialog (CcMousePanel *self)
                    G_SETTINGS_BIND_DEFAULT |
                    G_SETTINGS_BIND_NO_SENSITIVITY);
 
+  g_settings_bind_with_mapping (self->touchpad_settings, "click-method",
+                                self->two_finger_push_row, "use-default",
+                                G_SETTINGS_BIND_DEFAULT,
+                                click_method_get_mapping,
+                                click_method_set_mapping,
+                                NULL, NULL);
+
   g_settings_bind (self->touchpad_settings, "two-finger-scrolling-enabled",
                    self->touchpad_scroll_method_row, "use-default",
                    G_SETTINGS_BIND_DEFAULT |
@@ -335,6 +394,10 @@ setup_dialog (CcMousePanel *self)
                    self->touchpad_scroll_method_row, "use-default",
                    G_SETTINGS_BIND_INVERT_BOOLEAN |
                    G_SETTINGS_BIND_NO_SENSITIVITY);
+
+  g_settings_bind (self->touchpad_settings, "disable-while-typing",
+                   self->touchpad_typing_row, "active",
+                   G_SETTINGS_BIND_DEFAULT);
 
   setup_touchpad_options (self);
 
@@ -357,6 +420,17 @@ device_changed (CcMousePanel *self)
   self->have_mouse = mouse_is_present ();
   gtk_widget_set_visible (GTK_WIDGET (self->mouse_group), self->have_mouse);
   gtk_widget_set_visible (GTK_WIDGET (self->touchpad_toggle_row), can_disable_touchpad (self));
+}
+
+static void
+cc_mouse_panel_direction_changed (GtkWidget        *widget,
+                                  GtkTextDirection  previous_direction)
+{
+  CcMousePanel *self = CC_MOUSE_PANEL (widget);
+
+  update_primary_mouse_button_order (self);
+
+  GTK_WIDGET_CLASS (cc_mouse_panel_parent_class)->direction_changed (widget, previous_direction);
 }
 
 static void
@@ -426,6 +500,7 @@ cc_mouse_panel_class_init (CcMousePanelClass *klass)
   panel_class->get_help_uri = cc_mouse_panel_get_help_uri;
 
   object_class->dispose = cc_mouse_panel_dispose;
+  widget_class->direction_changed = cc_mouse_panel_direction_changed;
 
   g_type_ensure (CC_TYPE_ILLUSTRATED_ROW);
   g_type_ensure (CC_TYPE_SPLIT_ROW);
@@ -451,7 +526,8 @@ cc_mouse_panel_class_init (CcMousePanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcMousePanel, touchpad_stack_page);
   gtk_widget_class_bind_template_child (widget_class, CcMousePanel, touchpad_speed_scale);
   gtk_widget_class_bind_template_child (widget_class, CcMousePanel, touchpad_toggle_row);
-  gtk_widget_class_bind_template_child (widget_class, CcMousePanel, touchpad_toggle_switch);
+  gtk_widget_class_bind_template_child (widget_class, CcMousePanel, touchpad_typing_row);
+  gtk_widget_class_bind_template_child (widget_class, CcMousePanel, two_finger_push_row);
 
   gtk_widget_class_bind_template_callback (widget_class, on_touchpad_scroll_method_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, test_button_clicked_cb);

@@ -2,13 +2,14 @@
 <interface>
   <template class="CcFirmwareSecurityPage" parent="AdwNavigationPage">
     <property name="title" translatable="yes">Device Security</property>
-    <property name="tag">firmware-security-page</property>
+    <property name="tag">device-security</property>
     <property name="child">
       <object class="AdwToolbarView">
         <child type="top">
           <object class="AdwHeaderBar">
             <child type="end">
               <object class="GtkButton" id="fw_help_button">
+                <property name="tooltip-text" translatable="yes">About Device Security</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="icon-name">help-about-symbolic</property>

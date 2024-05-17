@@ -57,7 +57,7 @@ struct _CcWacomPage
 
 	CcWacomPanel   *panel;
 	CcWacomDevice  *stylus;
-	GList          *pads;
+	CcWacomDevice  *pad;
 	CcCalibArea    *area;
 	GSettings      *wacom_settings;
 
@@ -66,12 +66,9 @@ struct _CcWacomPage
 	GtkWidget      *tablet_display;
 	GtkWidget      *tablet_calibrate;
 	GtkWidget      *tablet_map_buttons;
-	GtkWidget      *tablet_mode;
-	GtkWidget      *tablet_mode_switch;
-	GtkWidget      *tablet_left_handed;
-	GtkWidget      *tablet_left_handed_switch;
-	GtkWidget      *tablet_aspect_ratio;
-	GtkWidget      *tablet_aspect_ratio_switch;
+	AdwSwitchRow   *tablet_mode_row;
+	AdwSwitchRow   *tablet_left_handed_row;
+	AdwSwitchRow   *tablet_aspect_ratio_row;
 	GtkWidget      *display_section;
 
 	GnomeRRScreen  *rr_screen;
@@ -173,45 +170,6 @@ finish_calibration (CcCalibArea *area,
 	gtk_widget_set_sensitive (page->tablet_calibrate, TRUE);
 }
 
-static GdkDevice *
-cc_wacom_page_get_gdk_device (CcWacomPage *page)
-{
-	GsdDevice *gsd_device;
-	GdkDevice *gdk_device = NULL;
-	GdkDisplay *display;
-	GdkSeat *seat;
-	g_autoptr(GList) slaves = NULL;
-	GList *l;
-
-	gsd_device = cc_wacom_device_get_device (page->stylus);
-	g_return_val_if_fail (GSD_IS_DEVICE (gsd_device), NULL);
-
-	display = gtk_widget_get_display (GTK_WIDGET (page));
-	seat = gdk_display_get_default_seat (display);
-	slaves = gdk_seat_get_devices (seat, GDK_SEAT_CAPABILITY_TABLET_STYLUS);
-
-	for (l = slaves; l && !gdk_device; l = l->next) {
-		g_autofree gchar *device_node = NULL;
-
-		if (gdk_device_get_source (l->data) != GDK_SOURCE_PEN)
-			continue;
-
-#ifdef GDK_WINDOWING_X11
-		if (GDK_IS_X11_DISPLAY (display))
-			device_node = xdevice_get_device_node (gdk_x11_device_get_id (l->data));
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-		if (GDK_IS_WAYLAND_DISPLAY (display))
-			device_node = g_strdup (gdk_wayland_device_get_node_path (l->data));
-#endif
-
-		if (g_strcmp0 (device_node, gsd_device_get_device_file (gsd_device)) == 0)
-			gdk_device = l->data;
-	}
-
-	return gdk_device;
-}
-
 static gboolean
 run_calibration (CcWacomPage *page,
 		 GVariant    *old_calibration,
@@ -221,12 +179,12 @@ run_calibration (CcWacomPage *page,
 	g_assert (page->area == NULL);
 
 	page->area = cc_calib_area_new (NULL,
-                                        monitor,
-                                        cc_wacom_page_get_gdk_device (page),
-                                        finish_calibration,
-                                        page,
-                                        THRESHOLD_MISCLICK,
-                                        THRESHOLD_DOUBLECLICK);
+					monitor,
+					cc_wacom_device_get_device (page->stylus),
+					finish_calibration,
+					page,
+					THRESHOLD_MISCLICK,
+					THRESHOLD_DOUBLECLICK);
 
 	g_object_set_data_full (G_OBJECT (page),
 				"old-calibration",
@@ -378,7 +336,7 @@ setup_button_mapping (CcWacomPage *page)
 	GSettings *settings;
 
 	list_box = MWID ("shortcuts_list");
-	pad = page->pads->data;
+	pad = page->pad;
 	n_buttons = cc_wacom_device_get_num_buttons (pad);
 
 	for (i = 0; i < n_buttons; i++) {
@@ -468,7 +426,7 @@ set_osd_visibility (CcWacomPage *page)
 	proxy = cc_wacom_panel_get_gsd_wacom_bus_proxy (page->panel);
 
 	/* Pick the first device, the OSD may change later between them */
-	gsd_device = cc_wacom_device_get_device (page->pads->data);
+	gsd_device = cc_wacom_device_get_device (page->pad);
 
 	device_path = gsd_device_get_device_file (gsd_device);
 
@@ -552,9 +510,8 @@ cc_wacom_page_dispose (GObject *object)
 	g_clear_object (&self->cancellable);
 	g_clear_pointer (&self->area, cc_calib_area_free);
 	g_clear_pointer (&self->button_map, gtk_window_destroy);
-	g_list_free_full (self->pads, g_object_unref);
+	g_clear_object (&self->pad);
 	g_clear_object (&self->rr_screen);
-	self->pads = NULL;
 
 	self->panel = NULL;
 
@@ -580,12 +537,9 @@ cc_wacom_page_class_init (CcWacomPageClass *klass)
 	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_display);
 	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_calibrate);
 	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_map_buttons);
-	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_mode);
-	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_mode_switch);
-	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_left_handed);
-	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_left_handed_switch);
-	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_aspect_ratio);
-	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_aspect_ratio_switch);
+	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_mode_row);
+	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_left_handed_row);
+	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, tablet_aspect_ratio_row);
 	gtk_widget_class_bind_template_child (widget_class, CcWacomPage, display_section);
 
 	gtk_widget_class_bind_template_callback (widget_class, on_map_buttons_activated);
@@ -631,7 +585,7 @@ update_displays_model (CcWacomPage *page)
 						   &vendor,
 						   &product,
 						   &serial);
-		variant = g_variant_new_strv ((const gchar *[]) { vendor, product, serial }, 3);
+		variant = g_variant_new_strv ((const gchar *[]) { vendor, product, serial, name }, 4);
 
 		gtk_string_list_append (list, text);
 		obj = g_list_model_get_item (G_LIST_MODEL (list), idx);
@@ -711,7 +665,7 @@ has_monitor (CcWacomPage *page)
 static void
 update_pad_availability (CcWacomPage *page)
 {
-	gtk_widget_set_visible (page->tablet_map_buttons, page->pads != NULL);
+	gtk_widget_set_visible (page->tablet_map_buttons, page->pad != NULL);
 }
 
 static void
@@ -719,40 +673,39 @@ check_add_pad (CcWacomPage *page,
 	       GsdDevice   *gsd_device)
 {
 	g_autoptr(CcWacomDevice) wacom_device = NULL;
+	const gchar *stylus_vendor, *stylus_product;
+	const gchar *pad_vendor, *pad_product;
+	GsdDevice *stylus_device;
 
 	if ((gsd_device_get_device_type (gsd_device) & GSD_DEVICE_TYPE_PAD) == 0)
 		return;
 
-	if (!gsd_device_shares_group (cc_wacom_device_get_device (page->stylus),
-				      gsd_device))
+	stylus_device = cc_wacom_device_get_device (page->stylus);
+	gsd_device_get_device_ids (cc_wacom_device_get_device (page->stylus),
+				   &stylus_vendor, &stylus_product);
+	gsd_device_get_device_ids (gsd_device, &pad_vendor, &pad_product);
+
+	if (!gsd_device_shares_group (stylus_device, gsd_device) ||
+	    g_strcmp0 (stylus_vendor, pad_vendor) != 0 ||
+	    g_strcmp0 (stylus_product, pad_product) != 0)
 		return;
 
-	wacom_device = cc_wacom_device_new (gsd_device);
-	if (!wacom_device)
-		return;
-
-	page->pads = g_list_prepend (page->pads, g_steal_pointer (&wacom_device));
-	update_pad_availability (page);
+	page->pad = cc_wacom_device_new (gsd_device);
+	if (page->pad)
+		update_pad_availability (page);
 }
 
 static void
 check_remove_pad (CcWacomPage *page,
 		  GsdDevice   *gsd_device)
 {
-	GList *l;
-
 	if ((gsd_device_get_device_type (gsd_device) & GSD_DEVICE_TYPE_PAD) == 0)
 		return;
 
-	for (l = page->pads; l; l = l->next) {
-		CcWacomDevice *wacom_device = l->data;
-		if (cc_wacom_device_get_device (wacom_device) == gsd_device) {
-			page->pads = g_list_delete_link (page->pads, l);
-			g_object_unref (wacom_device);
-		}
+	if (cc_wacom_device_get_device (page->pad) == gsd_device) {
+		g_clear_object (&page->pad);
+		update_pad_availability (page);
 	}
-
-	update_pad_availability (page);
 }
 
 static GVariant *
@@ -793,7 +746,7 @@ cc_wacom_page_new (CcWacomPanel  *panel,
 	page->panel = panel;
 	page->stylus = stylus;
 
-	gtk_widget_set_visible (page->tablet_left_handed,
+	gtk_widget_set_visible (GTK_WIDGET (page->tablet_left_handed_row),
 				get_layout_type (stylus) == LAYOUT_REVERSIBLE);
 	gtk_widget_set_visible (page->tablet_calibrate,
 				get_layout_type (stylus) == LAYOUT_SCREEN);
@@ -808,7 +761,7 @@ cc_wacom_page_new (CcWacomPanel  *panel,
 					       cc_wacom_device_get_description (stylus));
 
 	g_settings_bind_with_mapping (page->wacom_settings, "mapping",
-				      page->tablet_mode_switch, "active",
+				      page->tablet_mode_row, "active",
 				      G_SETTINGS_BIND_DEFAULT,
 				      tablet_mode_bind_get,
 				      tablet_mode_bind_set,
@@ -820,10 +773,10 @@ cc_wacom_page_new (CcWacomPanel  *panel,
 				      tablet_mode_bind_set,
 				      NULL, NULL);
 	g_settings_bind (page->wacom_settings, "left-handed",
-			 page->tablet_left_handed_switch, "active",
+			 page->tablet_left_handed_row, "active",
 			 G_SETTINGS_BIND_DEFAULT);
 	g_settings_bind (page->wacom_settings, "keep-aspect",
-			 page->tablet_aspect_ratio_switch, "active",
+			 page->tablet_aspect_ratio_row, "active",
 			 G_SETTINGS_BIND_DEFAULT);
 
 	/* Tablet icon */

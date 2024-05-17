@@ -53,6 +53,7 @@ struct _CcPanelList
 
   gchar              *current_panel_id;
   gchar              *search_query;
+  gchar             **search_words;
 
   CcPanelListView     previous_view;
   CcPanelListView     view;
@@ -238,8 +239,7 @@ row_data_new (CcPanelCategory     category,
               const gchar        *description,
               const GStrv         keywords,
               const gchar        *icon,
-              CcPanelVisibility   visibility,
-              gboolean            has_sidebar)
+              CcPanelVisibility   visibility)
 {
   GtkWidget *label, *grid, *image;
   RowData *data;
@@ -290,12 +290,6 @@ row_data_new (CcPanelCategory     category,
                                   NULL,
                                   -1);
 
-  if (has_sidebar)
-    {
-      image = gtk_image_new_from_icon_name ("go-next-symbolic");
-      gtk_grid_attach (GTK_GRID (grid), image, 2, 0, 1, 1);
-    }
-
   gtk_widget_add_css_class (label, "dim-label");
   gtk_grid_attach (GTK_GRID (grid), label, 1, 1, 1, 1);
 
@@ -319,24 +313,21 @@ filter_func (GtkListBoxRow *row,
 {
   CcPanelList *self;
   RowData *data;
-  g_autofree gchar *search_text = NULL;
   g_autofree gchar *panel_text = NULL;
   g_autofree gchar *panel_description = NULL;
-  gboolean retval = FALSE;
-  gint i;
+  gboolean retval = TRUE;
+  gint i, j;
 
   self = CC_PANEL_LIST (user_data);
   data = g_object_get_data (G_OBJECT (row), "data");
 
-  if (!self->search_query)
+  if (!self->search_words)
     return TRUE;
 
   panel_text = cc_util_normalize_casefold_and_unaccent (data->name);
-  search_text = cc_util_normalize_casefold_and_unaccent (self->search_query);
   panel_description = cc_util_normalize_casefold_and_unaccent (data->description);
 
   g_strstrip (panel_text);
-  g_strstrip (search_text);
   g_strstrip (panel_description);
 
   /*
@@ -345,11 +336,24 @@ filter_func (GtkListBoxRow *row,
    */
   gtk_widget_set_visible (data->description_label, self->view == CC_PANEL_LIST_SEARCH);
 
-  for (i = 0; !retval && data->keywords[i] != NULL; i++)
-      retval = (strstr (data->keywords[i], search_text) == data->keywords[i]);
+  for (j = 0; retval && self->search_words[j] != NULL; j++) {
+    const gchar *search_word = self->search_words[j];
+    gboolean match = FALSE;
 
-  retval = retval || g_strstr_len (panel_text, -1, search_text) != NULL ||
-           g_strstr_len (panel_description, -1, search_text) != NULL;
+    if (search_word[0] == '\0')
+      continue;
+
+    // Compare keywords
+    for (i = 0; !match && data->keywords[i] != NULL; i++)
+      match = (strstr (data->keywords[i], search_word) == data->keywords[i]);
+
+    // Compare panel title and description
+    match = match || (g_strstr_len (panel_text, -1, search_word) != NULL ||
+                      g_strstr_len (panel_description, -1, search_word) != NULL);
+
+    // All search words must match
+    retval = retval && match;
+  }
 
   return retval;
 }
@@ -361,34 +365,37 @@ static const gchar * const panel_order[] = {
   "wwan",
   "mobile-broadband",
   "bluetooth",
+
+  "separator",
+
+  "display",
+  "sound",
+  "power",
+  "multitasking",
   "background",
+
+  "separator",
+
+  "applications",
   "notifications",
   "search",
-  "multitasking",
-  "applications",
-  "privacy",
   "online-accounts",
   "sharing",
 
-  /* Devices page */
-  "sound",
-  "power",
-  "display",
+  "separator",
+
   "mouse",
   "keyboard",
-  "printers",
-  "removable-media",
-  "wacom",
   "color",
+  "printers",
+  "wacom",
 
-  /* Details page */
-  "region",
+  "separator",
+
   "universal-access",
-  "user-accounts",
-  "default-apps",
+  "privacy",
+  "system",
   "reset-settings",
-  "datetime",
-  "info-overview",
 };
 
 static guint
@@ -419,6 +426,9 @@ sort_function (GtkListBoxRow *a,
   return get_panel_id_index (a_id) - get_panel_id_index (b_id);
 }
 
+
+/* FIXME: This is now different from the "match all words" search.
+          Maybe add a search score based on number of matches in filter_func()? */
 static gint
 search_sort_function (GtkListBoxRow *a,
                       GtkListBoxRow *b,
@@ -471,15 +481,13 @@ header_func (GtkListBoxRow *row,
              GtkListBoxRow *before,
              gpointer       user_data)
 {
-  RowData *row_data, *before_data;
+  guint pid;
 
   if (!before)
     return;
 
-  row_data = g_object_get_data (G_OBJECT (row), "data");
-  before_data = g_object_get_data (G_OBJECT (before), "data");
-
-  if (row_data->category != before_data->category)
+  pid = get_panel_id_index (get_panel_id_from_row (user_data, row));
+  if (g_str_equal (panel_order[pid-1], "separator"))
     {
       GtkWidget *separator;
 
@@ -503,6 +511,7 @@ row_activated_cb (GtkWidget     *listbox,
                   CcPanelList   *self)
 {
   RowData *data;
+  const gchar *parent_panel = 0;
 
   /*
    * Since we're not sure that the activated row is in the
@@ -511,8 +520,12 @@ row_activated_cb (GtkWidget     *listbox,
   switch_to_view (self, get_view_from_listbox (self, listbox));
 
   data = g_object_get_data (G_OBJECT (row), "data");
+  if (data->category == CC_CATEGORY_SYSTEM)
+    parent_panel = "system";
+  else if (data->category == CC_CATEGORY_PRIVACY)
+    parent_panel = "privacy";
 
-  g_signal_emit (self, signals[SHOW_PANEL], 0, data->id);
+  g_signal_emit (self, signals[SHOW_PANEL], 0, data->id, parent_panel);
 
   /* After selecting the panel and eventually changing the view, reset the
    * autoselect flag. If necessary, cc_panel_list_set_active_panel() will
@@ -579,6 +592,7 @@ cc_panel_list_finalize (GObject *object)
   CcPanelList *self = (CcPanelList *)object;
 
   g_clear_pointer (&self->search_query, g_free);
+  g_clear_pointer (&self->search_words, g_strfreev);
   g_clear_pointer (&self->current_panel_id, g_free);
   g_clear_pointer (&self->id_to_data, g_hash_table_destroy);
   g_clear_pointer (&self->id_to_search_data, g_hash_table_destroy);
@@ -682,7 +696,8 @@ cc_panel_list_class_init (CcPanelListClass *klass)
                                       G_SIGNAL_RUN_LAST,
                                       0, NULL, NULL, NULL,
                                       G_TYPE_NONE,
-                                      1,
+                                      2,
+                                      G_TYPE_STRING,
                                       G_TYPE_STRING);
 
   /**
@@ -829,8 +844,16 @@ cc_panel_list_set_search_query (CcPanelList *self,
 
   if (g_strcmp0 (self->search_query, search) != 0)
     {
+      g_autofree gchar *search_query_normalized;
+
       g_clear_pointer (&self->search_query, g_free);
+      g_clear_pointer (&self->search_words, g_strfreev);
+
       self->search_query = g_strdup (search);
+
+      /* Split on spaces */
+      search_query_normalized = cc_util_normalize_casefold_and_unaccent (search);
+      self->search_words = g_strsplit (g_strstrip (search_query_normalized), " ", 0);
 
       update_search (self);
 
@@ -871,21 +894,20 @@ cc_panel_list_add_panel (CcPanelList        *self,
                          const gchar        *description,
                          const GStrv         keywords,
                          const gchar        *icon,
-                         CcPanelVisibility   visibility,
-                         gboolean            has_sidebar)
+                         CcPanelVisibility   visibility)
 {
   RowData *data, *search_data;
 
   g_return_if_fail (CC_IS_PANEL_LIST (self));
 
   /* Add the panel to the proper listbox */
-  data = row_data_new (category, id, title, description, keywords, icon, visibility, has_sidebar);
+  data = row_data_new (category, id, title, description, keywords, icon, visibility);
   gtk_widget_set_visible (data->row, visibility == CC_PANEL_VISIBLE);
 
   gtk_list_box_append (GTK_LIST_BOX (self->main_listbox), data->row);
 
   /* And add to the search listbox too */
-  search_data = row_data_new (category, id, title, description, keywords, icon, visibility, has_sidebar);
+  search_data = row_data_new (category, id, title, description, keywords, icon, visibility);
   gtk_widget_set_visible (search_data->row, visibility != CC_PANEL_HIDDEN);
 
   gtk_list_box_append (GTK_LIST_BOX (self->search_listbox), search_data->row);

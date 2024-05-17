@@ -24,11 +24,14 @@
 #include <glib/gi18n.h>
 #include <libgnome-desktop/gnome-desktop-thumbnail.h>
 
-#include "bg-colors-source.h"
 #include "bg-recent-source.h"
 #include "bg-wallpapers-source.h"
 #include "cc-background-chooser.h"
 #include "cc-background-paintable.h"
+#include "cc-background-item.h"
+
+#define THUMBNAIL_WIDTH 144
+#define THUMBNAIL_HEIGHT (THUMBNAIL_WIDTH * 3 / 4)
 
 struct _CcBackgroundChooser
 {
@@ -42,6 +45,10 @@ struct _CcBackgroundChooser
 
   BgWallpapersSource *wallpapers_source;
   BgRecentSource     *recent_source;
+
+  CcBackgroundItem   *active_item;
+
+  GnomeDesktopThumbnailFactory *thumbnail_factory;
 };
 
 G_DEFINE_TYPE (CcBackgroundChooser, cc_background_chooser, GTK_TYPE_BOX)
@@ -100,6 +107,7 @@ create_widget_func (gpointer model_item,
                     gpointer user_data)
 {
   g_autoptr(CcBackgroundPaintable) paintable = NULL;
+  CcBackgroundChooser *self;
   CcBackgroundItem *item;
   GtkWidget *overlay;
   GtkWidget *child;
@@ -112,7 +120,13 @@ create_widget_func (gpointer model_item,
   source = BG_SOURCE (user_data);
   item = CC_BACKGROUND_ITEM (model_item);
 
-  paintable = cc_background_paintable_new (source, item);
+  self = g_object_get_data (G_OBJECT (source), "background-chooser");
+
+  paintable = cc_background_paintable_new (self->thumbnail_factory,
+                                           item,
+                                           CC_BACKGROUND_PAINT_LIGHT_DARK,
+                                           THUMBNAIL_WIDTH,
+                                           THUMBNAIL_HEIGHT);
 
   picture = gtk_picture_new_for_paintable (GDK_PAINTABLE (paintable));
   gtk_picture_set_can_shrink (GTK_PICTURE (picture), FALSE);
@@ -143,6 +157,8 @@ create_widget_func (gpointer model_item,
       gtk_widget_add_css_class (button, "circular");
       gtk_widget_add_css_class (button, "remove-button");
 
+     gtk_widget_set_tooltip_text (GTK_WIDGET (button), _("Remove Background"));
+
       g_signal_connect (button,
                         "clicked",
                         G_CALLBACK (on_delete_background_clicked_cb),
@@ -169,6 +185,9 @@ create_widget_func (gpointer model_item,
   gtk_flow_box_child_set_child (GTK_FLOW_BOX_CHILD (child), overlay);
 
   g_object_set_data_full (G_OBJECT (child), "item", g_object_ref (item), g_object_unref);
+
+  if (self->active_item && cc_background_item_compare (item, self->active_item))
+    gtk_widget_add_css_class (GTK_WIDGET (child), "active-item");
 
   return child;
 }
@@ -264,6 +283,7 @@ cc_background_chooser_finalize (GObject *object)
 
   g_clear_object (&self->recent_source);
   g_clear_object (&self->wallpapers_source);
+  g_clear_object (&self->thumbnail_factory);
 
   G_OBJECT_CLASS (cc_background_chooser_parent_class)->finalize (object);
 }
@@ -298,8 +318,13 @@ cc_background_chooser_init (CcBackgroundChooser *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  self->recent_source = bg_recent_source_new (GTK_WIDGET (self));
-  self->wallpapers_source = bg_wallpapers_source_new (GTK_WIDGET (self));
+  self->recent_source = bg_recent_source_new ();
+  self->wallpapers_source = bg_wallpapers_source_new ();
+
+  self->thumbnail_factory = gnome_desktop_thumbnail_factory_new (GNOME_DESKTOP_THUMBNAIL_SIZE_LARGE);
+  g_object_set_data (G_OBJECT (self->recent_source), "background-chooser", self);
+  g_object_set_data (G_OBJECT (self->wallpapers_source), "background-chooser", self);
+
   setup_flowbox (self);
 }
 
@@ -335,4 +360,33 @@ cc_background_chooser_select_file (CcBackgroundChooser *self)
                                  NULL,
                                  file_dialog_open_cb,
                                  self);
+}
+
+static void flow_box_set_active_item (GtkFlowBox *flowbox, CcBackgroundItem *active_item)
+{
+  GtkFlowBoxChild *child = NULL;
+  CcBackgroundItem *item;
+  int idx = 0;
+
+  while ((child = gtk_flow_box_get_child_at_index (flowbox, idx++)))
+    {
+      item = g_object_get_data (G_OBJECT (child), "item");
+
+      if (cc_background_item_compare (item, active_item))
+        gtk_widget_add_css_class (GTK_WIDGET (child), "active-item");
+      else
+        gtk_widget_remove_css_class (GTK_WIDGET (child), "active-item");
+    }
+}
+
+void
+cc_background_chooser_set_active_item (CcBackgroundChooser *self, CcBackgroundItem *active_item)
+{
+  g_return_if_fail (CC_IS_BACKGROUND_CHOOSER (self));
+  g_return_if_fail (CC_IS_BACKGROUND_ITEM (active_item));
+
+  self->active_item = active_item;
+
+  flow_box_set_active_item (self->flowbox, active_item);
+  flow_box_set_active_item (self->recent_flowbox, active_item);
 }

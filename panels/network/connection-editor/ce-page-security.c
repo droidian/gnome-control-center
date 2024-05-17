@@ -31,7 +31,7 @@
 
 struct _CEPageSecurity
 {
-        GtkGrid parent;
+        AdwBin parent;
 
         GtkBox      *box;
         GtkComboBox *security_combo;
@@ -45,7 +45,7 @@ struct _CEPageSecurity
 
 static void ce_page_iface_init (CEPageInterface *);
 
-G_DEFINE_TYPE_WITH_CODE (CEPageSecurity, ce_page_security, GTK_TYPE_GRID,
+G_DEFINE_TYPE_WITH_CODE (CEPageSecurity, ce_page_security, ADW_TYPE_BIN,
                          G_IMPLEMENT_INTERFACE (ce_page_get_type (), ce_page_iface_init))
 
 enum {
@@ -98,8 +98,7 @@ get_default_type_for_security (NMSettingWirelessSecurity *sec)
         }
 #endif
 
-        if (   !strcmp (key_mgmt, "wpa-none")
-            || !strcmp (key_mgmt, "wpa-psk")) {
+        if (   !strcmp (key_mgmt, "wpa-psk")) {
                 if (find_proto (sec, "rsn"))
                         return NMU_SEC_WPA2_PSK;
                 else if (find_proto (sec, "wpa"))

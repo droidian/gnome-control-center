@@ -20,7 +20,7 @@
             <child>
               <object class="AdwPreferencesGroup">
                 <property name="title" translatable="yes">Input Sources</property>
-                <property name="description" translatable="yes">Includes keyboard layouts and input methods.</property>
+                <property name="description" translatable="yes">Includes keyboard layouts and input methods</property>
                 <child>
                   <object class="CcInputListBox" id="input_list">
                     <property name="vexpand">False</property>
@@ -62,11 +62,10 @@
             <child>
               <object class="AdwPreferencesGroup">
                 <property name="title" translatable="yes">Special Character Entry</property>
-                <property name="description" translatable="yes">Methods for entering symbols and letter variants using the keyboard.</property>
+                <property name="description" translatable="yes">Methods for entering symbols and letter variants using the keyboard</property>
                 <child>
                   <object class="CcListRow" id="alt_chars_row">
-                    <property name="title" translatable="yes">Alternate Characters Key</property>
-                    <property name="activatable">True</property>
+                    <property name="title" translatable="yes">A_lternate Characters Key</property>
                     <property name="show-arrow">True</property>
                     <property name="secondary-label" translatable="no">Right Alt</property>
                     <signal name="activated" handler="alt_chars_row_activated" object="CcKeyboardPanel" swapped="yes" />
@@ -74,9 +73,8 @@
                 </child>
                 <child>
                   <object class="CcListRow" id="compose_row">
-                    <property name="title" translatable="yes">Compose Key</property>
+                    <property name="title" translatable="yes">_Compose Key</property>
                     <property name="show-arrow">True</property>
-                    <property name="activatable">True</property>
                     <signal name="activated" handler="compose_row_activated" object="CcKeyboardPanel" swapped="yes" />
                   </object>
                 </child>
@@ -87,8 +85,7 @@
                 <property name="title" translatable="yes">Keyboard Shortcuts</property>
                 <child>
                   <object class="CcListRow" id="common_shortcuts_row">
-                    <property name="title" translatable="yes">View and Customize Shortcuts</property>
-                    <property name="activatable">True</property>
+                    <property name="title" translatable="yes">_View and Customize Shortcuts</property>
                     <property name="show-arrow">True</property>
                     <signal name="activated" handler="keyboard_shortcuts_activated" object="CcKeyboardPanel" swapped="yes" />
                   </object>

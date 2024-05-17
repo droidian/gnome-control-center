@@ -153,7 +153,7 @@ shortcut_removed_cb (CcKeyboardShortcutDialog *self,
 }
 
 static void
-shortuct_custom_items_changed (CcKeyboardShortcutDialog *self)
+shortcut_custom_items_changed (CcKeyboardShortcutDialog *self)
 {
   GListStore *section;
   GtkWidget *page;
@@ -251,7 +251,7 @@ shortcuts_loaded_cb (CcKeyboardShortcutDialog *self)
   filtered_lists = g_list_store_new (G_TYPE_LIST_MODEL);
 
   g_signal_connect_object (custom_store, "items-changed",
-                           G_CALLBACK (shortuct_custom_items_changed),
+                           G_CALLBACK (shortcut_custom_items_changed),
                            self, G_CONNECT_SWAPPED);
 
   g_list_store_sort (self->sections, compare_sections_title, NULL);
@@ -375,11 +375,11 @@ reset_all_clicked_cb (CcKeyboardShortcutDialog *self)
                                    NULL);
 
   adw_message_dialog_format_body (ADW_MESSAGE_DIALOG (dialog),
-                                  _("Resetting the shortcuts may affect your custom shortcuts. This cannot be undone."));
+                                  _("All changes to keyboard shortcuts will be lost."));
 
   adw_message_dialog_add_responses (ADW_MESSAGE_DIALOG (dialog),
-                                    "cancel",    _("Cancel"),
-                                    "reset_all", _("Reset All"),
+                                    "cancel",    _("_Cancel"),
+                                    "reset_all", _("_Reset All"),
                                     NULL);
 
   adw_message_dialog_set_response_appearance (ADW_MESSAGE_DIALOG (dialog),
@@ -464,6 +464,18 @@ shortcut_search_entry_changed_cb (CcKeyboardShortcutDialog *self)
 }
 
 static void
+shortcut_search_entry_stopped_cb (CcKeyboardShortcutDialog *self)
+{
+  const char *search_text;
+  search_text = gtk_editable_get_text (GTK_EDITABLE (self->search_entry));
+
+  if (search_text && g_strcmp0 (search_text, "") != 0)
+    gtk_editable_set_text (GTK_EDITABLE (self->search_entry), "");
+  else
+    gtk_window_close (GTK_WINDOW (self));
+}
+
+static void
 shortcut_section_row_activated_cb (CcKeyboardShortcutDialog *self,
                                    GtkListBoxRow            *row)
 {
@@ -479,7 +491,7 @@ shortcut_section_row_activated_cb (CcKeyboardShortcutDialog *self,
   page = g_object_get_data (G_OBJECT (section), "page");
   gtk_stack_set_visible_child (self->shortcut_list_stack, page);
   adw_navigation_view_push (self->navigation_view, self->subview_page);
-  shortuct_custom_items_changed (self);
+  shortcut_custom_items_changed (self);
 }
 
 static void
@@ -543,19 +555,23 @@ cc_keyboard_shortcut_dialog_class_init (CcKeyboardShortcutDialogClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, reset_all_clicked_cb);
   gtk_widget_class_bind_template_callback (widget_class, shortcut_dialog_visible_page_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, shortcut_search_entry_changed_cb);
+  gtk_widget_class_bind_template_callback (widget_class, shortcut_search_entry_stopped_cb);
   gtk_widget_class_bind_template_callback (widget_class, shortcut_section_row_activated_cb);
 }
 
 static void
 cc_keyboard_shortcut_dialog_init (CcKeyboardShortcutDialog *self)
 {
+  GtkWindow *toplevel;
+
   gtk_widget_init_template (GTK_WIDGET (self));
   gtk_search_entry_set_key_capture_widget (self->search_entry, GTK_WIDGET (self));
   shortcut_dialog_visible_page_changed_cb (self);
 
   self->manager = cc_keyboard_manager_new ();
 
-  self->shortcut_editor = cc_keyboard_shortcut_editor_new (self->manager);
+  toplevel = GTK_WINDOW (gtk_widget_get_native (GTK_WIDGET (self)));
+  self->shortcut_editor = cc_keyboard_shortcut_editor_new (toplevel, self->manager);
   shortcut_dialog_visible_page_changed_cb (self);
 
   self->sections = g_list_store_new (G_TYPE_LIST_STORE);

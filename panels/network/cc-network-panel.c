@@ -74,6 +74,7 @@ struct _CcNetworkPanel
         GtkWidget        *proxy_row;
         GtkWidget        *save_button;
         GtkWidget        *vpn_stack;
+        GtkWidget        *toolbar_view;
 
         /* wireless dialog stuff */
         CmdlineOperation  arg_operation;
@@ -613,13 +614,12 @@ static void
 add_connection (CcNetworkPanel *self, NMConnection *connection)
 {
         NMSettingConnection *s_con;
-        const gchar *type, *iface;
+        const gchar *type;
 
         s_con = NM_SETTING_CONNECTION (nm_connection_get_setting (connection,
                                                                   NM_TYPE_SETTING_CONNECTION));
         type = nm_setting_connection_get_connection_type (s_con);
-        iface = nm_connection_get_interface_name (connection);
-        if (g_strcmp0 (type, "vpn") != 0 && iface == NULL)
+        if (g_strcmp0 (type, "vpn") != 0 && g_strcmp0 (type, "wireguard") != 0)
                 return;
 
         /* Don't add the libvirtd bridge to the UI */
@@ -629,8 +629,7 @@ add_connection (CcNetworkPanel *self, NMConnection *connection)
         g_debug ("add %s/%s remote connection: %s",
                  type, g_type_name_from_instance ((GTypeInstance*)connection),
                  nm_connection_get_path (connection));
-        if (!iface || g_strcmp0 (type, "wireguard") == 0)
-                panel_add_vpn_device (self, connection);
+        panel_add_vpn_device (self, connection);
 }
 
 static void
@@ -660,7 +659,7 @@ panel_check_network_manager_version (CcNetworkPanel *self)
                 GtkWidget *status_page;
 
                 status_page = adw_status_page_new ();
-                adw_navigation_page_set_child (ADW_NAVIGATION_PAGE (self), status_page);
+                adw_toolbar_view_set_content (ADW_TOOLBAR_VIEW (self->toolbar_view), status_page);
 
                 adw_status_page_set_icon_name (ADW_STATUS_PAGE (status_page), "network-error-symbolic");
                 adw_status_page_set_title (ADW_STATUS_PAGE (status_page), _("Network Unavailable"));
@@ -722,6 +721,7 @@ cc_network_panel_class_init (CcNetworkPanelClass *klass)
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, empty_listbox);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, proxy_row);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, vpn_stack);
+        gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, toolbar_view);
 
         gtk_widget_class_bind_template_callback (widget_class, create_connection_cb);
 
