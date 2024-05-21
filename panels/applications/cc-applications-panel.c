@@ -145,6 +145,9 @@ struct _CcApplicationsPanel
   guint64          app_size;
   guint64          cache_size;
   guint64          data_size;
+
+  AdwSwitchRow        *suspend;
+  AdwPreferencesGroup *power_section;
 };
 
 static void select_app (CcApplicationsPanel *self,
@@ -160,6 +163,21 @@ enum
   PROP_0,
   PROP_PARAMETERS
 };
+
+static gboolean
+is_mobile_power_saver_available (void)
+{
+  GSettingsSchema *res = g_settings_schema_source_lookup (
+      g_settings_schema_source_get_default(), "org.adishatz.Mps", TRUE);
+
+  if (res != NULL)
+    {
+      g_free (res);
+      return TRUE;
+    }
+
+  return FALSE;
+}
 
 static gboolean
 gnome_software_is_installed (void)
@@ -1230,6 +1248,41 @@ on_storage_row_activated_cb (CcApplicationsPanel *self)
 }
 
 static void
+on_suspend_row_activated_cb (CcApplicationsPanel *self)
+{
+  if (is_mobile_power_saver_available ())
+    {
+      g_autoptr(GSettings) settings = g_settings_new ("org.adishatz.Mps");
+      g_autoptr(GVariant) value = g_settings_get_value (
+            settings, "screen-off-suspend-apps-blacklist");
+      GVariantBuilder builder;
+      g_autoptr (GVariantIter) iter;
+      const gchar *app_id;
+      gboolean is_active = adw_switch_row_get_active (self->suspend);
+      g_variant_builder_init (
+        &builder, G_VARIANT_TYPE ("as")
+      );
+
+      g_variant_get (value, "as", &iter);
+      while (g_variant_iter_loop (iter, "s", &app_id))
+        {
+          if (g_strcmp0 (app_id, self->current_app_id) == 0)
+            continue;
+
+          g_variant_builder_add (&builder, "s", app_id);
+        }
+
+      if (!is_active)
+        g_variant_builder_add (&builder, "s", self->current_app_id);
+
+      g_settings_set_value (settings,
+                            "screen-off-suspend-apps-blacklist",
+                            g_variant_builder_end (&builder));
+    }
+}
+
+
+static void
 on_items_changed_cb (GListModel *list,
                   guint       position,
                   guint       removed,
@@ -1406,6 +1459,31 @@ update_usage_section (CcApplicationsPanel *self,
   gtk_widget_set_visible (GTK_WIDGET (self->usage_section), portal_app_id || has_builtin);
 }
 
+static void
+update_power_section (CcApplicationsPanel *self,
+                      GAppInfo            *info)
+{
+  g_autoptr(GSettings) settings = g_settings_new ("org.adishatz.Mps");
+  g_autoptr(GVariant) value = g_settings_get_value (
+        settings, "screen-off-suspend-apps-blacklist");
+  g_autoptr (GVariantIter) iter;
+  const gchar *app_id;
+  gboolean is_blacklisted = FALSE;
+
+  g_variant_get (value, "as", &iter);
+  while (g_variant_iter_loop (iter, "s", &app_id))
+    {
+      if (g_strcmp0 (app_id, self->current_app_id) == 0)
+        {
+          is_blacklisted = TRUE;
+          break;
+        }
+    }
+
+  gtk_widget_set_visible (GTK_WIDGET (self->power_section), TRUE);
+  adw_switch_row_set_active (self->suspend, !is_blacklisted);
+}
+
 /* --- panel setup --- */
 
 static void
@@ -1445,6 +1523,9 @@ update_panel (CcApplicationsPanel *self,
   g_set_object (&self->current_app_info, info);
   self->current_app_id = get_app_id (info);
   self->current_portal_app_id = get_portal_app_id (info);
+
+  if (is_mobile_power_saver_available ())
+    update_power_section (self, info);
 }
 
 
@@ -1820,6 +1901,8 @@ cc_applications_panel_class_init (CcApplicationsPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcApplicationsPanel, total);
   gtk_widget_class_bind_template_child (widget_class, CcApplicationsPanel, usage_section);
   gtk_widget_class_bind_template_child (widget_class, CcApplicationsPanel, view_details_button);
+  gtk_widget_class_bind_template_child (widget_class, CcApplicationsPanel, suspend);
+  gtk_widget_class_bind_template_child (widget_class, CcApplicationsPanel, power_section);
 
   gtk_widget_class_bind_template_callback (widget_class, camera_cb);
   gtk_widget_class_bind_template_callback (widget_class, location_cb);
@@ -1843,6 +1926,7 @@ cc_applications_panel_class_init (CcApplicationsPanelClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, on_app_search_entry_search_stopped_cb);
 
   gtk_widget_class_bind_template_callback (widget_class, on_storage_row_activated_cb);
+  gtk_widget_class_bind_template_callback (widget_class, on_suspend_row_activated_cb);
 }
 
 static GtkWidget *
