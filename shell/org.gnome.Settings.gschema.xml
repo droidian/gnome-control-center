@@ -1,5 +1,10 @@
 <schemalist>
   <schema gettext-domain="gnome-control-center-2.0" id="org.gnome.Settings" path="/org/gnome/control-center/">
+    <key name="do-not-load-panel" type="b">
+      <default>false</default>
+      <summary>Do not load any panel at first start</summary>
+      <description>You probably don't want to touch this</description>
+    </key>
     <key name="last-panel" type="s">
       <default>''</default>
       <summary>The identifier for the last Settings panel to be opened</summary>

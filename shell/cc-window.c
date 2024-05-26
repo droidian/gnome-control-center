@@ -656,7 +656,8 @@ cc_window_constructed (GObject *object)
    * or the first visible panel. We do that in an idle handler so we
    * have a chance to skip it when another panel has been explicitly
    * activated from commandline parameter or from DBus method */
-  g_idle_add_once ((GSourceOnceFunc) maybe_load_last_panel, self);
+  if (!g_settings_get_boolean (self->settings, "do-not-load-panel"))
+    g_idle_add_once ((GSourceOnceFunc) maybe_load_last_panel, self);
 
   G_OBJECT_CLASS (cc_window_parent_class)->constructed (object);
 }
