@@ -274,6 +274,15 @@ endif
 config_h.set('HAVE_MALCONTENT', enable_malcontent,
              description: 'Define to 1 if malcontent support is enabled')
 
+# Droidian support
+enable_droidian = get_option('droidian')
+if enable_droidian
+  # Disable malcontent
+  config_h.set('HAVE_MALCONTENT_0_10', false)
+  config_h.set('HAVE_MALCONTENT', false)
+endif
+config_h.set('IS_DROIDIAN', enable_droidian, description: 'Define to 1 if droidian changes are needed')
+
 if host_is_linux
   # ModemManager
   mm_dep =  dependency('mm-glib', version: '>= 0.7')
