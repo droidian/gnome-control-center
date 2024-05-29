@@ -137,7 +137,7 @@ would_demote_only_admin (ActUser *user)
     return TRUE;
 }
 
-/*static gboolean
+static gboolean
 get_autologin_possible (ActUser *user)
 {
     gboolean locked;
@@ -147,7 +147,7 @@ get_autologin_possible (ActUser *user)
     set_password_at_login = (act_user_get_password_mode (user) == ACT_USER_PASSWORD_MODE_SET_AT_LOGIN);
 
     return !(locked || set_password_at_login);
-}*/
+}
 
 static gchar *
 get_user_language (ActUser *user)
@@ -325,7 +325,7 @@ change_password (CcUserPage *self)
     gtk_window_present (GTK_WINDOW (dialog));
 }
 
-/*static void
+static void
 autologin_changed (CcUserPage *self)
 {
     ActUserManager *user_manager = act_user_manager_get_default ();
@@ -347,7 +347,7 @@ autologin_changed (CcUserPage *self)
             }
         }
     }
-}*/
+}
 
 static void
 update_fingerprint_row_state (CcUserPage           *self,
@@ -416,10 +416,10 @@ remove_local_user_response (CcUserPage       *self,
         return;
     }
 
-    /* remove autologin
+    /* remove autologin */
     if (act_user_get_automatic_login (self->user)) {
         act_user_set_automatic_login (self->user, FALSE);
-    }*/
+    }
 
     /* Prevent user to click again while deleting, issue #2341 */
     gtk_widget_set_sensitive (GTK_WIDGET (self->remove_user_button), FALSE);
@@ -666,7 +666,7 @@ cc_user_page_class_init (CcUserPageClass * klass)
     gtk_widget_class_bind_template_child (widget_class, CcUserPage, remove_user_button);
 
     gtk_widget_class_bind_template_callback (widget_class, account_type_changed);
-//    gtk_widget_class_bind_template_callback (widget_class, autologin_changed);
+    gtk_widget_class_bind_template_callback (widget_class, autologin_changed);
     gtk_widget_class_bind_template_callback (widget_class, change_fingerprint);
     gtk_widget_class_bind_template_callback (widget_class, change_language);
     gtk_widget_class_bind_template_callback (widget_class, change_password);
@@ -749,10 +749,10 @@ cc_user_page_set_user (CcUserPage  *self,
                                      _("Enabled") : _("Disabled"));
 #endif
 
-/*    g_signal_handlers_block_by_func (self->auto_login_row, autologin_changed, self);
+    g_signal_handlers_block_by_func (self->auto_login_row, autologin_changed, self);
     gtk_widget_set_visible (GTK_WIDGET (self->auto_login_row), get_autologin_possible (user));
     adw_switch_row_set_active (self->auto_login_row, act_user_get_automatic_login (user));
-    g_signal_handlers_unblock_by_func (self->auto_login_row, autologin_changed, self);*/
+    g_signal_handlers_unblock_by_func (self->auto_login_row, autologin_changed, self);
 
     cc_list_row_set_secondary_label (self->password_row, get_password_mode_text (user));
     user_language = get_user_language (user);

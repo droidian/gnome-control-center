@@ -50,11 +50,11 @@
 struct _CcUsersPage {
     AdwNavigationPage  parent_instance;
 
-//    GtkButton         *add_user_button;
+    GtkButton         *add_user_button;
     GtkButton         *add_enterprise_user_button;
     CcUserPage        *current_user_page;
     AdwNavigationView *navigation;
-//    GtkWidget         *other_users_group;
+    GtkWidget         *other_users_group;
     GtkListBox        *user_list;
 
     GListStore        *model;
@@ -100,12 +100,12 @@ on_user_row_activated (CcUsersPage  *self,
     adw_navigation_view_push (self->navigation, ADW_NAVIGATION_PAGE (user_page));
 }
 
-/*static void
+static void
 on_other_users_model_changed (CcUsersPage *self)
 {
     gtk_widget_set_visible (self->other_users_group,
                             g_list_model_get_n_items (G_LIST_MODEL (self->model)) > 0);
-}*/
+}
 
 static GtkWidget *
 create_user_row (gpointer item, gpointer user_data)
@@ -314,17 +314,17 @@ cc_users_page_init (CcUsersPage *self)
                              (GtkListBoxCreateWidgetFunc)create_user_row,
                              self,
                              NULL);
-/*    g_signal_connect_object (self->model,
+    g_signal_connect_object (self->model,
                              "items-changed",
                              G_CALLBACK (on_other_users_model_changed),
                              self,
-                             G_CONNECT_SWAPPED);*/
+                             G_CONNECT_SWAPPED);
     self->permission = (GPermission *)polkit_permission_new_sync (USER_ACCOUNTS_PERMISSION, NULL, NULL, &error);
     if (self->permission == NULL) {
         g_warning ("Cannot create '%s' permission: %s", USER_ACCOUNTS_PERMISSION, error->message);
     }
 
-//    g_object_bind_property (self->permission, "allowed", self->add_user_button, "sensitive", G_BINDING_SYNC_CREATE);
+    g_object_bind_property (self->permission, "allowed", self->add_user_button, "sensitive", G_BINDING_SYNC_CREATE);
 
     self->user_manager = act_user_manager_get_default ();
     g_signal_connect_object (self->user_manager,
@@ -370,10 +370,10 @@ cc_users_page_class_init (CcUsersPageClass * klass)
     gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/control-center/system/users/cc-users-page.ui");
 
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_enterprise_user_button);
-//    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_user_button);
+    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_user_button);
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, current_user_page);
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, navigation);
-//    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, other_users_group);
+    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, other_users_group);
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, user_list);
 
     gtk_widget_class_bind_template_callback (widget_class, add_user);
