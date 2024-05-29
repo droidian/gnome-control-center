@@ -324,7 +324,12 @@ cc_users_page_init (CcUsersPage *self)
         g_warning ("Cannot create '%s' permission: %s", USER_ACCOUNTS_PERMISSION, error->message);
     }
 
+#ifdef IS_DROIDIAN
+    /* Always disallow adding new users in droidian */
+    gtk_widget_set_visible (GTK_WIDGET (self->add_user_button), FALSE);
+#else
     g_object_bind_property (self->permission, "allowed", self->add_user_button, "sensitive", G_BINDING_SYNC_CREATE);
+#endif /* IS_DROIDIAN */
 
     self->user_manager = act_user_manager_get_default ();
     g_signal_connect_object (self->user_manager,
