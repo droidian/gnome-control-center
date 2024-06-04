@@ -145,6 +145,21 @@
                   </object>
                 </child>
 
+                <!-- Touch Settings -->
+                <child>
+                  <object class="AdwPreferencesGroup" id="touch_settings_group">
+                    <property name="visible">False</property>
+                    <child>
+                      <object class="AdwSwitchRow" id="double_tap_row">
+                        <property name="visible">False</property>
+                        <property name="title" translatable="yes">Double tap wake up</property>
+                        <property name="subtitle" translatable="yes">Wake up screen by double tapping panel</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
                 <!-- Night Light -->
                 <child>
                   <object class="AdwPreferencesGroup">
