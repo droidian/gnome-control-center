@@ -107,6 +107,15 @@ template $CcDisplayPanel: $CcPanel {
           visible: false;
         }
 
+        Adw.PreferencesGroup touch_settings_group {
+          Adw.SwitchRow double_tap_row {
+            visible: false;
+            title: _("Double tap wake up");
+            subtitle: _("Wake up screen by double tapping panel");
+            use-underline: true;
+          }
+        }
+
         Adw.PreferencesGroup {
           $CcListRow night_light_row {
             /* Translators: This is the redshift functionality where we suppress blue light when the sun has gone down */
