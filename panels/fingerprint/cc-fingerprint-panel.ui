@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="CcFingerprintPanel" parent="CcPanel">
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar"></object>
+        </child>
+        <property name="content">
+          <object class="GtkScrolledWindow">
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="margin-start">30</property>
+                <property name="margin-end">30</property>
+                <property name="spacing">10</property>
+                <child>
+                  <object class="AdwPreferencesGroup">
+                    <property name="vexpand">True</property>
+                    <property name="halign">center</property>
+                    <child>
+                      <object class="AdwExpanderRow" id="fingerprints_row">
+                        <property name="title" translatable="yes">Enrolled fingerprints</property>
+                        <property name="valign">center</property>
+                        <property name="vexpand">True</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwToastOverlay" id="toast_overlay">
+                    <property name="vexpand">True</property>
+                    <property name="hexpand">True</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">10</property>
+                        <child>
+                          <object class="GtkImage" id="fingerprint_image">
+                            <property name="icon_name">fingerprint-detection-symbolic</property>
+                            <property name="pixel_size">200</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkProgressBar" id="progressbar">
+                            <property name="opacity">0.0</property>
+                            <property name="vexpand">True</property>
+                            <property name="valign">start</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwPreferencesGroup">
+                    <child>
+                      <object class="AdwEntryRow" id="fingerprint_entry">
+                        <property name="title" translatable="yes">Fingerprint name</property>
+                        <property name="vexpand">True</property>
+                        <signal name="notify::text-length" handler="fingerprint_name_cb" object="CcFingerprintPanel" swapped="yes" />
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="fingerprint_new_button">
+                        <property name="label" translatable="yes">New fingerprint</property>
+                        <property name="margin-top">20</property>
+                        <property name="margin-bottom">50</property>
+                        <property name="sensitive">False</property>
+                        <signal name="clicked" handler="fingerprint_new_button_clicked_cb" object="CcFingerprintPanel" swapped="yes" />
+                        <style>
+                          <class name="suggested-action" />
+                          <class name="pill" />
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
