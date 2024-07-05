@@ -28,6 +28,7 @@ endif
 if enable_droidian
   panels += [
     'droidian-encryption',
+    'fingerprint',
   ]
 endif
 
