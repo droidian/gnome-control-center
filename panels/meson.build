@@ -6,7 +6,6 @@ panels = [
   'color',
   'display',
   'droidian-encryption',
-  'fingerprint',
   'keyboard',
   'mouse',
   'multitasking',
