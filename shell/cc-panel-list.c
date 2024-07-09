@@ -388,7 +388,7 @@ static const gchar * const panel_order[] = {
   "keyboard",
   "fingerprint",
   "waydroid",
-  "mtp",
+  "usb",
   "nfc",
   "droidian-encryption",
   "color",

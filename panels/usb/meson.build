@@ -11,11 +11,11 @@ i18n.merge_file(
 )
 
 sources = files(
-  'cc-mtp-panel.c'
+  'cc-@0@-panel.c'.format(cappletname)
 )
 
 resource_data = files(
-  'cc-mtp-panel.ui'
+  'cc-@0@-panel.ui'.format(cappletname)
 )
 
 sources += gnome.compile_resources(
