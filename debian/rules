@@ -4,6 +4,12 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_CPPFLAGS_MAINT_APPEND = -DSSHD_SERVICE=\"ssh.service\"
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs
 
+TRANSLATIONS := $(notdir $(shell find droidian_po -name '*.po'))
+define TRANSLATION_install
+	msgcat --use-first po/$(1) droidian_po/$(1) >po/$(1).new
+	mv po/$(1).new po/$(1)
+endef
+
 # Not in Ubuntu main yet https://launchpad.net/bugs/1892456
 ifeq ($(shell dpkg-vendor --is Ubuntu && echo yes),yes)
 DISTRIBUTOR_LOGO := /usr/share/pixmaps/ubuntu-logo-text.png
@@ -22,6 +28,8 @@ endif
 	dh $@
 
 override_dh_auto_configure:
+	$(info Droidian translations: $(TRANSLATIONS))
+	$(foreach translation,$(TRANSLATIONS),$(call TRANSLATION_install,$(translation)))
 	dh_auto_configure -- \
 		-Dlocation-services=enabled \
 		-Dprivileged_group=sudo \
