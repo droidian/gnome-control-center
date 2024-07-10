@@ -4,3 +4,4 @@ _build/
 /subprojects/*
 !/subprojects/*.wrap
 .flatpak-builder/
+droidian_po/*.mo
