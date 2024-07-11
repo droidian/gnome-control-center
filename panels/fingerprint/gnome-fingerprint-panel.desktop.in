@@ -3,7 +3,7 @@ Name=Fingerprint
 Comment=Configure Fingerprint settings
 Exec=gnome-control-center fingerprint
 # Translators: Do NOT translate or transliterate this text (this is an icon file name)!
-Icon=org.gnome.Settings-fingerprint-symbolic
+Icon=fingerprint-detection-symbolic
 Terminal=false
 Type=Application
 NoDisplay=true
