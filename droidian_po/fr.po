@@ -1,0 +1,550 @@
+# French translation of gnome-control-center.
+# Copyright (C) 1998-2024 Free Software Foundation, Inc.
+# This file is under the same license as the gnome-control-center package.
+#
+# Vincent Renardias <vincent@ldsol.com>, 1998-1999.
+# Fabrice Bellet <fabrice.bellet@imag.fr>, 1999.
+# Thibaut Cousin <thibaut.cousin@clermont.in2p3.fr>, 1999.
+# Joaquim Fellmann <joaquim@hrnet.fr>, 2000.
+# Christophe Merlet <redfox@redfoxcenter.org>, 2000-2006.
+# Christophe Fergeau <teuf@users.sourceforge.net>, 2002.
+# Mathieu Gauthier-Pilote <mathieu.g.p@videotron.ca>, 2002.
+# Sebastien Oustric <sebastien.oustric@laposte.net>, 2002.
+# Simon Manlay <simon@solintech.fr>, 2005.
+# Vincent Untz <vuntz@gnome.org>, 2005.
+# Robert-André Mauchin <zebob.m@pengzone.org>, 2006-2008.
+# Jonathan Ernst <jonathan@ernstfamily.ch>, 2006-2007.
+# Benoît Dejean <benoit@placenet.org>, 2006.
+# Samuel Mutel <samuel.mutel@free.fr>, 2006.
+# Damien Durand <splinux@fedoraproject.org>, 2006.
+# Marc Lorber <linux-lorber@club-internet.fr>, 2006.
+# Stéphane Raimbault <stephane.raimbault@gmail.com>, 2007-2008.
+# Christophe Benz <christophe.benz@gmail.com>, 2007.
+# Bruno Brouard <annoa.b@gmail.com>, 2008-2012.
+# Laurent Coudeur <laurentc@iol.ie>, 2009, 2010.
+# Gérard Baylard <Geodebay@gmail.com>, 2011.
+# Grawok <grawok@gmx.com>, 2012.
+# Alain Lojewski <allomervan@gmail.com>, 2011-2018.
+# Julien Hardelin <jhardlin@orange.fr>, 2013.
+# Erwan Georget <dremor@dremor.info>, 2015.
+# Claude Paroz <claude@2xlibre.net>, 2007-2024.
+# Thibault Martin <mail@thibaultmart.in>, 2020-2021.
+# Charles Monzat <charles.monzat@free.fr>, 2016-2021.
+# Alexandre Franke <afranke@gnome.org>, 2013-2023.
+# Guillaume Bernard <associations@guillaume-bernard.fr>, 2015-2024.
+# mathieu <mathieu.bousquet2@gmail.com>, 2022.
+# Vincent Chatelain <vinchatl_gnome@proton.me>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-control-center HEAD\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-10 13:33+0100\n"
+"PO-Revision-Date: 2024-04-08 14:48+0200\n"
+"Last-Translator: Vincent Chatelain <vinchatl_gnome@proton.me>\n"
+"Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Gtranslator 45.3\n"
+
+#: panels/fingerprint/cc-fingerprint-panel.ui:26
+msgid "Enrolled fingerprints"
+msgstr "Empreintes enregistrées"
+
+#: panels/fingerprint/cc-fingerprint-panel.ui:62
+msgid "Fingerprint name"
+msgstr "Nom de l'empreinte"
+
+#: panels/fingerprint/cc-fingerprint-panel.ui:69
+msgid "New fingerprint"
+msgstr "Nouvelle empreinte"
+
+#: panels/nfc/cc-nfc-panel.ui:12
+msgid "Enable NFC Server"
+msgstr "Activer le serveur NFC"
+
+#: panels/nfc/cc-nfc-panel.ui:27
+msgid "NFC Settings"
+msgstr "Paramètres NFC"
+
+#: panels/nfc/cc-nfc-panel.ui:31
+msgid "NFC read"
+msgstr "Lecture NFC"
+
+#: panels/nfc/cc-nfc-panel.ui:32
+msgid "Read a NFC tag"
+msgstr "Lire un tag NFC"
+
+#: panels/nfc/cc-nfc-panel.ui:36
+msgid "Read"
+msgstr "Lecture"
+
+#: panels/nfc/cc-nfc-panel.ui:45
+msgid "NFC read status"
+msgstr "Résultat de la lecture NFC"
+
+#: panels/nfc/cc-nfc-panel.ui:46
+msgid "If reading was successful"
+msgstr "Si la lecture a fonctionné"
+
+#: panels/power/cc-battery-row.c:83
+#, c-format
+msgid "%i minute"
+msgid_plural "%i minutes"
+msgstr[0] "%i minute"
+msgstr[1] "%i minutes"
+
+#: panels/power/cc-battery-row.c:92
+#, c-format
+msgid "%i hour"
+msgid_plural "%i hours"
+msgstr[0] "%i heure"
+msgstr[1] "%i heures"
+
+#: panels/power/cc-battery-row.c:99
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "heure"
+msgstr[1] "heures"
+
+#: panels/power/cc-battery-row.c:100
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "minute"
+msgstr[1] "minutes"
+
+#: panels/power/cc-power-panel.ui:30
+msgid "Connected Devices"
+msgstr "Périphériques connectés"
+
+#: panels/power/cc-power-panel.ui:48
+msgid "Power Mode"
+msgstr "Mode d’énergie"
+
+#: panels/power/cc-power-panel.ui:76
+msgid "Power Saving"
+msgstr "Économie d’énergie"
+
+#: panels/power/cc-power-panel.ui:79
+msgid "A_utomatic Screen Brightness"
+msgstr "Luminosité de l’écran a_utomatique"
+
+#: panels/power/cc-power-panel.ui:80
+msgid "Adjust screen brightness to the surrounding light"
+msgstr "La luminosité de l’écran s’adapte à la luminosité ambiante"
+
+#: panels/power/cc-power-panel.ui:86
+msgid "Low brightness"
+msgstr "Luminosité faible"
+
+#: panels/power/cc-power-panel.ui:99
+msgid "Medium brightness"
+msgstr "Luminosité moyenne"
+
+#: panels/power/cc-power-panel.ui:113
+msgid "High brightness"
+msgstr "Luminosité élevée"
+
+#: panels/power/cc-power-panel.ui:128
+msgid "Optimized brightness"
+msgstr "Luminosité optimisée"
+
+#: panels/power/cc-power-panel.ui:143
+msgid "_Dim Screen"
+msgstr "Écran as_sombri"
+
+#: panels/power/cc-power-panel.ui:144
+msgid "Reduce screen brightness when the device is inactive"
+msgstr "Réduire la luminosité de l’écran lorsque l’appareil est inactif"
+
+#: panels/power/cc-power-panel.ui:150
+msgid "Screen _Blank"
+msgstr "Écran _noir"
+
+#: panels/power/cc-power-panel.ui:151
+msgid "Turn the screen off after a period of inactivity"
+msgstr "Éteint l’écran après une période d’inactivité"
+
+#. Translators: Idle time
+#: panels/power/cc-power-panel.ui:157
+msgid "Never"
+msgstr "Jamais"
+
+#: panels/power/cc-power-panel.ui:167
+msgid "Automatic Power _Saver"
+msgstr "É_conomie d’énergie automatique"
+
+#: panels/power/cc-power-panel.ui:168
+msgid "Turn on power saver mode when battery power is low"
+msgstr ""
+"Activer le mode économie d’énergie quand le niveau de batterie est faible"
+
+#: panels/power/cc-power-panel.ui:176
+msgid "Screen off Power _Saver"
+msgstr "Économie d'énergie écran éteint"
+
+#: panels/power/cc-power-panel.ui:177
+msgid "Turn on power saver mode when screen is off"
+msgstr "Activer l'économie d'énergie quand l'écran est éteint"
+
+#: panels/power/cc-power-panel.ui:181
+msgid "Bluetooth Power Saver"
+msgstr "Économie d’énergie Bluetooth"
+
+#: panels/power/cc-power-panel.ui:182
+msgid "Turn off bluetooth if unused"
+msgstr "Désactiver le Bluetooth s’il n’est pas utilisé"
+
+#: panels/power/cc-power-panel.ui:187
+msgid "Radio devices Power Saver"
+msgstr "Économie d’énergie des appareils radio"
+
+#: panels/power/cc-power-panel.ui:188
+msgid "Allow power saving on modem and Wi-FI"
+msgstr "Permettre l’économie d’énergie du modem et du Wi-Fi"
+
+#: panels/power/cc-power-panel.ui:196
+msgid "_Automatic Suspend"
+msgstr "Mise en veille _automatique"
+
+#: panels/power/cc-power-panel.ui:197
+msgid "Pause the device after a period of inactivity"
+msgstr "Mettre l’appareil en pause après une période d’inactivité"
+
+#: panels/power/cc-power-panel.ui:206
+msgid "General"
+msgstr "Général"
+
+#: panels/power/cc-power-panel.ui:210
+msgid "Po_wer Button Behavior"
+msgstr "Action du bouton d’e_xtinction"
+
+#: panels/power/cc-power-panel.ui:219
+msgid "Show Battery _Percentage"
+msgstr "Afficher le _pourcentage de batterie"
+
+#: panels/power/cc-power-panel.ui:220
+msgid "Show exact charge level in the top bar"
+msgstr "Afficher l’état de charge exact dans la barre supérieure"
+
+#: panels/power/cc-power-panel.ui:227
+msgid "Charging control"
+msgstr "Contrôle de la charge"
+
+#: panels/power/cc-power-panel.ui:228
+msgid "Automatically determine when to start charging based on alarms set."
+msgstr ""
+"Déterminer automatiquement quand commencer la charge en fonction des alarmes "
+"définies."
+
+#: panels/power/cc-power-panel.ui:235
+msgid "Maximum charging percentage"
+msgstr "Pourcentage maximum de charge"
+
+#: panels/power/cc-power-panel.ui:236
+msgid "Stop charging when this value is reached (unless an alarm is pending)."
+msgstr ""
+"Arrêter la charge quand cette valeur est atteinte (ou qu'une alarme est "
+"imminente)."
+
+#: panels/power/cc-power-panel.ui:251
+msgid "Minimum charging percentage"
+msgstr "Pourcentage minimum de charge"
+
+#: panels/power/cc-power-panel.ui:252
+msgid "Start charging when this value is reached."
+msgstr "Reprendre la charge quand cette valeur est atteinte."
+
+#: panels/power/cc-power-panel.ui:273
+msgid "Automatic Suspend"
+msgstr "Mise en veille automatique"
+
+#: panels/power/cc-power-panel.ui:286
+msgid "On _Battery Power"
+msgstr "Sur _batterie"
+
+#: panels/power/cc-power-panel.ui:293
+msgid "_Delay"
+msgstr "_Délai"
+
+#: panels/power/cc-power-panel.ui:304
+msgid "When _Plugged In"
+msgstr "Lorsque _branché"
+
+#: panels/power/cc-power-panel.ui:311
+msgid "D_elay"
+msgstr "Dé_lai"
+
+#: panels/sound/cc-alert-chooser-window.ui:4
+msgid "Alert Sound"
+msgstr "Son d’alerte"
+
+#: panels/sound/cc-alert-chooser-window.ui:17 panels/usb/cc-usb-panel.ui:23
+msgid "None"
+msgstr "Aucun"
+
+#: panels/sound/cc-alert-chooser-window.ui:29
+msgid "Click"
+msgstr "Clic"
+
+#: panels/sound/cc-alert-chooser-window.ui:43
+msgid "String"
+msgstr "Corde"
+
+#: panels/sound/cc-alert-chooser-window.ui:57
+msgid "Swing"
+msgstr "Balançoire"
+
+#: panels/sound/cc-alert-chooser-window.ui:71
+msgid "Hum"
+msgstr "Hum"
+
+#: panels/sound/cc-balance-slider.ui:9
+msgid "Balance"
+msgstr "Balance"
+
+#: panels/sound/cc-fade-slider.ui:9
+msgid "Fade"
+msgstr "Fondu"
+
+#: panels/sound/cc-output-test-window.ui:4
+msgid "Test Speakers"
+msgstr "Tester les haut-parleurs"
+
+#: panels/sound/cc-sound-panel.ui:6
+msgid "Sound"
+msgstr "Son"
+
+#: panels/sound/cc-sound-panel.ui:16 panels/sound/cc-sound-panel.ui:222
+msgid "Output"
+msgstr "Sortie"
+
+#: panels/sound/cc-sound-panel.ui:43
+msgid "_Output Device"
+msgstr "Périphérique de _sortie"
+
+#: panels/sound/cc-sound-panel.ui:61
+msgid "_Test…"
+msgstr "_Test…"
+
+#: panels/sound/cc-sound-panel.ui:86
+msgid "_Configuration"
+msgstr "_Configuration"
+
+#: panels/sound/cc-sound-panel.ui:111
+msgid "Master volume"
+msgstr "Volume principal"
+
+#: panels/sound/cc-sound-panel.ui:124
+msgid "O_utput Volume"
+msgstr "_Volume de sortie"
+
+#: panels/sound/cc-sound-panel.ui:151
+msgid "_Balance"
+msgstr "_Balance"
+
+#: panels/sound/cc-sound-panel.ui:178
+msgid "Fad_e"
+msgstr "_Fondu"
+
+#: panels/sound/cc-sound-panel.ui:205
+msgid "_Subwoofer"
+msgstr "Caisso_n de basse"
+
+#: panels/sound/cc-sound-panel.ui:225
+msgid "Output Device"
+msgstr "Périphérique de sortie"
+
+#: panels/sound/cc-sound-panel.ui:226
+msgid "No Output Devices"
+msgstr "Aucun périphérique de sortie"
+
+#: panels/sound/cc-sound-panel.ui:234 panels/sound/cc-sound-panel.ui:346
+msgid "Input"
+msgstr "Entrée"
+
+#: panels/sound/cc-sound-panel.ui:256
+msgid "_Input Device"
+msgstr "Périphérique d’_entrée"
+
+#: panels/sound/cc-sound-panel.ui:294
+msgid "Con_figuration"
+msgstr "Con_figuration"
+
+#: panels/sound/cc-sound-panel.ui:329
+msgid "I_nput Volume"
+msgstr "Volume d’e_ntrée"
+
+#: panels/sound/cc-sound-panel.ui:349
+msgid "Input Device"
+msgstr "Périphérique d’entrée"
+
+#: panels/sound/cc-sound-panel.ui:350
+msgid "No Input Devices"
+msgstr "Aucun périphérique d’entrée"
+
+#: panels/sound/cc-sound-panel.ui:359
+msgid "Headphone"
+msgstr "Casque"
+
+#: panels/sound/cc-sound-panel.ui:362
+msgid "Remember headphone volume"
+msgstr "Souvenir du volume du casque"
+
+#: panels/sound/cc-sound-panel.ui:363
+msgid ""
+"Automatically restore the last volume level when headphones are connected or "
+"disconnected."
+msgstr ""
+"Rétablir automatiquement le dernier niveau de volume lorsque le casque est "
+"connecté ou déconnecté."
+
+#: panels/sound/cc-sound-panel.ui:368
+msgid "Control playback on connection"
+msgstr "Contrôler la lecture à la connexion"
+
+#: panels/sound/cc-sound-panel.ui:369
+msgid ""
+"Automatically pause or resume playback when headphones are connected or "
+"disconnected."
+msgstr ""
+"Mettre en pause ou reprendre la lecture automatiquement lorsque le casque est "
+"connecté ou déconnecté."
+
+#: panels/sound/cc-sound-panel.ui:374
+msgid "Launch music app on connection"
+msgstr "Lancer l'application musicale à la connexion"
+
+#: panels/sound/cc-sound-panel.ui:375
+msgid ""
+"Automatically open your default music player when headphones are connected."
+msgstr ""
+"Ouvrir automatiquement votre lecteur de musique par défaut lorsque le casque est "
+"connecté."
+
+#: panels/sound/cc-sound-panel.ui:382
+msgid "Sounds"
+msgstr "Sons"
+
+#: panels/sound/cc-sound-panel.ui:385
+msgid "Vo_lume Levels"
+msgstr "N_iveaux de volume"
+
+#: panels/sound/cc-sound-panel.ui:392
+msgid "_Alert Sound"
+msgstr "Son d’_alerte"
+
+#: panels/sound/cc-subwoofer-slider.ui:8
+msgid "Subwoofer"
+msgstr "Caisson de basse"
+
+#: panels/sound/cc-volume-levels-page.ui:4
+msgid "Volume Levels"
+msgstr "Niveaux de volume"
+
+#: panels/sound/cc-volume-levels-page.ui:19
+msgid "No Sound Playing"
+msgstr ""
+
+#: panels/sound/cc-volume-slider.ui:8
+msgid "Mute"
+msgstr "Couper le son"
+
+#: panels/sound/cc-volume-slider.ui:19
+msgid "Volume"
+msgstr "Volume"
+
+#: panels/usb/cc-usb-panel.ui:19
+msgid "USB Settings"
+msgstr "Paramètres USB"
+
+#: panels/usb/cc-usb-panel.ui:24
+msgid "Disables all special USB functionalities."
+msgstr "Désactiver toutes les fonctionnalités USB."
+
+#: panels/usb/cc-usb-panel.ui:38
+msgid "File transfer"
+msgstr "Transfert de fichiers"
+
+#: panels/usb/cc-usb-panel.ui:39
+msgid "Allows you to transfer files via a USB connection."
+msgstr "Permet de transférer des fichiers via une connexion USB."
+
+#: panels/usb/cc-usb-panel.ui:53
+msgid "Networking"
+msgstr "Réseau"
+
+#: panels/usb/cc-usb-panel.ui:54
+msgid "Allows for USB networking and SSH over a USB connection."
+msgstr "Permet une connexion réseau et SSH à travers l'USB."
+
+#: panels/waydroid/cc-waydroid-app-row.ui:15
+msgid "Show in launcher"
+msgstr "Afficher dans le lanceur"
+
+#: panels/waydroid/cc-waydroid-panel.ui:40
+msgid "Settings"
+msgstr "Paramètres"
+
+#: panels/waydroid/cc-waydroid-panel.ui:44
+msgid "Suspend applications"
+msgstr "Suspendre les applications"
+
+#: panels/waydroid/cc-waydroid-panel.ui:45
+msgid "If unused, suspend applications"
+msgstr "Suspendre les applications si elles ne sont pas utilisées"
+
+#: panels/waydroid/cc-waydroid-panel.ui:57
+msgid "Waydroid access hardware directly"
+msgstr "Waydroid a accès au matériel"
+
+#: panels/waydroid/cc-waydroid-panel.ui:58
+msgid "Will improve stability of NFC and GPS"
+msgstr "Meilleur fonctionnement du NFC et du GPS"
+
+#: panels/waydroid/cc-waydroid-panel.ui:70
+msgid "Shared folder"
+msgstr "Dossier partagé"
+
+#: panels/waydroid/cc-waydroid-panel.ui:71
+msgid "Share a Waydroid folder with Android"
+msgstr "Partager un dossier Waydroid avec Android"
+
+#: panels/waydroid/cc-waydroid-panel.ui:83
+msgid "Forward notifications"
+msgstr "Transférer les notifications"
+
+#: panels/waydroid/cc-waydroid-panel.ui:84
+msgid "Show Android notifications"
+msgstr "Afficher les notifications Android"
+
+#: panels/waydroid/cc-waydroid-panel.ui:98
+msgid "Android applications"
+msgstr "Applications Android"
+
+#: panels/waydroid/cc-waydroid-panel.ui:103
+msgid "Reset Waydroid"
+msgstr "Réinitialiser Waydroid"
+
+#: panels/waydroid/cc-waydroid-panel.ui:107
+msgid "Clear data"
+msgstr "Effacer les données"
+
+#: panels/waydroid/cc-waydroid-panel.ui:108
+msgid "This will remove applications and settings"
+msgstr "Cela supprimera les applications et les paramètres"
+
+#: panels/waydroid/cc-waydroid-panel.ui:134
+msgid "Waydroid needs to be installed"
+msgstr "Waydroid doit être installé"
+
+#: panels/waydroid/cc-waydroid-panel.ui:145
+msgid "Install"
+msgstr "Installer"
+
+#: panels/waydroid/cc-waydroid-panel.ui:170
+msgid "Unable to install Waydroid"
+msgstr "Impossible d’installer Waydroid"
