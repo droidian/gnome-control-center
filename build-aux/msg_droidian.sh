@@ -20,7 +20,7 @@ trap "rm -f /tmp/gcc$$.pot" EXIT
 
 >/tmp/gcc$$.pot
 
-git ls-files panels/usb panels/power panels/nfc panels/fingerprint  | grep -E '(.*\.[ch]$|.*\.ui$)' | while read file
+git ls-files $FILES  | grep -E '(.*\.[ch]$|.*\.ui$)' | while read file
 do
 	xgettext --from-code=UTF-8 -j $file -o /tmp/gcc$$.pot
 done
