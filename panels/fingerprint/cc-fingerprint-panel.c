@@ -203,6 +203,8 @@ get_fingerprints_cb (GObject      *source_object,
   value = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
                                     res, &error);
 
+  g_return_if_fail (value != NULL);
+
   g_variant_get (value, "(as)", &iter);
   while (g_variant_iter_loop (iter, "&s", &fingerprint))
     {
