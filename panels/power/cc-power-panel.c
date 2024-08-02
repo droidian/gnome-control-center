@@ -45,6 +45,11 @@ struct _CcPowerPanel
   CcListRow         *automatic_suspend_row;
   GtkListBox        *battery_listbox;
   AdwSwitchRow      *battery_percentage_row;
+  AdwSwitchRow      *battery_bim_row;
+  AdwSpinRow        *battery_bim_row_max;
+  AdwSpinRow        *battery_bim_row_min;
+  GtkAdjustment     *battery_bim_adj_max;
+  GtkAdjustment     *battery_bim_adj_min;
   AdwPreferencesGroup *battery_section;
   AdwComboRow       *blank_screen_row;
   GtkListBox        *device_listbox;
@@ -56,6 +61,7 @@ struct _CcPowerPanel
   GtkListBox        *power_profile_info_listbox;
   AdwPreferencesGroup *power_profile_section;
   AdwSwitchRow      *power_saver_low_battery_row;
+  AdwSwitchRow      *power_saver_screen_off_row;
   GtkComboBox       *suspend_on_battery_delay_combo;
   AdwSwitchRow      *suspend_on_battery_switch_row;
   GtkWidget         *suspend_on_battery_group;
@@ -63,8 +69,10 @@ struct _CcPowerPanel
   AdwSwitchRow      *suspend_on_ac_switch_row;
 
   GSettings     *gsd_settings;
+  GSettings     *mps_settings;
   GSettings     *session_settings;
   GSettings     *interface_settings;
+  GSettings     *bim_settings;
   UpClient      *up_client;
   GPtrArray     *devices;
   gboolean       has_batteries;
@@ -146,6 +154,19 @@ update_power_saver_low_battery_row_visibility (CcPowerPanel *self)
   g_object_get (composite, "kind", &kind, NULL);
   gtk_widget_set_visible (GTK_WIDGET (self->power_saver_low_battery_row),
                           self->power_profiles_proxy && kind == UP_DEVICE_KIND_BATTERY);
+}
+
+static void
+update_power_saver_screen_off_row_visibility (CcPowerPanel *self)
+{
+  g_autoptr(UpDevice) composite = NULL;
+  gboolean mobile_power_saver = g_settings_schema_exist ("org.adishatz.Mps");
+  UpDeviceKind kind;
+
+  composite = up_client_get_display_device (self->up_client);
+  g_object_get (composite, "kind", &kind, NULL);
+  gtk_widget_set_visible (GTK_WIDGET (self->power_saver_screen_off_row),
+                          mobile_power_saver && kind == UP_DEVICE_KIND_BATTERY);
 }
 
 static void
@@ -242,6 +263,7 @@ up_client_changed (CcPowerPanel *self)
     }
 
   update_power_saver_low_battery_row_visibility (self);
+  update_power_saver_screen_off_row_visibility (self);
 }
 
 static void
@@ -1267,6 +1289,7 @@ setup_power_profiles (CcPowerPanel *self)
     power_profile_update_info_boxes (self);
 
   update_power_saver_low_battery_row_visibility (self);
+  update_power_saver_screen_off_row_visibility (self);
 }
 
 static void
@@ -1310,6 +1333,27 @@ setup_general_section (CcPowerPanel *self)
       show_section = TRUE;
     }
 
+  if (g_settings_schema_exist ("org.adishatz.Bim")) {
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row), TRUE);
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row_max), TRUE);
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row_min), TRUE);
+
+      g_settings_bind (self->bim_settings, "enabled",
+                       self->battery_bim_row, "active",
+                       G_SETTINGS_BIND_DEFAULT);
+
+      g_settings_bind (self->bim_settings, "threshold-start",
+                       self->battery_bim_row_min, "value",
+                       G_SETTINGS_BIND_DEFAULT);
+
+
+      g_settings_bind (self->bim_settings, "threshold-end",
+                       self->battery_bim_row_max, "value",
+                       G_SETTINGS_BIND_DEFAULT);
+
+      show_section = TRUE;
+  }
+
   gtk_widget_set_visible (GTK_WIDGET (self->general_section), show_section);
 }
 
@@ -1349,6 +1393,7 @@ cc_power_panel_dispose (GObject *object)
   g_clear_object (&self->gsd_settings);
   g_clear_object (&self->session_settings);
   g_clear_object (&self->interface_settings);
+  g_clear_object (&self->bim_settings);
   g_clear_pointer (&self->automatic_suspend_dialog, gtk_window_destroy);
   g_clear_pointer (&self->devices, g_ptr_array_unref);
   g_clear_object (&self->up_client);
@@ -1379,6 +1424,9 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, automatic_suspend_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_listbox);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_percentage_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row_max);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row_min);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, blank_screen_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, device_listbox);
@@ -1390,6 +1438,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_profile_info_listbox);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_profile_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_low_battery_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_screen_off_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_delay_combo);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_switch_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_group);
@@ -1407,6 +1456,7 @@ static void
 cc_power_panel_init (CcPowerPanel *self)
 {
   guint i;
+  gboolean mobile_power_saver = g_settings_schema_exist ("org.adishatz.Mps");
 
   g_resources_register (cc_power_get_resource ());
 
@@ -1419,8 +1469,12 @@ cc_power_panel_init (CcPowerPanel *self)
   self->up_client = up_client_new ();
 
   self->gsd_settings = g_settings_new ("org.gnome.settings-daemon.plugins.power");
+  if (mobile_power_saver)
+    self->mps_settings = g_settings_new ("org.adishatz.Mps");
   self->session_settings = g_settings_new ("org.gnome.desktop.session");
   self->interface_settings = g_settings_new ("org.gnome.desktop.interface");
+  if (g_settings_schema_exist ("org.adishatz.Bim"))
+    self->bim_settings = g_settings_new ("org.adishatz.Bim");
 
   gtk_list_box_set_sort_func (self->battery_listbox,
                               (GtkListBoxSortFunc)battery_sort_func, NULL, NULL);
@@ -1437,6 +1491,11 @@ cc_power_panel_init (CcPowerPanel *self)
   g_settings_bind (self->gsd_settings, "power-saver-profile-on-low-battery",
                    self->power_saver_low_battery_row, "active",
                    G_SETTINGS_BIND_DEFAULT);
+
+  if (mobile_power_saver)
+    g_settings_bind (self->mps_settings, "screen-off-power-saving",
+                     self->power_saver_screen_off_row, "active",
+                     G_SETTINGS_BIND_DEFAULT);
 
   setup_general_section (self);
 

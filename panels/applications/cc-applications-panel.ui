@@ -387,6 +387,20 @@
                             </child>
                           </object>
                         </child>
+                        <child>
+                          <object class="AdwPreferencesGroup" id="power_section">
+                              <property name="title" translatable="yes">Power Saving</property>
+                              <property name="visible">False</property>
+                              <child>
+                              <object class="AdwSwitchRow" id="suspend">
+                                <property name="title" translatable="yes">Suspend application</property>
+                                <property name="subtitle" translatable="yes">Allow suspending application</property>
+                                <property name="use_underline">True</property>
+                                <signal name="notify::active" handler="on_suspend_row_activated_cb" object="CcApplicationsPanel" swapped="yes"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

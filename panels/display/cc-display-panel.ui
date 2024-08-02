@@ -138,6 +138,14 @@
                             <signal name="notify::selected-item" handler="on_primary_display_selected_item_changed_cb" swapped="yes"/>
                           </object>
                         </child>
+                        <child>
+                          <object class="AdwSwitchRow" id="double_tap_row">
+                            <property name="visible">False</property>
+                            <property name="title" translatable="yes">Double tap wake up</property>
+                            <property name="subtitle" translatable="yes">Wake up screen by double tapping panel</property>
+                            <property name="use_underline">True</property>
+                          </object>
+                        </child>
                       </object>
 
                     </child>

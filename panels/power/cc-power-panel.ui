@@ -156,6 +156,14 @@
                   </object>
                 </child>
                 <child>
+                  <object class="AdwSwitchRow" id="power_saver_screen_off_row">
+                    <property name="visible">False</property>
+                    <property name="title" translatable="yes">Screen off Power _Saver</property>
+                    <property name="subtitle" translatable="yes">Turn on power saver mode when screen is off</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
                   <object class="CcListRow" id="automatic_suspend_row">
                     <property name="visible">False</property>
                     <property name="title" translatable="yes">_Automatic Suspend</property>
@@ -183,6 +191,46 @@
                     <property name="title" translatable="yes">Show Battery _Percentage</property>
                     <property name="subtitle" translatable="yes">Show exact charge level in the top bar</property>
                     <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwSwitchRow" id="battery_bim_row">
+                    <property name="visible">False</property>
+                    <property name="title" translatable="yes">Charging control</property>
+                    <property name="subtitle" translatable="yes">Automatically determine when to start charging based on alarms set.</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwSpinRow" id="battery_bim_row_max">
+                    <property name="visible">False</property>
+                    <property name="title" translatable="yes">Maximum charging percentage</property>
+                    <property name="subtitle" translatable="yes">Stop charging when this value is reached (unless an alarm is pending).</property>
+                    <property name="use_underline">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment" id="battery_bim_adj_max">
+                        <property name="lower">61</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">10</property>
+                        <property name="step-increment">1</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwSpinRow" id="battery_bim_row_min">
+                    <property name="visible">False</property>
+                    <property name="title" translatable="yes">Minimum charging percentage</property>
+                    <property name="subtitle" translatable="yes">Start charging when this value is reached.</property>
+                    <property name="use_underline">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment" id="battery_bim_adj_min">
+                        <property name="lower">20</property>
+                        <property name="upper">60</property>
+                        <property name="page-increment">10</property>
+                        <property name="step-increment">1</property>
+                      </object>
+                    </property>
                   </object>
                 </child>
               </object>

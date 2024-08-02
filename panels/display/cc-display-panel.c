@@ -36,6 +36,7 @@
 #include "cc-night-light-page.h"
 #include "cc-display-resources.h"
 #include "cc-display-settings.h"
+#include "cc-util.h"
 
 /* The minimum supported size for the panel
  * Note that WIDTH is assumed to be the larger size and we accept portrait
@@ -103,11 +104,13 @@ struct _CcDisplayPanel
   AdwNavigationView *nav_view;
   AdwComboRow    *primary_display_row;
   AdwPreferencesGroup *single_display_settings_group;
+  AdwSwitchRow      *double_tap_row;
 
   GtkShortcutController *toplevel_shortcuts;
   GtkShortcut *escape_shortcut;
 
   GSettings           *display_settings;
+  GSettings           *droidian_settings;
 };
 
 enum {
@@ -445,6 +448,8 @@ cc_display_panel_dispose (GObject *object)
 
   g_clear_object (&self->shell_proxy);
 
+  g_clear_object (&self->droidian_settings);
+
   g_signal_handlers_disconnect_by_data (toplevel, self);
 
   G_OBJECT_CLASS (cc_display_panel_parent_class)->dispose (object);
@@ -617,6 +622,7 @@ cc_display_panel_class_init (CcDisplayPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, night_light_page);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, night_light_row);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, primary_display_row);
+  gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, double_tap_row);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, single_display_settings_group);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, toplevel_shortcuts);
 
@@ -1158,4 +1164,18 @@ cc_display_panel_init (CcDisplayPanel *self)
                            self,
                            G_CONNECT_SWAPPED);
   on_night_light_enabled_changed_cb (self);
+
+  if (g_settings_schema_exist ("org.droidian.MobileSettings"))
+    {
+      self->droidian_settings = g_settings_new ("org.droidian.MobileSettings");
+      if (g_settings_get_boolean (self->droidian_settings, "touchpanel-double-tap-available"))
+        {
+          gtk_widget_show (GTK_WIDGET (self->double_tap_row));
+          g_settings_bind (self->droidian_settings, "touchpanel-double-tap",
+                           self->double_tap_row, "active",
+                           G_SETTINGS_BIND_DEFAULT);
+
+
+        }
+    }
 }
