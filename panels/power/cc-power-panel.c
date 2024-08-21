@@ -62,6 +62,9 @@ struct _CcPowerPanel
   AdwPreferencesGroup *power_profile_section;
   AdwSwitchRow      *power_saver_low_battery_row;
   AdwSwitchRow      *power_saver_screen_off_row;
+  AdwSwitchRow      *power_saver_radio_row;
+  AdwSwitchRow      *power_saver_radio_2g_row;
+  AdwSwitchRow      *power_saver_radio_3g_row;
   GtkComboBox       *suspend_on_battery_delay_combo;
   AdwSwitchRow      *suspend_on_battery_switch_row;
   GtkWidget         *suspend_on_battery_group;
@@ -166,6 +169,8 @@ update_power_saver_screen_off_row_visibility (CcPowerPanel *self)
   composite = up_client_get_display_device (self->up_client);
   g_object_get (composite, "kind", &kind, NULL);
   gtk_widget_set_visible (GTK_WIDGET (self->power_saver_screen_off_row),
+                          mobile_power_saver && kind == UP_DEVICE_KIND_BATTERY);
+  gtk_widget_set_visible (GTK_WIDGET (self->power_saver_radio_row),
                           mobile_power_saver && kind == UP_DEVICE_KIND_BATTERY);
 }
 
@@ -514,6 +519,22 @@ blank_screen_row_changed_cb (CcPowerPanel *self)
   value = GPOINTER_TO_UINT (g_object_get_data (item, "value"));
 
   g_settings_set_uint (self->session_settings, "idle-delay", value);
+}
+
+static void
+power_saver_radio_activated_cb (CcPowerPanel *self,
+                                gpointer      user_data)
+{
+    AdwActionRow *row = ADW_ACTION_ROW (user_data);
+    const gchar *name = gtk_widget_get_name (GTK_WIDGET (user_data));
+
+    if (g_strcmp0 (name, "2G") == 0) {
+        /* MM_MODEM_MODE_NONE */
+        g_settings_set_int (self->mps_settings, "radio-power-saving-blacklist", 0);
+    } else {
+        /* MM_MODEM_MODE_CS | MM_MODEM_MODE_2G */
+        g_settings_set_int (self->mps_settings, "radio-power-saving-blacklist", 3);
+    }
 }
 
 static void
@@ -1439,6 +1460,9 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_profile_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_low_battery_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_screen_off_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_2g_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_3g_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_delay_combo);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_switch_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_group);
@@ -1447,6 +1471,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
 
   gtk_widget_class_bind_template_callback (widget_class, als_row_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, blank_screen_row_changed_cb);
+  gtk_widget_class_bind_template_callback (widget_class, power_saver_radio_activated_cb);
   gtk_widget_class_bind_template_callback (widget_class, keynav_failed_cb);
   gtk_widget_class_bind_template_callback (widget_class, power_button_row_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, automatic_suspend_row_activated_cb);
@@ -1492,10 +1517,22 @@ cc_power_panel_init (CcPowerPanel *self)
                    self->power_saver_low_battery_row, "active",
                    G_SETTINGS_BIND_DEFAULT);
 
-  if (mobile_power_saver)
+  if (mobile_power_saver) {
+    gint blacklist = g_settings_get_int (self->mps_settings, "radio-power-saving-blacklist");
+
+    if (blacklist >= 3) {
+        adw_action_row_activate (ADW_ACTION_ROW (self->power_saver_radio_3g_row));
+    } else {
+        adw_action_row_activate (ADW_ACTION_ROW (self->power_saver_radio_2g_row));
+    }
+
     g_settings_bind (self->mps_settings, "screen-off-power-saving",
                      self->power_saver_screen_off_row, "active",
                      G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (self->mps_settings, "radio-power-saving",
+                     self->power_saver_radio_row, "enable-expansion",
+                     G_SETTINGS_BIND_DEFAULT);
+  }
 
   setup_general_section (self);
 
