@@ -125,11 +125,67 @@
               <object class="AdwPreferencesGroup" id="power_saving_section">
                 <property name="title" translatable="yes">Power Saving</property>
                 <child>
-                  <object class="AdwSwitchRow" id="als_row">
+                  <object class="AdwExpanderRow" id="als_row">
                     <property name="title" translatable="yes">A_utomatic Screen Brightness</property>
                     <property name="subtitle" translatable="yes">Adjust screen brightness to the surrounding light</property>
                     <property name="use_underline">True</property>
-                    <signal name="notify::active" handler="als_row_changed_cb" object="CcPowerPanel" swapped="yes"/>
+                    <property name="show_enable_switch">True</property>
+                    <child>
+                      <object class="AdwActionRow" id="als_row_light">
+                        <property name="activatable_widget">als_radio_light</property>
+                        <property name="title" translatable="yes">Low brightness</property>
+                        <signal name="activated" handler="als_radio_activated_cb" object="CcPowerPanel" swapped="yes"/>
+                        <child type="prefix">
+                          <object class="GtkCheckButton" id="als_radio_light">
+                            <property name="valign">center</property>
+                            <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow" id="als_row_medium">
+                        <property name="activatable_widget">als_radio_medium</property>
+                        <property name="title" translatable="yes">Medium brightness</property>
+                        <signal name="activated" handler="als_radio_activated_cb" object="CcPowerPanel" swapped="yes"/>
+                        <child type="prefix">
+                          <object class="GtkCheckButton" id="als_radio_medium">
+                            <property name="group">als_radio_light</property>
+                            <property name="valign">center</property>
+                            <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow" id="als_row_high">
+                        <property name="activatable_widget">als_radio_high</property>
+                        <property name="title" translatable="yes">High brightness</property>
+                        <signal name="activated" handler="als_radio_activated_cb" object="CcPowerPanel" swapped="yes"/>
+                        <child type="prefix">
+                          <object class="GtkCheckButton" id="als_radio_high">
+                            <property name="group">als_radio_light</property>
+                            <property name="valign">center</property>
+                            <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow" id="als_row_device">
+                        <property name="visible">False</property>
+                        <property name="activatable_widget">als_radio_device</property>
+                        <property name="title" translatable="yes">Optimized brightness</property>
+                        <signal name="activated" handler="als_radio_activated_cb" object="CcPowerPanel" swapped="yes"/>
+                        <child type="prefix">
+                          <object class="GtkCheckButton" id="als_radio_device">
+                            <property name="group">als_radio_light</property>
+                            <property name="valign">center</property>
+                            <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child>
