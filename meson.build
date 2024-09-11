@@ -143,6 +143,11 @@ gtk_dep = dependency(
   ]
 )
 
+packagekit_dep = dependency(
+  'packagekit-glib2',
+  required: true
+)
+
 libadwaita_dep = dependency(
   'libadwaita-1',
   version: libadwaita_version,
@@ -206,6 +211,7 @@ common_deps = [
   glib_dep,
   gsettings_desktop_dep,
   libadwaita_dep,
+  packagekit_dep,
   dependency('gio-unix-2.0'),
   dependency('gthread-2.0'),
   gtk_dep,
