@@ -49,7 +49,7 @@
 
 struct _CcEnterpriseLoginDialog
 {
-  AdwWindow            parent_instance;
+  AdwDialog           parent_instance;
 
   AdwNavigationView   *navigation;
   AdwNavigationPage   *offline_page;
@@ -60,7 +60,7 @@ struct _CcEnterpriseLoginDialog
   AdwToastOverlay     *toast_overlay;
 
   GtkButton           *add_button;
-  GtkSpinner          *main_page_spinner;
+  AdwSpinner          *main_page_spinner;
   AdwEntryRow         *domain_row;
   CcEntryFeedback     *domain_feedback;
   gint                 domain_timeout_id;
@@ -68,7 +68,7 @@ struct _CcEnterpriseLoginDialog
   AdwPasswordEntryRow *password_row;
 
   GtkButton           *enroll_button;
-  GtkSpinner          *enroll_page_spinner;
+  AdwSpinner          *enroll_page_spinner;
   AdwEntryRow         *admin_name_row;
   AdwPasswordEntryRow *admin_password_row;
 
@@ -79,7 +79,22 @@ struct _CcEnterpriseLoginDialog
   GCancellable        *cancellable;
 };
 
-G_DEFINE_TYPE (CcEnterpriseLoginDialog, cc_enterprise_login_dialog, ADW_TYPE_WINDOW)
+G_DEFINE_TYPE (CcEnterpriseLoginDialog, cc_enterprise_login_dialog, ADW_TYPE_DIALOG)
+
+static gboolean
+add_button_is_valid (CcEnterpriseLoginDialog *self)
+{
+  return (self->selected_realm != NULL) &&
+         strlen (gtk_editable_get_text (GTK_EDITABLE (self->username_row))) > 0 &&
+         strlen (gtk_editable_get_text (GTK_EDITABLE (self->password_row))) > 0;
+}
+
+static gboolean
+enroll_button_is_valid (CcEnterpriseLoginDialog *self)
+{
+  return strlen (gtk_editable_get_text (GTK_EDITABLE (self->admin_name_row))) > 0 &&
+         strlen (gtk_editable_get_text (GTK_EDITABLE (self->admin_password_row))) > 0;
+}
 
 static void
 show_operation_progress (CcEnterpriseLoginDialog *self,
@@ -89,9 +104,9 @@ show_operation_progress (CcEnterpriseLoginDialog *self,
   gtk_widget_set_visible (GTK_WIDGET (self->enroll_page_spinner), show);
 
   gtk_widget_set_sensitive (GTK_WIDGET (self->main_preferences_page), !show);
-  gtk_widget_set_sensitive (GTK_WIDGET (self->add_button), !show);
+  gtk_widget_set_sensitive (GTK_WIDGET (self->add_button), !show && add_button_is_valid (self));
   gtk_widget_set_sensitive (GTK_WIDGET (self->enroll_preferences_page), !show);
-  gtk_widget_set_sensitive (GTK_WIDGET (self->enroll_button), !show);
+  gtk_widget_set_sensitive (GTK_WIDGET (self->enroll_button), !show && enroll_button_is_valid (self));
 
   /* Hide passwords during operations. */
   if (show)
@@ -124,7 +139,7 @@ cache_user_cb (GObject      *source,
     {
       g_debug ("Successfully cached remote user: %s", act_user_get_user_name (user));
 
-      gtk_window_close (GTK_WINDOW (self));
+      adw_dialog_close (ADW_DIALOG (self));
     }
   else
     {
@@ -328,9 +343,7 @@ on_enroll_button_clicked_cb (CcEnterpriseLoginDialog *self)
 static void
 enroll_page_validate (CcEnterpriseLoginDialog *self)
 {
-  gtk_widget_set_sensitive (GTK_WIDGET (self->enroll_button),
-                            strlen (gtk_editable_get_text (GTK_EDITABLE (self->admin_name_row))) > 0 &&
-                            strlen (gtk_editable_get_text (GTK_EDITABLE (self->admin_password_row))) > 0);
+  gtk_widget_set_sensitive (GTK_WIDGET (self->enroll_button), enroll_button_is_valid (self));
 }
 
 static void
@@ -511,10 +524,7 @@ on_add_button_clicked_cb (CcEnterpriseLoginDialog *self)
 static void
 main_page_validate (CcEnterpriseLoginDialog *self)
 {
-  gtk_widget_set_sensitive (GTK_WIDGET (self->add_button),
-                            (self->selected_realm != NULL) &&
-                            strlen (gtk_editable_get_text (GTK_EDITABLE (self->username_row))) > 0 &&
-                            strlen (gtk_editable_get_text (GTK_EDITABLE (self->password_row))) > 0);
+  gtk_widget_set_sensitive (GTK_WIDGET (self->add_button), add_button_is_valid (self));
 }
 
 static void
@@ -536,10 +546,12 @@ realm_manager_discover_cb (GObject       *source,
       self->selected_realm = g_object_ref (realms->data);
 
       cc_entry_feedback_update (self->domain_feedback, "emblem-default-symbolic", _("Valid domain"));
+      gtk_widget_remove_css_class (GTK_WIDGET (self->domain_row), "error");
     }
   else
     {
-      cc_entry_feedback_update (self->domain_feedback, "dialog-warning-symbolic", _("Domain not found"));
+      cc_entry_feedback_update (self->domain_feedback, "dialog-error-symbolic", _("Domain not found"));
+      gtk_widget_add_css_class (GTK_WIDGET (self->domain_row), "error");
     }
 
   main_page_validate (self);
@@ -582,7 +594,7 @@ on_domain_entry_changed_cb (CcEnterpriseLoginDialog *self)
       return;
     }
 
-  cc_entry_feedback_update (self->domain_feedback, "process-working-symbolic", _("Checking domain…"));
+  cc_entry_feedback_update (self->domain_feedback, CC_ENTRY_LOADING, _("Checking domain…"));
   self->domain_timeout_id = g_timeout_add (DOMAIN_CHECK_TIMEOUT, (GSourceFunc)domain_validate, self);
 }
 

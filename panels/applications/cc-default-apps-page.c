@@ -83,9 +83,25 @@ on_row_selected_item_changed (CcDefaultAppsRow *row)
 }
 
 static void
+cc_default_apps_page_dispose (GObject *object)
+{
+#ifdef BUILD_WWAN
+  CcDefaultAppsPage *self = CC_DEFAULT_APPS_PAGE (object);
+
+  g_clear_object (&self->mm_manager);
+#endif
+
+  G_OBJECT_CLASS (cc_default_apps_page_parent_class)->dispose (object);
+}
+
+
+static void
 cc_default_apps_page_class_init (CcDefaultAppsPageClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->dispose = cc_default_apps_page_dispose;
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/control-center/applications/cc-default-apps-page.ui");
   gtk_widget_class_bind_template_child (widget_class, CcDefaultAppsPage, web_row);
@@ -108,9 +124,9 @@ cc_default_apps_page_init (CcDefaultAppsPage *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
 #ifdef BUILD_WWAN
-  if (cc_object_storage_has_object ("CcObjectStorage::mm-manager"))
+  if (cc_object_storage_has_object (CC_OBJECT_MMMANAGER))
     {
-      self->mm_manager = cc_object_storage_get_object ("CcObjectStorage::mm-manager");
+      self->mm_manager = cc_object_storage_get_object (CC_OBJECT_MMMANAGER);
 
       g_signal_connect_swapped (self->mm_manager, "object-added",
                                 G_CALLBACK (update_modem_apps_visibility), self);

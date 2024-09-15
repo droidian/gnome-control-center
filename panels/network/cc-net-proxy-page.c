@@ -109,13 +109,24 @@ set_ignore_hosts (const GValue       *value,
                   const GVariantType *expected_type,
                   gpointer            user_data)
 {
-  g_auto(GStrv) strv = NULL;
   const char *sv;
+  char **strv;
+  g_autoptr(GPtrArray) str_array = NULL;
+  guint i = 0;
 
   sv = g_value_get_string (value);
   strv = g_strsplit_set (sv, ", ", 0);
 
-  return g_variant_new_strv ((const char * const *)strv, -1);
+  /* Remove empty strings */
+  str_array = g_ptr_array_new_take_null_terminated ((gpointer) strv, g_free);
+
+  while (i < str_array->len)
+    if (*(const char *) g_ptr_array_index (str_array, i) == '\0')
+      g_ptr_array_remove_index (str_array, i);
+    else
+      i++;
+
+  return g_variant_new_strv ((const char *const *) str_array->pdata, -1);
 }
 
 /*
@@ -457,9 +468,6 @@ cc_net_proxy_page_set_enabled (CcNetProxyPage *self,
   ProxyMode mode;
 
   g_return_if_fail (CC_IS_NET_PROXY_PAGE (self));
-
-  /* Proxy should not have changed when enabling/disabling */
-  g_return_if_fail (!cc_net_proxy_page_has_modified (self));
 
   mode = g_settings_get_enum (self->settings, "mode");
 
