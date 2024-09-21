@@ -328,7 +328,7 @@ cc_users_page_init (CcUsersPage *self)
 
 #ifdef IS_DROIDIAN
     /* Always disallow adding new users in droidian */
-    gtk_widget_set_visible (GTK_WIDGET (self->add_user_button), FALSE);
+    gtk_widget_set_visible (GTK_WIDGET (self->add_user_button_row), FALSE);
 #else
     g_object_bind_property (self->permission, "allowed", self->add_user_button_row, "sensitive", G_BINDING_SYNC_CREATE);
 #endif /* IS_DROIDIAN */
