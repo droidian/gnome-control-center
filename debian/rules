@@ -14,7 +14,6 @@ endef
 ifeq ($(shell dpkg-vendor --is Ubuntu && echo yes),yes)
 DISTRIBUTOR_LOGO := /usr/share/pixmaps/ubuntu-logo-text.png
 DISTRIBUTOR_LOGO_DARK := /usr/share/pixmaps/ubuntu-logo-text-dark.png
-MALCONTENT := -Dmalcontent=false
 else
 DISTRIBUTOR_LOGO := /usr/share/icons/vendor/scalable/emblems/emblem-vendor.svg
 DISTRIBUTOR_LOGO_DARK := /usr/share/icons/vendor/scalable/emblems/emblem-vendor.svg
@@ -32,6 +31,7 @@ override_dh_auto_configure:
 	$(info Droidian translations: $(TRANSLATIONS))
 	$(foreach translation,$(TRANSLATIONS),$(call TRANSLATION_install,$(translation)))
 	dh_auto_configure -- \
+		-Dlocation-services=enabled \
 		-Dprivileged_group=sudo \
 		-Ddocumentation=true \
 		-Ddistributor_logo=$(DISTRIBUTOR_LOGO) \

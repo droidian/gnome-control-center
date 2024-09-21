@@ -68,7 +68,7 @@ cc_subwoofer_slider_dispose (GObject *object)
 {
   CcSubwooferSlider *self = CC_SUBWOOFER_SLIDER (object);
 
-  g_clear_pointer (&self->scale, gtk_widget_unparent);
+  gtk_widget_dispose_template (GTK_WIDGET (self), CC_TYPE_SUBWOOFER_SLIDER);
 
   g_clear_object (&self->channel_map);
 
@@ -111,7 +111,8 @@ cc_subwoofer_slider_set_mixer_control (CcSubwooferSlider *self,
 
   vol_max_norm = gvc_mixer_control_get_vol_max_norm (mixer_control);
   gtk_adjustment_set_upper (self->adjustment, vol_max_norm);
-  gtk_adjustment_set_page_increment (self->adjustment, vol_max_norm / 100.0);
+  gtk_adjustment_set_page_increment (self->adjustment, vol_max_norm / 10.0);
+  gtk_adjustment_set_step_increment (self->adjustment, vol_max_norm / 100.0);
 }
 
 void

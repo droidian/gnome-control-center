@@ -92,16 +92,6 @@ on_delete_background_clicked_cb (GtkButton *button,
   bg_recent_source_remove_item (source, item);
 }
 
-static void
-direction_changed_cb (GtkWidget        *widget,
-                      GtkTextDirection *previous_direction,
-                      GdkPaintable     *paintable)
-{
-  g_object_set (paintable,
-                "text-direction", gtk_widget_get_direction (widget),
-                NULL);
-}
-
 static GtkWidget*
 create_widget_func (gpointer model_item,
                     gpointer user_data)
@@ -126,15 +116,11 @@ create_widget_func (gpointer model_item,
                                            item,
                                            CC_BACKGROUND_PAINT_LIGHT_DARK,
                                            THUMBNAIL_WIDTH,
-                                           THUMBNAIL_HEIGHT);
+                                           THUMBNAIL_HEIGHT,
+                                           GTK_WIDGET (self));
 
   picture = gtk_picture_new_for_paintable (GDK_PAINTABLE (paintable));
   gtk_picture_set_can_shrink (GTK_PICTURE (picture), FALSE);
-
-  g_object_bind_property (picture, "scale-factor",
-                          paintable, "scale-factor", G_BINDING_SYNC_CREATE);
-  g_signal_connect_object (picture, "direction-changed",
-                           G_CALLBACK (direction_changed_cb), paintable, 0);
 
   icon = gtk_image_new_from_icon_name ("slideshow-symbolic");
   gtk_widget_set_halign (icon, GTK_ALIGN_START);
@@ -149,7 +135,7 @@ create_widget_func (gpointer model_item,
 
   if (BG_IS_RECENT_SOURCE (source))
     {
-      button = gtk_button_new_from_icon_name ("window-close-symbolic");
+      button = gtk_button_new_from_icon_name ("cross-small-symbolic");
       gtk_widget_set_halign (button, GTK_ALIGN_END);
       gtk_widget_set_valign (button, GTK_ALIGN_START);
 
@@ -173,21 +159,29 @@ create_widget_func (gpointer model_item,
   gtk_overlay_add_overlay (GTK_OVERLAY (overlay), check);
   if (button)
     gtk_overlay_add_overlay (GTK_OVERLAY (overlay), button);
-  gtk_accessible_update_property (GTK_ACCESSIBLE (overlay),
-                                  GTK_ACCESSIBLE_PROPERTY_LABEL,
-                                  cc_background_item_get_name (item),
-                                  -1);
-
 
   child = gtk_flow_box_child_new ();
   gtk_widget_set_halign (child, GTK_ALIGN_CENTER);
   gtk_widget_set_valign (child, GTK_ALIGN_CENTER);
   gtk_flow_box_child_set_child (GTK_FLOW_BOX_CHILD (child), overlay);
+  gtk_accessible_update_property (GTK_ACCESSIBLE (child),
+                                  GTK_ACCESSIBLE_PROPERTY_LABEL,
+                                  cc_background_item_get_name (item),
+                                  -1);
 
   g_object_set_data_full (G_OBJECT (child), "item", g_object_ref (item), g_object_unref);
 
   if (self->active_item && cc_background_item_compare (item, self->active_item))
-    gtk_widget_add_css_class (GTK_WIDGET (child), "active-item");
+    {
+      gtk_widget_add_css_class (GTK_WIDGET (child), "active-item");
+      gtk_accessible_update_state (GTK_ACCESSIBLE (child),
+                                   GTK_ACCESSIBLE_STATE_CHECKED, TRUE,
+                                   -1);
+    }
+  else
+    gtk_accessible_update_state (GTK_ACCESSIBLE (child),
+                                    GTK_ACCESSIBLE_STATE_CHECKED, FALSE,
+                                    -1);
 
   return child;
 }
@@ -373,9 +367,19 @@ static void flow_box_set_active_item (GtkFlowBox *flowbox, CcBackgroundItem *act
       item = g_object_get_data (G_OBJECT (child), "item");
 
       if (cc_background_item_compare (item, active_item))
-        gtk_widget_add_css_class (GTK_WIDGET (child), "active-item");
+        {
+          gtk_widget_add_css_class (GTK_WIDGET (child), "active-item");
+          gtk_accessible_update_state (GTK_ACCESSIBLE (child),
+                                       GTK_ACCESSIBLE_STATE_CHECKED, TRUE,
+                                       -1);
+        }
       else
-        gtk_widget_remove_css_class (GTK_WIDGET (child), "active-item");
+        {
+          gtk_widget_remove_css_class (GTK_WIDGET (child), "active-item");
+          gtk_accessible_update_state (GTK_ACCESSIBLE (child),
+                                       GTK_ACCESSIBLE_STATE_CHECKED, FALSE,
+                                       -1);
+        }
     }
 }
 

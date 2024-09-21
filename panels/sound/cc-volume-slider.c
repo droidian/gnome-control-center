@@ -148,7 +148,8 @@ update_ranges (CcVolumeSlider *self)
     {
       gtk_adjustment_set_upper (self->volume_adjustment, vol_max_norm);
     }
-  gtk_adjustment_set_page_increment (self->volume_adjustment, vol_max_norm / 100.0);
+  gtk_adjustment_set_page_increment (self->volume_adjustment, vol_max_norm / 10.0);
+  gtk_adjustment_set_step_increment (self->volume_adjustment, vol_max_norm / 100.0);
 
   if (self->stream)
     {
@@ -203,8 +204,7 @@ cc_volume_slider_dispose (GObject *object)
 {
   CcVolumeSlider *self = CC_VOLUME_SLIDER (object);
 
-  g_clear_pointer ((GtkWidget **) &self->volume_scale, gtk_widget_unparent);
-  g_clear_pointer ((GtkWidget **) &self->mute_button, gtk_widget_unparent);
+  gtk_widget_dispose_template (GTK_WIDGET (self), CC_TYPE_VOLUME_SLIDER);
 
   g_clear_object (&self->mixer_control);
   g_clear_object (&self->stream);

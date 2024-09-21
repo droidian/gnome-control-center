@@ -50,8 +50,8 @@
 struct _CcUsersPage {
     AdwNavigationPage  parent_instance;
 
-    GtkButton         *add_user_button;
-    GtkButton         *add_enterprise_user_button;
+    AdwButtonRow      *add_user_button_row;
+    AdwButtonRow      *add_enterprise_user_button_row;
     CcUserPage        *current_user_page;
     AdwNavigationView *navigation;
     GtkWidget         *other_users_group;
@@ -69,9 +69,7 @@ add_enterprise_user (CcUsersPage *self)
 {
     CcEnterpriseLoginDialog *dialog = cc_enterprise_login_dialog_new ();
 
-    gtk_window_set_transient_for (GTK_WINDOW (dialog),
-                                  GTK_WINDOW (gtk_widget_get_native (GTK_WIDGET (self))));
-    gtk_window_present (GTK_WINDOW (dialog));
+    adw_dialog_present (ADW_DIALOG (dialog), GTK_WIDGET (self));
 }
 
 static void
@@ -79,9 +77,7 @@ add_user (CcUsersPage *self)
 {
     CcAddUserDialog *dialog = cc_add_user_dialog_new (self->permission);
 
-    gtk_window_set_transient_for (GTK_WINDOW (dialog),
-                                  GTK_WINDOW (gtk_widget_get_native (GTK_WIDGET (self))));
-    gtk_window_present (GTK_WINDOW (dialog));
+    adw_dialog_present (ADW_DIALOG (dialog), GTK_WIDGET (self));
 }
 
 static void
@@ -115,6 +111,7 @@ create_user_row (gpointer item, gpointer user_data)
 
     row = g_object_new (CC_TYPE_LIST_ROW, "show-arrow", TRUE, NULL);
     gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (row), TRUE);
+    adw_preferences_row_set_use_underline (ADW_PREFERENCES_ROW (row), FALSE);
 
     user = item;
     g_object_set_data (G_OBJECT (row), "uid", GINT_TO_POINTER (act_user_get_uid (user)));
@@ -170,6 +167,11 @@ on_user_added (CcUsersPage *self,
                ActUser     *user)
 {
   CcUserPage *page;
+
+  if (act_user_is_system_account (user)) {
+    return;
+  }
+
   g_list_store_insert_sorted (self->model, user, sort_users, self);
 
   page = CC_USER_PAGE (adw_navigation_view_get_visible_page (self->navigation));
@@ -252,7 +254,7 @@ check_realmd_list_names_cb (GObject      *object,
     g_variant_iter_init (&iter, names);
     while (g_variant_iter_loop (&iter, "&s", &name)) {
         if (g_str_equal (name, "org.freedesktop.realmd"))
-            gtk_widget_set_visible (GTK_WIDGET (self->add_enterprise_user_button), TRUE);
+            gtk_widget_set_visible (GTK_WIDGET (self->add_enterprise_user_button_row), TRUE);
     }
 }
 
@@ -303,7 +305,7 @@ cc_users_page_init (CcUsersPage *self)
 
     provider = gtk_css_provider_new ();
     gtk_css_provider_load_from_resource (provider,
-                                         "/org/gnome/control-center/system/users/user-accounts-dialog.css");
+                                         "/org/gnome/control-center/system/users/users.css");
     gtk_style_context_add_provider_for_display (gdk_display_get_default (),
                                                 GTK_STYLE_PROVIDER (provider),
                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -326,9 +328,9 @@ cc_users_page_init (CcUsersPage *self)
 
 #ifdef IS_DROIDIAN
     /* Always disallow adding new users in droidian */
-    gtk_widget_set_visible (GTK_WIDGET (self->add_user_button), FALSE);
+    gtk_widget_set_visible (GTK_WIDGET (self->add_user_button_row), FALSE);
 #else
-    g_object_bind_property (self->permission, "allowed", self->add_user_button, "sensitive", G_BINDING_SYNC_CREATE);
+    g_object_bind_property (self->permission, "allowed", self->add_user_button_row, "sensitive", G_BINDING_SYNC_CREATE);
 #endif /* IS_DROIDIAN */
 
     self->user_manager = act_user_manager_get_default ();
@@ -374,8 +376,8 @@ cc_users_page_class_init (CcUsersPageClass * klass)
 
     gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/control-center/system/users/cc-users-page.ui");
 
-    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_enterprise_user_button);
-    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_user_button);
+    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_enterprise_user_button_row);
+    gtk_widget_class_bind_template_child (widget_class, CcUsersPage, add_user_button_row);
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, current_user_page);
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, navigation);
     gtk_widget_class_bind_template_child (widget_class, CcUsersPage, other_users_group);

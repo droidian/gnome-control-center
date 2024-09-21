@@ -67,12 +67,10 @@ struct _CcDesktopSharingPage {
   AdwSwitchRow *remote_control_row;
   AdwActionRow *hostname_row;
   AdwActionRow *port_row;
-  GtkWidget *username_entry;
-  GtkWidget *password_entry;
-  GtkWidget *generate_password_button;
-  GtkWidget *verify_encryption_button;
-
-  CcEncryptionFingerprintDialog *fingerprint_dialog;
+  GtkWidget    *username_entry;
+  GtkWidget    *password_entry;
+  AdwButtonRow *generate_password_button_row;
+  AdwButtonRow *verify_encryption_button_row;
 
   guint desktop_sharing_name_watch;
   guint store_credentials_id;
@@ -85,7 +83,7 @@ struct _CcDesktopSharingPage {
 G_DEFINE_TYPE (CcDesktopSharingPage, cc_desktop_sharing_page, ADW_TYPE_BIN)
 
 static void
-on_generate_password_button_clicked (CcDesktopSharingPage *self)
+on_generate_password_button_row_activated (CcDesktopSharingPage *self)
 {
   g_autofree char *new_password = cc_generate_password ();
 
@@ -93,19 +91,15 @@ on_generate_password_button_clicked (CcDesktopSharingPage *self)
 }
 
 static void
-on_verify_encryption_button_clicked (CcDesktopSharingPage *self)
+on_verify_encryption_button_row_activated (CcDesktopSharingPage *self)
 {
-  GtkNative *native;
+  CcEncryptionFingerprintDialog *dialog;
 
   g_return_if_fail (self->certificate);
 
-  if (!self->fingerprint_dialog)
-    self->fingerprint_dialog = g_object_new (CC_TYPE_ENCRYPTION_FINGERPRINT_DIALOG, NULL);
-
-  native = gtk_widget_get_native (GTK_WIDGET (self));
-  gtk_window_set_transient_for (GTK_WINDOW (self->fingerprint_dialog), GTK_WINDOW (native));
-  cc_encryption_fingerprint_dialog_set_certificate (self->fingerprint_dialog, self->certificate);
-  gtk_window_present (GTK_WINDOW (self->fingerprint_dialog));
+  dialog = g_object_new (CC_TYPE_ENCRYPTION_FINGERPRINT_DIALOG, NULL);
+  cc_encryption_fingerprint_dialog_set_certificate (dialog, self->certificate);
+  adw_dialog_present (ADW_DIALOG (dialog), GTK_WIDGET (self));
 }
 
 static char *
@@ -223,7 +217,7 @@ set_tls_certificate (CcDesktopSharingPage  *self,
                      GTlsCertificate *tls_certificate)
 {
   g_set_object (&self->certificate, tls_certificate);
-  gtk_widget_set_sensitive (self->verify_encryption_button, TRUE);
+  gtk_widget_set_sensitive (GTK_WIDGET (self->verify_encryption_button_row), TRUE);
 }
 
 static void
@@ -361,7 +355,7 @@ on_address_copy_clicked (CcDesktopSharingPage *self,
 {
   gdk_clipboard_set_text (gtk_widget_get_clipboard (GTK_WIDGET (button)),
                           adw_action_row_get_subtitle (self->hostname_row));
-  add_toast (self, _("Device address copied"));
+  add_toast (self, _("Device address copied to clipboard"));
 }
 
 static void
@@ -370,7 +364,7 @@ on_port_copy_clicked (CcDesktopSharingPage *self,
 {
   gdk_clipboard_set_text (gtk_widget_get_clipboard (GTK_WIDGET (button)),
                           adw_action_row_get_subtitle (self->port_row));
-  add_toast (self, _("Port number copied"));
+  add_toast (self, _("Port number copied to clipboard"));
 }
 
 static void
@@ -381,7 +375,7 @@ on_username_copy_clicked (CcDesktopSharingPage *self,
 
   gdk_clipboard_set_text (gtk_widget_get_clipboard (GTK_WIDGET (button)),
                           gtk_editable_get_text (editable));
-  add_toast (self, _("Username copied"));
+  add_toast (self, _("Username copied to clipboard"));
 }
 
 static void
@@ -392,7 +386,7 @@ on_password_copy_clicked (CcDesktopSharingPage *self,
 
   gdk_clipboard_set_text (gtk_widget_get_clipboard (GTK_WIDGET (button)),
                           gtk_editable_get_text (editable));
-  add_toast (self, _("Password copied"));
+  add_toast (self, _("Password copied to clipboard"));
 }
 
 static void
@@ -459,7 +453,7 @@ setup_desktop_sharing_page (CcDesktopSharingPage *self)
                           self->remote_control_row, "sensitive",
                           G_BINDING_SYNC_CREATE);
   g_object_bind_property (self->password_entry, "sensitive",
-		          self->generate_password_button, "sensitive",
+		          self->generate_password_button_row, "sensitive",
 			  G_BINDING_SYNC_CREATE);
 }
 
@@ -505,7 +499,6 @@ cc_desktop_sharing_page_dispose (GObject *object)
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
 
-  g_clear_pointer ((GtkWindow **) &self->fingerprint_dialog, gtk_window_destroy);
   g_clear_handle_id (&self->store_credentials_id, g_source_remove);
 
   g_clear_object (&self->rdp_server);
@@ -532,15 +525,15 @@ cc_desktop_sharing_page_class_init (CcDesktopSharingPageClass * klass)
   gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, port_row);
   gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, username_entry);
   gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, password_entry);
-  gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, generate_password_button);
-  gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, verify_encryption_button);
+  gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, generate_password_button_row);
+  gtk_widget_class_bind_template_child (widget_class, CcDesktopSharingPage, verify_encryption_button_row);
 
   gtk_widget_class_bind_template_callback (widget_class, on_address_copy_clicked);
   gtk_widget_class_bind_template_callback (widget_class, on_port_copy_clicked);
   gtk_widget_class_bind_template_callback (widget_class, on_username_copy_clicked);
   gtk_widget_class_bind_template_callback (widget_class, on_password_copy_clicked);
-  gtk_widget_class_bind_template_callback (widget_class, on_generate_password_button_clicked);
-  gtk_widget_class_bind_template_callback (widget_class, on_verify_encryption_button_clicked);
+  gtk_widget_class_bind_template_callback (widget_class, on_generate_password_button_row_activated);
+  gtk_widget_class_bind_template_callback (widget_class, on_verify_encryption_button_row_activated);
 }
 
 static gboolean
@@ -552,7 +545,7 @@ format_port_for_row (GBinding     *binding,
   int port = g_value_get_int (from_value);
 
   if (port <= 0)
-    g_value_set_string (to_value, " ");
+    g_value_set_string (to_value, "—");
   else
     g_value_take_string (to_value, g_strdup_printf ("%u", port));
 

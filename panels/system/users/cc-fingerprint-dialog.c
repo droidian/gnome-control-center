@@ -71,7 +71,7 @@ struct _CcFingerprintDialog
   GtkLabel       *title;
   GtkListBox     *devices_list;
   GtkPopover     *add_print_popover;
-  GtkSpinner     *spinner;
+  AdwSpinner     *spinner;
   GtkStack       *stack;
   GtkWidget      *add_print_icon;
   GtkWidget      *delete_confirmation_infobar;
@@ -140,7 +140,7 @@ typedef enum {
 } EnrollState;
 
 const char * ENROLL_STATE_CLASSES[N_ENROLL_STATES] = {
-  "",
+  "normal", /* undefined */
   "retry",
   "success",
   "warning",
@@ -170,11 +170,11 @@ update_dialog_state (CcFingerprintDialog *self,
   if (self->dialog_state == DIALOG_STATE_NONE ||
       self->dialog_state == (self->dialog_state & DIALOG_STATE_IDLE))
     {
-      gtk_spinner_stop (self->spinner);
+      gtk_widget_set_visible (GTK_WIDGET (self->spinner), FALSE);
     }
   else
     {
-      gtk_spinner_start (self->spinner);
+      gtk_widget_set_visible (GTK_WIDGET (self->spinner), TRUE);
     }
 
   return TRUE;
@@ -448,18 +448,18 @@ update_prints_to_add_visibility (CcFingerprintDialog *self)
 {
   g_autoptr(GList) print_buttons = NULL;
   GList *l;
-  guint i;
 
   print_buttons = get_container_children (GTK_WIDGET (self->add_print_popover_box));
 
-  for (i = 0, l = print_buttons; i < N_VALID_FINGERS && l; ++i, l = l->next)
+  for (l = print_buttons; l != NULL; l = l->next)
     {
       GtkWidget *button = l->data;
       gboolean enrolled;
+      const char *finger_id = g_object_get_data (G_OBJECT (button), "finger-id");
 
       enrolled = self->enrolled_fingers &&
                  g_strv_contains ((const gchar **) self->enrolled_fingers,
-                                  FINGER_IDS[i]);
+                                  finger_id);
 
       gtk_widget_set_visible (button, !enrolled);
     }
@@ -981,7 +981,7 @@ populate_add_print_popover (CcFingerprintDialog *self)
       gtk_button_set_label (GTK_BUTTON (finger_item), get_finger_name (FINGER_IDS[i]));
       gtk_button_set_use_underline (GTK_BUTTON (finger_item), TRUE);
       g_object_set_data (G_OBJECT (finger_item), "finger-id", (gpointer) FINGER_IDS[i]);
-      gtk_box_prepend (GTK_BOX (self->add_print_popover_box), finger_item);
+      gtk_box_append (GTK_BOX (self->add_print_popover_box), finger_item);
 
       g_signal_connect_object (finger_item, "clicked", G_CALLBACK (on_enroll_cb),
                                self, G_CONNECT_SWAPPED);
@@ -1258,18 +1258,9 @@ on_stack_child_changed (CcFingerprintDialog *self)
 static void
 cc_fingerprint_dialog_init (CcFingerprintDialog *self)
 {
-  g_autoptr(GtkCssProvider) provider = NULL;
-
   self->cancellable = g_cancellable_new ();
 
   gtk_widget_init_template (GTK_WIDGET (self));
-
-  provider = gtk_css_provider_new ();
-  gtk_css_provider_load_from_resource (provider,
-                                       "/org/gnome/control-center/system/users/cc-fingerprint-dialog.css");
-  gtk_style_context_add_provider_for_display (gdk_display_get_default (),
-                                              GTK_STYLE_PROVIDER (provider),
-                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   on_stack_child_changed (self);
   g_signal_connect_object (self->stack, "notify::visible-child",

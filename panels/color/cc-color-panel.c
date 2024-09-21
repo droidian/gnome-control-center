@@ -52,7 +52,6 @@ struct _CcColorPanel
   GtkWidget     *box_calib_summary;
   GtkWidget     *box_calib_temp;
   GtkWidget     *box_calib_title;
-  GtkWidget     *box_devices;
   GtkWidget     *button_assign_import;
   GtkWidget     *button_assign_ok;
   GtkWidget     *button_calib_export;
@@ -60,11 +59,11 @@ struct _CcColorPanel
   GtkWidget     *entry_calib_title;
   GtkWidget     *label_assign_warning;
   GtkWidget     *label_calib_summary_message;
-  GtkWidget     *label_no_devices;
   GtkTreeModel  *liststore_assign;
   GtkTreeModel  *liststore_calib_kind;
   GtkTreeModel  *liststore_calib_sensor;
-  AdwPreferencesGroup *pref_group_devices;
+  AdwViewStack  *stack;
+  AdwPreferencesPage *color_page;
   GtkWidget     *toolbar_devices;
   GtkWidget     *toolbutton_device_calibrate;
   GtkWidget     *toolbutton_device_default;
@@ -866,9 +865,12 @@ static void
 gcm_prefs_calib_export_link_cb (CcColorPanel *self,
                                 const gchar *url)
 {
-  gtk_show_uri (GTK_WINDOW (gtk_widget_get_native (GTK_WIDGET (self))),
-                "help:gnome-help/color-howtoimport",
-                GDK_CURRENT_TIME);
+  g_autoptr(GtkUriLauncher) launcher = NULL;
+
+  launcher = gtk_uri_launcher_new ("help:gnome-help/color-howtoimport");
+  gtk_uri_launcher_launch (launcher,
+                           GTK_WINDOW (gtk_widget_get_native (GTK_WIDGET (self))),
+                           NULL, NULL, NULL);
 }
 
 static void
@@ -1001,26 +1003,31 @@ gcm_prefs_profile_view (CcColorPanel *self, CdProfile *profile)
     g_warning ("failed to run calibrate: %s", error->message);
 }
 
-static void
-gcm_prefs_profile_assign_link_activate_cb (CcColorPanel *self,
-                                           const gchar *uri)
+static gboolean
+gcm_prefs_profile_assign_link_activate_cb (CcColorPanel *self)
 {
-  CdProfile *profile;
-  GtkListBoxRow *row;
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  g_autoptr(CdProfile) profile = NULL;
+  GtkTreeSelection *selection;
 
   /* get the selected profile */
-  row = gtk_list_box_get_selected_row (self->list_box);
-  if (row == NULL)
-    return;
-  profile = cc_color_profile_get_profile (CC_COLOR_PROFILE (row));
+  selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self->treeview_assign));
+  if (gtk_tree_selection_get_selected (selection, &model, &iter))
+    gtk_tree_model_get (model, &iter,
+                        GCM_PREFS_COMBO_COLUMN_PROFILE, &profile,
+                        -1);
+
   if (profile == NULL)
     {
-        g_warning ("failed to get the active profile");
-        return;
+      g_warning ("failed to get the selected profile");
+      return TRUE;
     }
 
   /* show it in the viewer */
   gcm_prefs_profile_view (self, profile);
+
+  return TRUE;
 }
 
 static void
@@ -1533,10 +1540,14 @@ gcm_prefs_device_expanded_changed_cb (CcColorPanel *self,
             cc_color_device_set_expanded (CC_COLOR_DEVICE (child), FALSE);
         }
       self->model_is_changing = FALSE;
+
+      gtk_list_box_select_row (self->list_box, GTK_LIST_BOX_ROW (widget));
     }
   else
     {
       self->list_box_filter = NULL;
+
+      gtk_list_box_unselect_row (self->list_box, GTK_LIST_BOX_ROW (widget));
     }
   gtk_list_box_invalidate_filter (self->list_box);
 }
@@ -1609,8 +1620,11 @@ gcm_prefs_update_device_list_extra_entry (CcColorPanel *self)
 
   /* any devices to show? */
   first_row = gtk_list_box_get_row_at_index (self->list_box, 0);
-  gtk_widget_set_visible (self->label_no_devices, first_row == NULL);
-  gtk_widget_set_visible (self->box_devices, first_row != NULL);
+
+  if (first_row == NULL)
+    adw_view_stack_set_visible_child_name (self->stack, "no-devices-page");
+  else
+    adw_view_stack_set_visible_child_name (self->stack, "color-page");
 
   /* if we have only one device expand it by default */
   if (first_row != NULL &&
@@ -1846,7 +1860,11 @@ cc_color_panel_dispose (GObject *object)
   g_clear_object (&self->list_box_size);
   g_clear_pointer (&self->sensors, g_ptr_array_unref);
   g_clear_pointer (&self->list_box_filter, g_free);
-  g_clear_pointer ((GtkWindow **)&self->dialog_assign, gtk_window_destroy);
+
+  if (self->dialog_assign != NULL) {
+    gtk_window_destroy (GTK_WINDOW (self->dialog_assign));
+    self->dialog_assign = NULL;
+  }
 
   G_OBJECT_CLASS (cc_color_panel_parent_class)->dispose (object);
 }
@@ -1881,7 +1899,6 @@ cc_color_panel_class_init (CcColorPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, box_calib_summary);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, box_calib_temp);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, box_calib_title);
-  gtk_widget_class_bind_template_child (widget_class, CcColorPanel, box_devices);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, button_assign_import);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, button_assign_ok);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, button_calib_export);
@@ -1889,12 +1906,12 @@ cc_color_panel_class_init (CcColorPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, entry_calib_title);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, label_assign_warning);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, label_calib_summary_message);
-  gtk_widget_class_bind_template_child (widget_class, CcColorPanel, label_no_devices);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, list_box);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, liststore_assign);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, liststore_calib_kind);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, liststore_calib_sensor);
-  gtk_widget_class_bind_template_child (widget_class, CcColorPanel, pref_group_devices);
+  gtk_widget_class_bind_template_child (widget_class, CcColorPanel, stack);
+  gtk_widget_class_bind_template_child (widget_class, CcColorPanel, color_page);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, toolbar_devices);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, toolbutton_device_calibrate);
   gtk_widget_class_bind_template_child (widget_class, CcColorPanel, toolbutton_device_default);
@@ -1988,10 +2005,10 @@ cc_color_panel_init (CcColorPanel *self)
   self->settings_colord = g_settings_new (COLORD_SETTINGS_SCHEMA);
 
   /* Translators: This will be presented as the text of a link to the documentation */
-  learn_more_link = g_strdup_printf ("<a href='help:gnome-help/color-whyimportant'>%s</a>", _("Learn more"));
-  /* Translators: %s is a link to the documentation with the label "Learn more" */
-  panel_description = g_strdup_printf (_("Each device needs an up to date color profile to be color managed. %s"), learn_more_link);
-  adw_preferences_group_set_description (self->pref_group_devices, panel_description);
+  learn_more_link = g_strdup_printf ("<a href='help:gnome-help/color-whyimportant'>%s</a>", _("learn more"));
+  /* Translators: %s is a link to the documentation with the label "learn more" */
+  panel_description = g_strdup_printf (_("Each device needs an up to date color profile to be color managed — %s."), learn_more_link);
+  adw_preferences_page_set_description (self->color_page, panel_description);
 
   /* assign buttons */
   g_signal_connect_object (self->toolbutton_profile_add, "clicked",

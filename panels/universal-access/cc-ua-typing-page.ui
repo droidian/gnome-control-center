@@ -3,6 +3,7 @@
   <template class="CcUaTypingPage" parent="AdwNavigationPage">
     <property name="title" translatable="yes">Typing</property>
     <property name="tag">typing</property>
+    <signal name="hidden" handler="page_hidden_cb" object="CcUaTypingPage" swapped="yes"/>
     <property name="child">
       <object class="AdwToolbarView">
         <child type="top">
@@ -100,6 +101,7 @@
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Speed</property>
+                        <property name="activatable-widget">repeat_speed_scale</property>
                         <child type="suffix">
                           <object class="GtkScale" id="repeat_speed_scale">
                             <property name="hexpand">True</property>
@@ -112,7 +114,7 @@
                             <property name="adjustment">
                               <object class="GtkAdjustment">
                                 <property name="lower">-110.0</property>
-                                <property name="upper">-0.5</property>
+                                <property name="upper">-1.5</property>
                                 <property name="step-increment">1</property>
                                 <property name="page-increment">1</property>
                               </object>
@@ -124,6 +126,7 @@
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Delay</property>
+                        <property name="activatable-widget">repeat_delay_scale</property>
                         <child type="suffix">
                           <object class="GtkScale" id="repeat_delay_scale">
                             <property name="hexpand">True</property>
@@ -176,6 +179,7 @@
                     <child>
                       <object class="AdwActionRow">
                         <property name="title" translatable="yes">Acceptance Delay</property>
+                        <property name="activatable-widget">slow_keys_delay_scale</property>
                         <child type="suffix">
                           <object class="GtkScale" id="slow_keys_delay_scale">
                             <property name="hexpand">True</property>
