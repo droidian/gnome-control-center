@@ -95,7 +95,11 @@ libshell_dep = declare_dependency(
 # gnome-control-center #
 ########################
 
-shell_sources = common_sources + files('main.c')
+if enable_droidian
+  shell_sources = common_sources + files('main-droidian.c')
+else
+  shell_sources = common_sources + files('main.c')
+endif
 
 shell_deps = common_deps + [
   libdevice_dep,
