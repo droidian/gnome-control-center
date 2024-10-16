@@ -25,6 +25,11 @@ if host_is_linux
   panels += ['network']
 endif
 
+if enable_droidian
+  panels += [
+  ]
+endif
+
 if host_is_linux_not_s390
   panels += [
     'bluetooth',
