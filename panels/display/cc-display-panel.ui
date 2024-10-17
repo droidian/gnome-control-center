@@ -134,6 +134,21 @@
                         <signal name="notify::selected-item" handler="on_primary_display_selected_item_changed_cb" swapped="yes"/>
                       </object>
                     </child>
+                  </object>
+
+                </child>
+
+                <!-- Single Display Settings -->
+                <child>
+                  <object class="AdwPreferencesGroup" id="single_display_settings_group">
+                    <property name="visible">False</property>
+                  </object>
+                </child>
+
+                <!-- Touch Settings -->
+                <child>
+                  <object class="AdwPreferencesGroup" id="touch_settings_group">
+                    <property name="visible">False</property>
                     <child>
                       <object class="AdwSwitchRow" id="double_tap_row">
                         <property name="visible">False</property>
@@ -174,14 +189,6 @@
                         <property name="use_underline">True</property>
                       </object>
                     </child>
-                  </object>
-
-                </child>
-
-                <!-- Single Display Settings -->
-                <child>
-                  <object class="AdwPreferencesGroup" id="single_display_settings_group">
-                    <property name="visible">False</property>
                   </object>
                 </child>
 
