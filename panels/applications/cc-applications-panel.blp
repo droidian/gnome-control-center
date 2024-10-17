@@ -356,6 +356,19 @@ template $CcApplicationsPanel: $CcPanel {
               action-target: "'storage-page'";
             }
           }
+
+          Adw.PreferencesGroup power_section {
+            title: _("Power saving");
+            visible: false;
+
+            Adw.SwitchRow suspend {
+              title: _("Suspend application");
+              subtitle: _("Allow suspending application");
+              use-underline: true;
+
+              notify::active => $on_suspend_row_activated_cb(template);
+            }
+          }
         }
       };
     };
