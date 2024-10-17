@@ -22,7 +22,8 @@
 
 #include <glib.h>
 
-char * cc_util_normalize_casefold_and_unaccent (const char *str);
-char * cc_util_get_smart_date                  (GDateTime *date);
-char * cc_util_get_smart_date_time             (GDateTime *date);
-char * cc_util_time_to_string_text             (gint64 msecs);
+char *   cc_util_normalize_casefold_and_unaccent (const char *str);
+char *   cc_util_get_smart_date                  (GDateTime *date);
+char *   cc_util_get_smart_date_time             (GDateTime *date);
+char *   cc_util_time_to_string_text             (gint64 msecs);
+gboolean g_settings_schema_exist (const char * id);

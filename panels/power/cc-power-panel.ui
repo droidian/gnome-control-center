@@ -114,6 +114,50 @@
                   </object>
                 </child>
                 <child>
+                  <object class="AdwSwitchRow" id="power_saver_screen_off_row">
+                    <property name="visible">False</property>
+                    <property name="title" translatable="yes">Screen off Power _Saver</property>
+                    <property name="subtitle" translatable="yes">Turn on power saver mode when screen is off</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwExpanderRow" id="power_saver_radio_row">
+                    <property name="show_enable_switch">True</property>
+                    <property name="title" translatable="yes">Radio devices Power Saver</property>
+                    <property name="subtitle" translatable="yes">Allow power saving on modem and Wi-FI</property>
+                    <child>
+                      <object class="AdwActionRow" id="power_saver_radio_2g_row">
+                        <property name="activatable_widget">power_saver_radio_2g</property>
+                        <property name="title" translatable="yes">Powersave to 2G</property>
+                        <property name="name">2G</property>
+                        <signal name="activated" handler="power_saver_radio_activated_cb" object="CcPowerPanel" swapped="yes"/>
+                        <child type="prefix">
+                          <object class="GtkCheckButton" id="power_saver_radio_2g">
+                            <property name="valign">center</property>
+                            <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow" id="power_saver_radio_3g_row">
+                        <property name="activatable_widget">power_saver_radio_3g</property>
+                        <property name="title" translatable="yes">Powersave to 3G</property>
+                        <property name="name">3G</property>
+                        <signal name="activated" handler="power_saver_radio_activated_cb" object="CcPowerPanel" swapped="yes"/>
+                        <child type="prefix">
+                          <object class="GtkCheckButton" id="power_saver_radio_3g">
+                            <property name="group">power_saver_radio_2g</property>
+                            <property name="valign">center</property>
+                            <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
                   <object class="CcListRow" id="automatic_suspend_row">
                     <property name="visible">False</property>
                     <property name="title" translatable="yes">_Automatic Suspend</property>
