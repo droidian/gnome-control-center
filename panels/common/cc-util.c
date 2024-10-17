@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gio/gdesktopappinfo.h>
+#include <gio/gio.h>
 #include <glib/gi18n.h>
 #include <string.h>
 
@@ -243,4 +244,19 @@ cc_util_app_id_to_display_name (const char *app_id)
     return g_strdup (g_app_info_get_display_name (info));
 
   return g_strdup (app_id);
+}
+
+gboolean
+g_settings_schema_exist (const char * id)
+{
+  GSettingsSchema *res = g_settings_schema_source_lookup (
+      g_settings_schema_source_get_default(), id, TRUE);
+
+  if (res != NULL)
+    {
+      g_free (res);
+      return TRUE;
+    }
+
+  return FALSE;
 }
