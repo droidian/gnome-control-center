@@ -277,6 +277,45 @@ template $CcPowerPanel: $CcPanel {
                 title: _("Disabling automatic suspend will result in higher power consumption. It is recommended to keep automatic suspend enabled.");
               }
             }
+
+            Adw.PreferencesGroup battery_bim_group {
+              visible: false;
+
+              Adw.SwitchRow battery_bim_row {
+                visible: true;
+                title: _("Charging controls");
+                subtitle: _("Automatically determine when to start charging based on alarms set.");
+                use-underline: true;
+              }
+
+              Adw.SpinRow battery_bim_row_max {
+                visible: true;
+                title: _("Maximum charging percentage");
+                subtitle: _("Stop charging when this value is reached (unless an alarm is pending).");
+                use-underline: true;
+
+                adjustment: Gtk.Adjustment battery_bim_adj_max {
+                  lower: 61;
+                  upper: 100;
+                  page-increment: 10;
+                  step-increment: 1;
+                };
+              }
+
+              Adw.SpinRow battery_bim_row_min {
+                visible: true;
+                title: _("Minimum charging percentage");
+                subtitle: _("Start charging when this value is reached.");
+                use-underline: true;
+
+                adjustment: Gtk.Adjustment battery_bim_adj_min {
+                  lower: 20;
+                  upper: 60;
+                  page-increment: 10;
+                  step-increment: 1;
+                };
+              }
+            }
           };
         }
       };
