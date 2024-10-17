@@ -20,7 +20,6 @@
  */
 
 #include <config.h>
-#include <glib/gi18n.h>
 #include <stdlib.h>
 
 #include "shell/cc-object-storage.h"
@@ -66,15 +65,13 @@ struct _CcNetworkPanel
         gboolean          updating_device;
 
         /* widgets */
+        AdwViewStack     *stack;
         GtkWidget        *box_bluetooth;
         GtkWidget        *box_vpn;
         GtkWidget        *box_wired;
         GtkWidget        *container_bluetooth;
-        GtkWidget        *empty_listbox;
         GtkWidget        *proxy_row;
         GtkWidget        *save_button;
-        GtkWidget        *vpn_stack;
-        GtkWidget        *toolbar_view;
 
         /* wireless dialog stuff */
         CmdlineOperation  arg_operation;
@@ -135,7 +132,8 @@ verify_argv (CcNetworkPanel *self,
 		if (self->arg_device == NULL) {
 			g_warning ("Operation %s requires an object path", args[0]);
 		        return FALSE;
-                }
+		}
+		G_GNUC_FALLTHROUGH;
 	default:
 		return TRUE;
 	}
@@ -356,13 +354,6 @@ handle_argv (CcNetworkPanel *self)
 }
 
 static void
-update_vpn_section (CcNetworkPanel *self)
-{
-        gtk_stack_set_visible_child (GTK_STACK (self->vpn_stack),
-                                     self->vpns->len == 0 ? self->empty_listbox : self->box_vpn);
-}
-
-static void
 update_bluetooth_section (CcNetworkPanel *self)
 {
         gtk_widget_set_visible (self->container_bluetooth, self->bluetooth_devices->len > 0);
@@ -479,10 +470,10 @@ panel_remove_device (CcNetworkPanel *self, NMDevice *device)
         g_ptr_array_remove (self->mobile_devices, net_device);
         g_hash_table_remove (self->nm_device_to_device, device);
 
-        gtk_box_remove (GTK_BOX (gtk_widget_get_parent (net_device)), net_device);
-
-        /* update vpn widgets */
-        update_vpn_section (self);
+        if (nm_device_get_device_type (device) == NM_DEVICE_TYPE_BT)
+                gtk_list_box_remove (GTK_LIST_BOX (self->box_bluetooth), net_device);
+        else
+                gtk_box_remove (GTK_BOX (gtk_widget_get_parent (net_device)), net_device);
 
         /* update device_bluetooth widgets */
         update_bluetooth_section (self);
@@ -587,6 +578,18 @@ out:
         handle_argv (self);
 }
 
+static gint
+sort_vpns_func (GtkListBoxRow *a,
+                GtkListBoxRow *b,
+                gpointer user_data)
+{
+        NetVpn *vpn_a = NET_VPN (a);
+        NetVpn *vpn_b = NET_VPN (b);
+
+        return g_utf8_collate (nm_connection_get_id (net_vpn_get_connection (vpn_a)),
+                               nm_connection_get_id (net_vpn_get_connection (vpn_b)));
+}
+
 static void
 panel_add_vpn_device (CcNetworkPanel *self, NMConnection *connection)
 {
@@ -605,9 +608,6 @@ panel_add_vpn_device (CcNetworkPanel *self, NMConnection *connection)
 
         /* store in the devices array */
         g_ptr_array_add (self->vpns, net_vpn);
-
-        /* update vpn widgets */
-        update_vpn_section (self);
 }
 
 static void
@@ -642,7 +642,6 @@ client_connection_removed_cb (CcNetworkPanel *self, NMConnection *connection)
                 if (net_vpn_get_connection (vpn) == connection) {
                         g_ptr_array_remove (self->vpns, vpn);
                         gtk_list_box_remove (GTK_LIST_BOX (self->box_vpn), GTK_WIDGET (vpn));
-                        update_vpn_section (self);
                         return;
                 }
         }
@@ -655,19 +654,11 @@ panel_check_network_manager_version (CcNetworkPanel *self)
 
         /* parse running version */
         version = nm_client_get_version (self->client);
+
         if (version == NULL) {
-                GtkWidget *status_page;
-
-                status_page = adw_status_page_new ();
-                adw_toolbar_view_set_content (ADW_TOOLBAR_VIEW (self->toolbar_view), status_page);
-
-                adw_status_page_set_icon_name (ADW_STATUS_PAGE (status_page), "network-error-symbolic");
-                adw_status_page_set_title (ADW_STATUS_PAGE (status_page), _("Network Unavailable"));
-                adw_status_page_set_description (ADW_STATUS_PAGE (status_page),
-                                                 _("An error has occurred and network cannot be used."
-                                                   "\n Error details: NetworkManager not running."));
-
+                adw_view_stack_set_visible_child_name (ADW_VIEW_STACK (self->stack), "nm-error-page");
         } else {
+                adw_view_stack_set_visible_child_name (ADW_VIEW_STACK (self->stack), "network-page");
                 manager_running (self);
         }
 }
@@ -714,14 +705,12 @@ cc_network_panel_class_init (CcNetworkPanelClass *klass)
 
         gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/control-center/network/cc-network-panel.ui");
 
+        gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, stack);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, box_bluetooth);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, box_vpn);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, box_wired);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, container_bluetooth);
-        gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, empty_listbox);
         gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, proxy_row);
-        gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, vpn_stack);
-        gtk_widget_class_bind_template_child (widget_class, CcNetworkPanel, toolbar_view);
 
         gtk_widget_class_bind_template_callback (widget_class, create_connection_cb);
 
@@ -746,6 +735,8 @@ cc_network_panel_init (CcNetworkPanel *self)
         self->mobile_devices = g_ptr_array_new ();
         self->vpns = g_ptr_array_new ();
         self->nm_device_to_device = g_hash_table_new (g_direct_hash, g_direct_equal);
+
+        gtk_list_box_set_sort_func (GTK_LIST_BOX (self->box_vpn), sort_vpns_func, NULL, NULL);
 
         /* Create and store a NMClient instance if it doesn't exist yet */
         if (!cc_object_storage_has_object (CC_OBJECT_NMCLIENT)) {

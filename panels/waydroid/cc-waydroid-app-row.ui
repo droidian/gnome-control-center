@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <!-- interface-requires gtk+ 3.0 -->
+  <template class="CcAppRow" parent="AdwExpanderRow">
+    <child type="prefix">
+      <object class="GtkImage" id="icon">
+        <property name="pixel-size">48</property>
+        <property name="margin-top">5</property>
+        <property name="margin-bottom">5</property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwActionRow" id="show_in_launcher_row">
+        <property name="margin-start">10</property>
+        <property name="title" translatable="yes">Show in launcher</property>
+        <property name="activatable_widget">show_in_launcher_switch</property>
+        <child type="suffix">
+          <object class="GtkSwitch" id="show_in_launcher_switch">
+            <property name="valign">center</property>
+            <signal name="notify::active" handler="show_in_launcher_active_cb" swapped="yes"/>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwActionRow" id="action_row">
+        <property name="margin-start">10</property>
+        <child type="suffix">
+          <object class="GtkBox">
+            <property name="spacing">10</property>
+            <child>
+              <object class="GtkSpinner" id="spinner"></object>
+            </child>
+            <child>
+              <object class="GtkButton" id="action_button">
+                <property name="valign">center</property>
+                <style>
+                  <class name="suggested-action"/>
+                </style>
+                <signal name="clicked" handler="action_button_clicked_cb" swapped="yes"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
