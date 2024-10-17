@@ -71,4 +71,7 @@ void                 cc_panel_list_set_selection_mode            (CcPanelList   
 void                 cc_panel_list_center_activated_row          (CcPanelList        *self,
                                                                   gboolean            val);
 
+void                 cc_panel_list_override_order                (gchar * const * new_panel_order,
+                                                                  guint new_panel_order_len);
+
 G_END_DECLS
