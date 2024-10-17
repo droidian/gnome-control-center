@@ -55,6 +55,11 @@ struct _CcPowerPanel
   AdwPreferencesGroup *battery_charging_section;
   GtkListBox        *battery_listbox;
   AdwSwitchRow      *battery_percentage_row;
+  AdwSwitchRow      *battery_bim_row;
+  AdwSpinRow        *battery_bim_row_max;
+  AdwSpinRow        *battery_bim_row_min;
+  GtkAdjustment     *battery_bim_adj_max;
+  GtkAdjustment     *battery_bim_adj_min;
   AdwPreferencesGroup *battery_section;
   AdwSwitchRow      *blank_screen_switch_row;
   CcNumberRow       *blank_screen_delay_row;
@@ -88,6 +93,7 @@ struct _CcPowerPanel
   GSettings     *mps_settings;
   GSettings     *session_settings;
   GSettings     *interface_settings;
+  GSettings     *bim_settings;
   UpClient      *up_client;
   GPtrArray     *devices;
   gboolean       has_batteries;
@@ -1382,6 +1388,27 @@ setup_general_section (CcPowerPanel *self)
       show_section = TRUE;
     }
 
+  if (g_settings_schema_exist ("org.adishatz.Bim")) {
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row), TRUE);
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row_max), TRUE);
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row_min), TRUE);
+
+      g_settings_bind (self->bim_settings, "enabled",
+                       self->battery_bim_row, "active",
+                       G_SETTINGS_BIND_DEFAULT);
+
+      g_settings_bind (self->bim_settings, "threshold-start",
+                       self->battery_bim_row_min, "value",
+                       G_SETTINGS_BIND_DEFAULT);
+
+
+      g_settings_bind (self->bim_settings, "threshold-end",
+                       self->battery_bim_row_max, "value",
+                       G_SETTINGS_BIND_DEFAULT);
+
+      show_section = TRUE;
+  }
+
   gtk_widget_set_visible (GTK_WIDGET (self->general_section), show_section);
 
   if (!self->has_batteries)
@@ -1468,6 +1495,7 @@ cc_power_panel_dispose (GObject *object)
   g_clear_object (&self->gsd_settings);
   g_clear_object (&self->session_settings);
   g_clear_object (&self->interface_settings);
+  g_clear_object (&self->bim_settings);
   g_clear_pointer (&self->devices, g_ptr_array_unref);
   g_clear_object (&self->up_client);
   g_clear_object (&self->iio_proxy);
@@ -1503,6 +1531,9 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_charging_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_listbox);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_percentage_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row_max);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row_min);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, blank_screen_delay_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, blank_screen_group);
@@ -1571,6 +1602,8 @@ cc_power_panel_init (CcPowerPanel *self)
     self->mps_settings = g_settings_new ("org.adishatz.Mps");
   self->session_settings = g_settings_new ("org.gnome.desktop.session");
   self->interface_settings = g_settings_new ("org.gnome.desktop.interface");
+  if (g_settings_schema_exist ("org.adishatz.Bim"))
+    self->bim_settings = g_settings_new ("org.adishatz.Bim");
 
   gtk_list_box_set_sort_func (self->battery_listbox,
                               (GtkListBoxSortFunc)battery_sort_func, NULL, NULL);
