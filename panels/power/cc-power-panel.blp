@@ -198,6 +198,24 @@ template $CcPowerPanel: $CcPanel {
                 use-underline: true;
                 notify::visible => $power_saving_group_visibility_cb(template);
               }
+
+              Adw.ExpanderRow power_saver_screen_off_row {
+                visible: false;
+                show-enable-switch: true;
+                title: _("Screen off Power _Saver");
+                subtitle: _("Turn on power saver mode when screen is off");
+                use-underline: true;
+
+                Adw.SwitchRow power_saver_bluetooth_row {
+                  title: _("Bluetooth Power Saver");
+                  subtitle: _("Turn off bluetooth if unused");
+                }
+
+                Adw.SwitchRow power_saver_radio_row {
+                  title: _("Radio devices Power Saver");
+                  subtitle: _("Allow power saving on modem and Wi-FI");
+                }
+              }
             }
 
             Adw.PreferencesGroup blank_screen_group {

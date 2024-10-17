@@ -36,6 +36,8 @@
 #include "cc-power-resources.h"
 #include "cc-ui-util.h"
 
+#include "cc-util.h"
+
 /* This enum represents the availability of power actions, ordered from least
  * to most available so that the code can compare w/ inequality operators */
 typedef enum
@@ -77,6 +79,11 @@ struct _CcPowerPanel
   GtkListBox        *power_profile_info_listbox;
   AdwPreferencesGroup *power_profile_section;
   AdwSwitchRow      *power_saver_low_battery_row;
+  AdwExpanderRow    *power_saver_screen_off_row;
+  AdwSwitchRow      *power_saver_bluetooth_row;
+  AdwSwitchRow      *power_saver_radio_row;
+  AdwSwitchRow      *power_saver_radio_2g_row;
+  AdwSwitchRow      *power_saver_radio_3g_row;
   AdwPreferencesGroup *power_saving_group;
   CcNumberRow       *suspend_on_battery_delay_row;
   AdwSwitchRow      *suspend_on_battery_switch_row;
@@ -87,6 +94,7 @@ struct _CcPowerPanel
   AdwPreferencesGroup *suspend_notice_group;
 
   GSettings     *gsd_settings;
+  GSettings     *mps_settings;
   GSettings     *session_settings;
   GSettings     *interface_settings;
   UpClient      *up_client;
@@ -252,6 +260,21 @@ power_saving_group_visibility_cb (CcPowerPanel *self)
 }
 
 static void
+update_power_saver_screen_off_row_visibility (CcPowerPanel *self)
+{
+  g_autoptr(UpDevice) composite = NULL;
+  gboolean mobile_power_saver = g_settings_schema_exist ("org.adishatz.Mps");
+  UpDeviceKind kind;
+
+  composite = up_client_get_display_device (self->up_client);
+  g_object_get (composite, "kind", &kind, NULL);
+  gtk_widget_set_visible (GTK_WIDGET (self->power_saver_screen_off_row),
+                          mobile_power_saver && kind == UP_DEVICE_KIND_BATTERY);
+  gtk_widget_set_visible (GTK_WIDGET (self->power_saver_radio_row),
+                          mobile_power_saver && kind == UP_DEVICE_KIND_BATTERY);
+}
+
+static void
 up_client_changed (CcPowerPanel *self)
 {
   gint i;
@@ -393,6 +416,7 @@ up_client_changed (CcPowerPanel *self)
     }
 
   update_power_saver_low_battery_row_visibility (self);
+  update_power_saver_screen_off_row_visibility (self);
 }
 
 static void
@@ -486,6 +510,7 @@ devices_have_batteries (GPtrArray *devices)
   return FALSE;
 }
 
+#ifndef IS_DROIDIAN
 static void
 set_ac_battery_ui_mode (CcPowerPanel *self)
 {
@@ -495,6 +520,25 @@ set_ac_battery_ui_mode (CcPowerPanel *self)
     adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self->suspend_on_ac_switch_row),
                                    adw_preferences_group_get_title (self->suspend_on_battery_group));
 }
+#endif /* IS_DROIDIAN */
+
+
+static void
+power_saver_radio_activated_cb (CcPowerPanel *self,
+                                gpointer      user_data)
+{
+    AdwActionRow *row = ADW_ACTION_ROW (user_data);
+    const gchar *name = gtk_widget_get_name (GTK_WIDGET (user_data));
+
+    if (g_strcmp0 (name, "2G") == 0) {
+        /* MM_MODEM_MODE_NONE */
+        g_settings_set_int (self->mps_settings, "radio-power-saving-blacklist", 0);
+    } else {
+        /* MM_MODEM_MODE_CS | MM_MODEM_MODE_2G */
+        g_settings_set_int (self->mps_settings, "radio-power-saving-blacklist", 3);
+    }
+}
+
 
 static void
 als_enabled_setting_changed (CcPowerPanel *self)
@@ -541,6 +585,7 @@ iio_proxy_vanished_cb (GDBusConnection *connection,
   als_enabled_state_changed (self);
 }
 
+#ifndef IS_DROIDIAN
 static gboolean
 get_sleep_type (GValue   *value,
                 GVariant *variant,
@@ -552,6 +597,7 @@ get_sleep_type (GValue   *value,
 
   return TRUE;
 }
+#endif /* IS_DROIDIAN */
 
 static GVariant *
 set_sleep_type (const GValue       *value,
@@ -781,6 +827,7 @@ setup_blank_screen_rows (CcPowerPanel *self)
     }
 }
 
+#ifndef IS_DROIDIAN
 static void
 setup_suspend_delay_rows (CcPowerPanel *self)
 {
@@ -813,6 +860,7 @@ setup_suspend_delay_rows (CcPowerPanel *self)
   cc_number_row_bind_settings (self->suspend_on_ac_delay_row, self->gsd_settings,
                                "sleep-inactive-ac-timeout");
 }
+#endif /* IS_DROIDIAN */
 
 static void
 setup_power_saving (CcPowerPanel *self)
@@ -859,6 +907,7 @@ setup_power_saving (CcPowerPanel *self)
 
   setup_blank_screen_rows (self);
 
+#ifndef IS_DROIDIAN
   /* The default values for these settings are unfortunate for us;
    * timeout == 0, action == suspend means 'do nothing' - just
    * as timout === anything, action == nothing.
@@ -897,6 +946,7 @@ setup_power_saving (CcPowerPanel *self)
 
       update_suspend_notice_visibility (self);
     }
+#endif /* IS_DROIDIAN */
 }
 
 static const char *
@@ -1262,6 +1312,7 @@ setup_power_profiles (CcPowerPanel *self)
     power_profile_update_info_boxes (self);
 
   update_power_saver_low_battery_row_visibility (self);
+  update_power_saver_screen_off_row_visibility (self);
 }
 
 static void
@@ -1399,6 +1450,9 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_profile_info_listbox);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_profile_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_low_battery_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_screen_off_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_bluetooth_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saving_group);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saving_page);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saving_stack_page);
@@ -1411,6 +1465,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_notice_group);
 
   gtk_widget_class_bind_template_callback (widget_class, als_row_changed_cb);
+  //gtk_widget_class_bind_template_callback (widget_class, als_radio_activated_cb);
   gtk_widget_class_bind_template_callback (widget_class, blank_screen_switch_cb);
   gtk_widget_class_bind_template_callback (widget_class, battery_health_radio_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, cc_util_keynav_propagate_vertical);
@@ -1422,6 +1477,7 @@ static void
 cc_power_panel_init (CcPowerPanel *self)
 {
   guint i;
+  gboolean mobile_power_saver = g_settings_schema_exist ("org.adishatz.Mps");
   g_autoptr(GtkCssProvider) provider = NULL;
 
   g_resources_register (cc_power_get_resource ());
@@ -1443,6 +1499,8 @@ cc_power_panel_init (CcPowerPanel *self)
   setup_can_power_actions (self);
 
   self->gsd_settings = g_settings_new ("org.gnome.settings-daemon.plugins.power");
+  if (mobile_power_saver)
+    self->mps_settings = g_settings_new ("org.adishatz.Mps");
   self->session_settings = g_settings_new ("org.gnome.desktop.session");
   self->interface_settings = g_settings_new ("org.gnome.desktop.interface");
 
@@ -1461,6 +1519,19 @@ cc_power_panel_init (CcPowerPanel *self)
   g_settings_bind (self->gsd_settings, "power-saver-profile-on-low-battery",
                    self->power_saver_low_battery_row, "active",
                    G_SETTINGS_BIND_DEFAULT);
+
+  if (mobile_power_saver) {
+    g_settings_bind (self->mps_settings, "screen-off-power-saving",
+                     self->power_saver_screen_off_row, "enable-expansion",
+                     G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (self->mps_settings, "bluetooth-power-saving",
+                     self->power_saver_bluetooth_row, "active",
+                     G_SETTINGS_BIND_DEFAULT);
+ 
+    g_settings_bind (self->mps_settings, "radio-power-saving",
+                     self->power_saver_radio_row, "active",
+                     G_SETTINGS_BIND_DEFAULT);
+  }
 
   setup_general_section (self);
 

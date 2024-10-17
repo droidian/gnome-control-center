@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <gio/gdesktopappinfo.h>
+#include <gio/gio.h>
 #include <glib/gi18n.h>
 #include <string.h>
 
@@ -264,4 +265,19 @@ cc_util_get_localized_weekday_name (gint iso_weekday_number)
   g_assert_nonnull (item_date);
 
   return g_date_time_format (item_date, "%A");
+}
+
+gboolean
+g_settings_schema_exist (const char * id)
+{
+  GSettingsSchema *res = g_settings_schema_source_lookup (
+      g_settings_schema_source_get_default(), id, TRUE);
+
+  if (res != NULL)
+    {
+      g_free (res);
+      return TRUE;
+    }
+
+  return FALSE;
 }
