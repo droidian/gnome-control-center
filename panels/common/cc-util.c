@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <gio/gio.h>
 #include <glib/gi18n.h>
 
 
@@ -228,4 +229,19 @@ cc_util_time_to_string_text (gint64 msecs)
       /* 0 seconds */
       return g_strdup (_("0 seconds"));
     }
+}
+
+gboolean
+g_settings_schema_exist (const char * id)
+{
+  GSettingsSchema *res = g_settings_schema_source_lookup (
+      g_settings_schema_source_get_default(), id, TRUE);
+
+  if (res != NULL)
+    {
+      g_free (res);
+      return TRUE;
+    }
+
+  return FALSE;
 }
