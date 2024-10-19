@@ -114,6 +114,34 @@ template $CcDisplayPanel: $CcPanel {
             subtitle: _("Wake up screen by double tapping panel");
             use-underline: true;
           }
+
+          Adw.SwitchRow swipe_up_row {
+            visible: false;
+            title: _("Swipe up to wake up");
+            subtitle: _("Wake up the screen by swiping up");
+            use-underline: true;
+          }
+
+          Adw.SwitchRow swipe_down_row {
+            visible: false;
+            title: _("Swipe down to wake up");
+            subtitle: _("Wake up the screen by swiping down");
+            use-underline: true;
+          }
+
+          Adw.SwitchRow swipe_left_row {
+            visible: false;
+            title: _("Swipe left to wake up");
+            subtitle: _("Wake up the screen by swiping left");
+            use-underline: true;
+          }
+
+          Adw.SwitchRow swipe_right_row {
+            visible: false;
+            title: _("Swipe right to wake up");
+            subtitle: _("Wake up the screen by swiping right");
+            use-underline: true;
+          }
         }
 
         Adw.PreferencesGroup {
