@@ -105,6 +105,10 @@ struct _CcDisplayPanel
   AdwPreferencesGroup *single_display_settings_group;
   AdwPreferencesGroup *touch_settings_group;
   AdwSwitchRow      *double_tap_row;
+  AdwSwitchRow      *swipe_up_row;
+  AdwSwitchRow      *swipe_down_row;
+  AdwSwitchRow      *swipe_left_row;
+  AdwSwitchRow      *swipe_right_row;
 
   GtkShortcut *escape_shortcut;
 
@@ -620,6 +624,10 @@ cc_display_panel_class_init (CcDisplayPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, primary_display_row);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, touch_settings_group);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, double_tap_row);
+  gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, swipe_up_row);
+  gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, swipe_down_row);
+  gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, swipe_left_row);
+  gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, swipe_right_row);
   gtk_widget_class_bind_template_child (widget_class, CcDisplayPanel, single_display_settings_group);
 
   gtk_widget_class_bind_template_callback (widget_class, apply_current_configuration);
@@ -1168,6 +1176,38 @@ cc_display_panel_init (CcDisplayPanel *self)
           gtk_widget_show (GTK_WIDGET (self->double_tap_row));
           g_settings_bind (self->droidian_settings, "touchpanel-double-tap",
                            self->double_tap_row, "active",
+                           G_SETTINGS_BIND_DEFAULT);
+        }
+      if (g_settings_get_boolean (self->droidian_settings, "touchpanel-swipe-up-available"))
+        {
+          show_touch_settings_group = TRUE;
+          gtk_widget_show (GTK_WIDGET (self->swipe_up_row));
+          g_settings_bind (self->droidian_settings, "touchpanel-swipe-up",
+                           self->swipe_up_row, "active",
+                           G_SETTINGS_BIND_DEFAULT);
+        }
+      if (g_settings_get_boolean (self->droidian_settings, "touchpanel-swipe-down-available"))
+        {
+          show_touch_settings_group = TRUE;
+          gtk_widget_show (GTK_WIDGET (self->swipe_down_row));
+          g_settings_bind (self->droidian_settings, "touchpanel-swipe-down",
+                           self->swipe_down_row, "active",
+                           G_SETTINGS_BIND_DEFAULT);
+        }
+      if (g_settings_get_boolean (self->droidian_settings, "touchpanel-swipe-left-available"))
+        {
+          show_touch_settings_group = TRUE;
+          gtk_widget_show (GTK_WIDGET (self->swipe_left_row));
+          g_settings_bind (self->droidian_settings, "touchpanel-swipe-left",
+                           self->swipe_left_row, "active",
+                           G_SETTINGS_BIND_DEFAULT);
+        }
+      if (g_settings_get_boolean (self->droidian_settings, "touchpanel-swipe-right-available"))
+        {
+          show_touch_settings_group = TRUE;
+          gtk_widget_show (GTK_WIDGET (self->swipe_right_row));
+          g_settings_bind (self->droidian_settings, "touchpanel-swipe-right",
+                           self->swipe_right_row, "active",
                            G_SETTINGS_BIND_DEFAULT);
         }
     }
