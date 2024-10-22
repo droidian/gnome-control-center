@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/control-center/waydroid">
+    <file preprocess="xml-stripblanks">cc-waydroid-panel.ui</file>
+    <file preprocess="xml-stripblanks">cc-waydroid-app-row.ui</file>
+  </gresource>
+</gresources>
