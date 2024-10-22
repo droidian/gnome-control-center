@@ -391,7 +391,7 @@ start_stop_service_cb (GObject      *object,
   result = g_dbus_proxy_call_finish (proxy, res, &error);
 
   if (error != NULL) {
-    g_warning (error->message);
+    g_warning ("Unable to toggle service: %s", error->message);
   }
 }
 
@@ -407,7 +407,7 @@ mask_service_cb (GObject      *object,
   result = g_dbus_proxy_call_finish (proxy, res, &error);
 
   if (error != NULL) {
-    g_warning (error->message);
+    g_warning ("Unable to mask service: %s", error->message);
     g_free (user_data);
   } else {
     reload_service (user_data);
@@ -428,7 +428,7 @@ reload_service_cb (GObject      *object,
   result = g_dbus_proxy_call_finish (proxy, res, &error);
 
   if (error != NULL) {
-    g_warning (error->message);
+    g_warning ("Unable to reload service: %s", error->message);
   } else if (g_strcmp0 (mask_service_params->action, "MaskUnitFiles") == 0) {
     stop_service (mask_service_params->self, "waydroid-notification-client.service");
   } else {
