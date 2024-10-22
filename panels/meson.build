@@ -31,6 +31,7 @@ endif
 
 if enable_droidian
   panels += [
+    'waydroid',
     'droidian-encryption',
     'fingerprint',
     'usb',
