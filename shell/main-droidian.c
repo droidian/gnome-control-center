@@ -82,6 +82,7 @@ extern GType cc_droidian_encryption_panel_get_type (void);
 extern GType cc_fingerprint_panel_get_type (void);
 extern GType cc_usb_panel_get_type (void);
 extern GType cc_nfc_panel_get_type (void);
+extern GType cc_waydroid_panel_get_type (void);
 
 #define PANEL_TYPE(name, get_type, init_func) { name, get_type, init_func }
 
@@ -113,6 +114,7 @@ static CcPanelLoaderVtable droidian_panels[] =
 #ifdef BUILD_WWAN
   PANEL_TYPE("wwan",             cc_wwan_panel_get_type,                 cc_wwan_panel_static_init_func),
 #endif
+  PANEL_TYPE("waydroid",         cc_waydroid_panel_get_type,             NULL),
   PANEL_TYPE("droidian-encryption", cc_droidian_encryption_panel_get_type, NULL),
   PANEL_TYPE("fingerprint", cc_fingerprint_panel_get_type, NULL),
   PANEL_TYPE("usb",              cc_usb_panel_get_type,                  NULL),
@@ -147,6 +149,7 @@ static gchar * const droidian_panel_order[] = {
   "keyboard",
   "printers",
   "wacom",
+  "waydroid",
   "usb",
   "nfc",
 
