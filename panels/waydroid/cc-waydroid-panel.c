@@ -230,12 +230,13 @@ static gboolean
 add_applications (gpointer user_data)
 {
   struct ApplicationsData *data = user_data;
-  GList *first = g_list_first (data->applications);
+  GList *first;
 
-  if (data->self->cancellable == NULL) {
+  if (data->applications == NULL || data->self->cancellable == NULL) {
     goto out;
   }
 
+  first = g_list_first (data->applications);
   add_application (first->data, data->self);
 
   data->applications = g_list_remove_link (data->applications, first);
@@ -284,7 +285,9 @@ check_available_apps (CcWaydroidPanel *self)
     i += 1;
   }
 
-  g_idle_add ((GSourceFunc) add_applications, data);
+  if (data->applications != NULL) {
+    g_idle_add ((GSourceFunc) add_applications, data);
+  }
 
   g_free (apps);
 }
