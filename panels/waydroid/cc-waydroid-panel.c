@@ -804,6 +804,7 @@ waydroid_installed_cb (GObject      *object,
     check_waydroid_running (self);
   } else {
     g_warning ("Can't install waydroid: %s", error->message);
+    gtk_stack_set_visible_child_name (GTK_STACK (self->stack), "error");
   }
 }
 

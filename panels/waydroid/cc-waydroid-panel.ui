@@ -160,6 +160,18 @@
                     </property>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkStackPage">
+                    <property name="name">error</property>
+                    <property name="child">
+                      <object class="AdwStatusPage" id="install_error_page">
+                        <property name="vexpand">True</property>
+                        <property name="icon-name">face-sad-symbolic</property>
+                        <property name="title" translatable="yes">Unable to install Waydroid</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
