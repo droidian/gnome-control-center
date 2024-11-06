@@ -63,8 +63,9 @@ struct _CcPowerPanel
   GtkListBox        *power_profile_info_listbox;
   AdwPreferencesGroup *power_profile_section;
   AdwSwitchRow      *power_saver_low_battery_row;
-  AdwSwitchRow      *power_saver_screen_off_row;
-  AdwSwitchRow      *power_saver_radio_row;
+  AdwExpanderRow    *power_saver_screen_off_row;
+  AdwSwitchRow    *power_saver_bluetooth_row;
+  AdwExpanderRow      *power_saver_radio_row;
   AdwSwitchRow      *power_saver_radio_2g_row;
   AdwSwitchRow      *power_saver_radio_3g_row;
   CcNumberRow       *suspend_on_battery_delay_row;
@@ -1258,6 +1259,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_profile_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_low_battery_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_screen_off_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_bluetooth_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_2g_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_3g_row);
@@ -1327,7 +1329,10 @@ cc_power_panel_init (CcPowerPanel *self)
     }
 
     g_settings_bind (self->mps_settings, "screen-off-power-saving",
-                     self->power_saver_screen_off_row, "active",
+                     self->power_saver_screen_off_row, "enable-expansion",
+                     G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (self->mps_settings, "screen-off-bluetooth-power-saving",
+                     self->power_saver_bluetooth_row, "active",
                      G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (self->mps_settings, "radio-power-saving",
                      self->power_saver_radio_row, "enable-expansion",

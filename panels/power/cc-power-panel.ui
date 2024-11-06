@@ -114,15 +114,23 @@
                   </object>
                 </child>
                 <child>
-                  <object class="AdwSwitchRow" id="power_saver_screen_off_row">
+                  <object class="AdwExpanderRow" id="power_saver_screen_off_row">
                     <property name="visible">False</property>
+                    <property name="show_enable_switch">True</property>
                     <property name="title" translatable="yes">Screen off Power _Saver</property>
                     <property name="subtitle" translatable="yes">Turn on power saver mode when screen is off</property>
                     <property name="use_underline">True</property>
+                    <child>
+                      <object class="AdwSwitchRow" id="power_saver_bluetooth_row">
+                        <property name="title" translatable="yes">Bluetooth Power Saver</property>
+                    	<property name="subtitle" translatable="yes">Turn off bluetooth if unused</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child>
                   <object class="AdwExpanderRow" id="power_saver_radio_row">
+                    <property name="visible">False</property>
                     <property name="show_enable_switch">True</property>
                     <property name="title" translatable="yes">Radio devices Power Saver</property>
                     <property name="subtitle" translatable="yes">Allow power saving on modem and Wi-FI</property>
