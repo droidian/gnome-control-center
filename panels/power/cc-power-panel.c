@@ -68,8 +68,8 @@ struct _CcPowerPanel
   AdwPreferencesGroup *power_profile_section;
   AdwSwitchRow      *power_saver_low_battery_row;
   AdwExpanderRow    *power_saver_screen_off_row;
-  AdwSwitchRow    *power_saver_bluetooth_row;
-  AdwExpanderRow      *power_saver_radio_row;
+  AdwSwitchRow      *power_saver_bluetooth_row;
+  AdwSwitchRow      *power_saver_radio_row;
   AdwSwitchRow      *power_saver_radio_2g_row;
   AdwSwitchRow      *power_saver_radio_3g_row;
   CcNumberRow       *suspend_on_battery_delay_row;
@@ -452,22 +452,6 @@ keynav_failed_cb (CcPowerPanel *self, GtkDirectionType direction, GtkWidget *lis
   direction = GTK_DIR_UP ? GTK_DIR_TAB_BACKWARD : GTK_DIR_TAB_FORWARD;
 
   return gtk_widget_child_focus (GTK_WIDGET (self), direction);
-}
-
-static void
-power_saver_radio_activated_cb (CcPowerPanel *self,
-                                gpointer      user_data)
-{
-    AdwActionRow *row = ADW_ACTION_ROW (user_data);
-    const gchar *name = gtk_widget_get_name (GTK_WIDGET (user_data));
-
-    if (g_strcmp0 (name, "2G") == 0) {
-        /* MM_MODEM_MODE_NONE */
-        g_settings_set_int (self->mps_settings, "radio-power-saving-blacklist", 0);
-    } else {
-        /* MM_MODEM_MODE_CS | MM_MODEM_MODE_2G */
-        g_settings_set_int (self->mps_settings, "radio-power-saving-blacklist", 3);
-    }
 }
 
 static void
@@ -1390,16 +1374,14 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_screen_off_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_bluetooth_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_row);
-  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_2g_row);
-  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, power_saver_radio_3g_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_delay_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_switch_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_battery_group);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_ac_delay_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_ac_switch_row);
 
+  gtk_widget_class_bind_template_callback (widget_class, als_row_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, als_radio_activated_cb);
-  gtk_widget_class_bind_template_callback (widget_class, power_saver_radio_activated_cb);
   gtk_widget_class_bind_template_callback (widget_class, keynav_failed_cb);
 }
 
@@ -1449,22 +1431,14 @@ cc_power_panel_init (CcPowerPanel *self)
                    G_SETTINGS_BIND_DEFAULT);
 
   if (mobile_power_saver) {
-    gint blacklist = g_settings_get_int (self->mps_settings, "radio-power-saving-blacklist");
-
-    if (blacklist >= 3) {
-        adw_action_row_activate (ADW_ACTION_ROW (self->power_saver_radio_3g_row));
-    } else {
-        adw_action_row_activate (ADW_ACTION_ROW (self->power_saver_radio_2g_row));
-    }
-
     g_settings_bind (self->mps_settings, "screen-off-power-saving",
                      self->power_saver_screen_off_row, "enable-expansion",
                      G_SETTINGS_BIND_DEFAULT);
-    g_settings_bind (self->mps_settings, "screen-off-bluetooth-power-saving",
+    g_settings_bind (self->mps_settings, "bluetooth-power-saving",
                      self->power_saver_bluetooth_row, "active",
                      G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (self->mps_settings, "radio-power-saving",
-                     self->power_saver_radio_row, "enable-expansion",
+                     self->power_saver_radio_row, "active",
                      G_SETTINGS_BIND_DEFAULT);
   }
 
