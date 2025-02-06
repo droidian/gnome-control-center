@@ -42,6 +42,7 @@
 #include "cc-subwoofer-slider.h"
 #include "cc-volume-levels-page.h"
 #include "cc-volume-slider.h"
+#include "cc-util.h"
 
 struct _CcSoundPanel
 {
@@ -67,8 +68,13 @@ struct _CcSoundPanel
   CcVolumeSlider      *input_volume_slider;
   AdwPreferencesGroup *input_no_devices_group;
   CcListRow           *alert_sound_row;
+  AdwPreferencesGroup *headphone_group;
+  AdwSwitchRow        *headphone_sound_level;
+  AdwSwitchRow        *headphone_mpris;
+  AdwSwitchRow        *headphone_player;
 
   GvcMixerControl   *mixer_control;
+  GSettings         *headphone_manager_settings;
   GSettings         *sound_settings;
 };
 
@@ -257,6 +263,7 @@ cc_sound_panel_finalize (GObject *object)
   CcSoundPanel *self = CC_SOUND_PANEL (object);
 
   g_clear_object (&self->mixer_control);
+  g_clear_object (&self->headphone_manager_settings);
   g_clear_object (&self->sound_settings);
 
   G_OBJECT_CLASS (cc_sound_panel_parent_class)->finalize (object);
@@ -295,6 +302,10 @@ cc_sound_panel_class_init (CcSoundPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, input_volume_slider);
   gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, input_no_devices_group);
   gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, alert_sound_row);
+  gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, headphone_group);
+  gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, headphone_sound_level);
+  gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, headphone_mpris);
+  gtk_widget_class_bind_template_child (widget_class, CcSoundPanel, headphone_player);
 
   gtk_widget_class_bind_template_callback (widget_class, input_device_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, output_device_changed_cb);
@@ -318,6 +329,23 @@ cc_sound_panel_init (CcSoundPanel *self)
   g_resources_register (cc_sound_get_resource ());
 
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  if (g_settings_schema_exist ("org.adishatz.HeadphoneManager")) {
+    self->headphone_manager_settings = g_settings_new ("org.adishatz.HeadphoneManager");
+    gtk_widget_set_visible (GTK_WIDGET (self->headphone_group), TRUE);
+
+    g_settings_bind (self->headphone_manager_settings, "restore-sound-level",
+                     self->headphone_sound_level, "active",
+                     G_SETTINGS_BIND_DEFAULT);
+
+    g_settings_bind (self->headphone_manager_settings, "pause-mpris",
+                     self->headphone_mpris, "active",
+                     G_SETTINGS_BIND_DEFAULT);
+
+     g_settings_bind (self->headphone_manager_settings, "launch-player",
+                     self->headphone_player, "active",
+                     G_SETTINGS_BIND_DEFAULT);
+  }
 
   self->sound_settings = g_settings_new (KEY_SOUNDS_SCHEMA);
   g_signal_connect_object (self->sound_settings,
