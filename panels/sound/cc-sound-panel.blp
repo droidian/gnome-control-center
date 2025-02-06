@@ -201,6 +201,26 @@ template $CcSoundPanel: $CcPanel {
         }
 
         Adw.PreferencesGroup {
+          visible: false;
+          title: _("Headphone");
+
+          Adw.SwitchRow headphone_sound_level {
+            title: _("Remember headphone volume");
+            subtitle: _("Automatically restore the last volume level when headphones are connected or disconnected.");
+          }
+
+          Adw.SwitchRow headphone_mpris {
+            title: _("Control playback on connection");
+            subtitle: _("Automatically pause or resume playback when headphones are connected or disconnected.");
+          }
+
+          Adw.SwitchRow headphone_player {
+            title: _("Launch music app on connection");
+            subtitle: _("Automatically open your default music player when headphones are connected.");
+          }
+        }
+
+        Adw.PreferencesGroup {
           title: _("Sounds");
 
           $CcListRow {
