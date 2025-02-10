@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILES="panels/usb panels/power panels/nfc panels/fingerprint panels/waydroid"
+FILES="panels/usb panels/power panels/nfc panels/fingerprint panels/waydroid panels/sound"
 
 usage() {
 	echo "usage: build-aux/msg_droidian.sh language"
