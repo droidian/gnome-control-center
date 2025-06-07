@@ -485,6 +485,26 @@ set_ac_battery_ui_mode (CcPowerPanel *self)
 }
 #endif /* IS_DROIDIAN */
 
+static void
+als_radio_activated_cb (CcPowerPanel *self,
+                        gpointer      user_data)
+{
+  AdwActionRow *row = ADW_ACTION_ROW (user_data);
+
+  if (row == self->als_row_light) {
+    set_brightness_value (self, LOW_BRIGHTNESS, sizeof (LOW_BRIGHTNESS));
+  } else if (row == self->als_row_medium) {
+    set_brightness_value (self, MEDIUM_BRIGHTNESS, sizeof (MEDIUM_BRIGHTNESS));
+  } else if (row == self->als_row_high) {
+    set_brightness_value (self, HIGH_BRIGHTNESS, sizeof (HIGH_BRIGHTNESS));
+  } else {
+    g_settings_set_value (self->gsd_settings,
+                          "ambient-brightness-points",
+                          g_settings_get_default_value (
+                                                self->gsd_settings,
+                                                "ambient-brightness-points"));
+  }
+}
 
 static void
 power_saver_radio_activated_cb (CcPowerPanel *self,
