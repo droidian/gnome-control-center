@@ -368,7 +368,7 @@ filter_func (GtkListBoxRow *row,
   return retval;
 }
 
-static const gchar * const panel_order[] = {
+static gchar * const panel_default_order[] = {
   /* Main page */
   "wifi",
   "network",
@@ -409,12 +409,16 @@ static const gchar * const panel_order[] = {
   "reset-settings",
 };
 
+
+static gchar * const * panel_order = panel_default_order;
+static guint           panel_order_len = G_N_ELEMENTS (panel_default_order);
+
 static guint
 get_panel_id_index (const gchar *panel_id)
 {
   guint i;
 
-  for (i = 0; i < G_N_ELEMENTS (panel_order); i++)
+  for (i = 0; i < panel_order_len; i++)
     {
       if (g_str_equal (panel_order[i], panel_id))
         return i;
@@ -1088,4 +1092,16 @@ cc_panel_list_set_selection_mode (CcPanelList      *self,
       listbox = gtk_widget_get_parent (data->row);
       gtk_list_box_select_row (GTK_LIST_BOX (listbox), GTK_LIST_BOX_ROW (data->row));
     }
+}
+
+
+void
+cc_panel_list_override_order (gchar * const * new_panel_order,
+                              guint new_panel_order_len)
+{
+  g_assert (new_panel_order != NULL);
+  g_assert (new_panel_order_len >= 0);
+
+  panel_order = new_panel_order;
+  panel_order_len = new_panel_order_len;
 }
