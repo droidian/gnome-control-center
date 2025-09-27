@@ -55,6 +55,7 @@ struct _CcPowerPanel
   AdwPreferencesGroup *battery_charging_section;
   GtkListBox        *battery_listbox;
   AdwSwitchRow      *battery_percentage_row;
+  AdwPreferencesGroup *battery_bim_group;
   AdwSwitchRow      *battery_bim_row;
   AdwSpinRow        *battery_bim_row_max;
   AdwSpinRow        *battery_bim_row_min;
@@ -1389,9 +1390,7 @@ setup_general_section (CcPowerPanel *self)
     }
 
   if (g_settings_schema_exist ("org.adishatz.Bim")) {
-      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row), TRUE);
-      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row_max), TRUE);
-      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_row_min), TRUE);
+      gtk_widget_set_visible (GTK_WIDGET (self->battery_bim_group), TRUE);
 
       g_settings_bind (self->bim_settings, "enabled",
                        self->battery_bim_row, "active",
@@ -1531,6 +1530,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_charging_section);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_listbox);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_percentage_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_group);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row_max);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, battery_bim_row_min);
