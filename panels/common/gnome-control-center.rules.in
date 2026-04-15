@@ -5,6 +5,7 @@ polkit.addRule(function(action, subject) {
 	     action.id == "org.freedesktop.ModemManager1.Modem.SetPrimarySimSlot" ||
 	     action.id == "org.freedesktop.hostname1.set-static-hostname" ||
 	     action.id == "org.freedesktop.hostname1.set-hostname" ||
+	     action.id == "org.gnome.controlcenter.set-keyboard" ||
 	     action.id == "org.gnome.controlcenter.datetime.configure") &&
 	    subject.local &&
 	    subject.active &&

@@ -619,6 +619,12 @@ set_localed_input (CcInputListBox *self)
   g_autoptr(GString) variants = NULL;
   GtkListBoxRow *row;
   gint i = 0;
+  const char *locale_helper;
+  const char * const *argv;
+  g_auto(GStrv) envp = NULL;
+  g_autoptr(GError) error = NULL;
+  GSpawnFlags spawn_flags;
+  GPid child_pid;
 
   layouts = g_string_new ("");
   variants = g_string_new ("");
@@ -648,11 +654,20 @@ set_localed_input (CcInputListBox *self)
     }
   }
 
-  g_dbus_proxy_call (self->localed,
-                     "SetX11Keyboard",
-                     g_variant_new ("(ssssbb)", layouts->str, "", variants->str, "", TRUE, TRUE),
-                     G_DBUS_CALL_FLAGS_NONE,
-                     -1, NULL, NULL, NULL);
+  locale_helper = LIBEXECDIR "/gnome-control-center-set-debian-keyboard";
+  envp = g_get_environ ();
+  envp = g_environ_unsetenv (envp, "SHELL");
+  argv = (const char * const []) { "pkexec", locale_helper, layouts->str, variants->str, NULL };
+  spawn_flags = G_SPAWN_DO_NOT_REAP_CHILD |
+                G_SPAWN_SEARCH_PATH |
+                G_SPAWN_CHILD_INHERITS_STDOUT |
+                G_SPAWN_CHILD_INHERITS_STDERR |
+                G_SPAWN_STDIN_FROM_DEV_NULL;
+
+  if (!g_spawn_async (NULL, (char **)argv, envp, spawn_flags, NULL, NULL, &child_pid, &error))
+          g_warning ("Failed to launch %s as root: %s", locale_helper, error->message);
+  else
+          g_spawn_close_pid (child_pid);
 }
 
 static void
@@ -726,9 +741,9 @@ setup_localed_proxy (CcInputListBox *self)
   g_autoptr(GDBusConnection) bus = NULL;
   g_autoptr(GError) error = NULL;
 
-  self->permission = polkit_permission_new_sync ("org.freedesktop.locale1.set-locale", NULL, NULL, &error);
+  self->permission = polkit_permission_new_sync ("org.gnome.controlcenter.set-keyboard", NULL, NULL, &error);
   if (self->permission == NULL) {
-    g_debug ("Could not get 'org.freedesktop.locale1.set-locale' permission: %s",
+    g_debug ("Could not get 'org.gnome.controlcenter.set-keyboard' permission: %s",
              error->message);
     return;
   }
