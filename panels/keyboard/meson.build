@@ -130,6 +130,7 @@ keyboard_panel_lib = static_library(
   include_directories: [top_inc, common_inc],
   dependencies: deps,
   c_args: cflags + [
+    '-DLIBEXECDIR="@0@"'.format(control_center_libexecdir),
     '-DKEYBOARD_PREVIEWER_EXEC="@0@"'.format(keyboard_previewer_exec)
   ]
 )
@@ -140,5 +141,21 @@ keyboard_panel_dep = declare_dependency(
   sources: [resources_ch[1]],
   link_with: keyboard_panel_lib,
 )
+
+i18n.merge_file(
+  input: configure_file(
+    input: 'org.gnome.controlcenter.keyboard.policy.in.in',
+    output: '@BASENAME@',
+    configuration: {
+      'libexecdir': control_center_libexecdir,
+    }
+  ),
+  output: '@BASENAME@',
+  po_dir: po_dir,
+  install: true,
+  install_dir: join_paths(control_center_datadir, 'polkit-1', 'actions')
+)
+
+install_data('gnome-control-center-set-debian-keyboard', install_dir: control_center_libexecdir)
 
 subdir('icons')

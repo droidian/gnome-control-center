@@ -1,0 +1,61 @@
+#!/bin/sh
+
+set -eu
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run as root." >&2
+    exit 1
+fi
+
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+    echo "Usage: $0 <layouts> <variants> [options]" >&2
+    exit 1
+fi
+
+LAYOUTS="$1"
+VARIANTS="$2"
+OPTIONS="${3:-}"
+
+KBD_FILE="/etc/default/keyboard"
+TMP_FILE="${KBD_FILE}.gis.tmp"
+
+# Explicit whitelist: letters, numbers, commas, underscores, hyphens, and colons.
+case "${LAYOUTS}${VARIANTS}${OPTIONS}" in
+    *[!a-zA-Z0-9,_:-]*)
+        echo "Error: Invalid characters detected in arguments." >&2
+        exit 1
+        ;;
+esac
+
+if [ ! -f "$KBD_FILE" ]; then
+    echo "Error: $KBD_FILE does not exist. Is keyboard-configuration installed?" >&2
+    exit 1
+fi
+
+echo "Updating ${KBD_FILE}..."
+
+# Clone the original file first to inherit its exact permissions and ownership.
+cp -p "$KBD_FILE" "$TMP_FILE"
+
+awk -v l="${LAYOUTS}" -v v="${VARIANTS}" -v o="${OPTIONS}" '
+/^XKBLAYOUT=/  { print "XKBLAYOUT=\"" l "\""; l_seen=1; next }
+/^XKBVARIANT=/ { print "XKBVARIANT=\"" v "\""; v_seen=1; next }
+/^XKBOPTIONS=/ { print "XKBOPTIONS=\"" o "\""; o_seen=1; next }
+{ print }
+END {
+    if (!l_seen) print "XKBLAYOUT=\"" l "\""
+    if (!v_seen) print "XKBVARIANT=\"" v "\""
+    if (!o_seen) print "XKBOPTIONS=\"" o "\""
+}
+' "$KBD_FILE" > "$TMP_FILE"
+
+# Atomic Swap
+mv "$TMP_FILE" "$KBD_FILE"
+
+echo "Synchronizing keyboard config to debconf database"
+
+# Forces the package to read our edited file, update its internal
+# debconf database, and apply the changes to the initramfs.
+DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true dpkg-reconfigure keyboard-configuration
+
+echo "Keyboard configuration successfully updated!"
